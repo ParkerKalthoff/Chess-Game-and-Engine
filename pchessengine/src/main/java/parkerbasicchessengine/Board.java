@@ -1,10 +1,20 @@
 package parkerbasicchessengine;
 
-import javax.swing.*;
-
-import parkerbasicchessengine.pieces.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+import parkerbasicchessengine.pieces.Bishop;
+import parkerbasicchessengine.pieces.King;
+import parkerbasicchessengine.pieces.Knight;
+import parkerbasicchessengine.pieces.Pawn;
+import parkerbasicchessengine.pieces.Piece;
+import parkerbasicchessengine.pieces.Queen;
+import parkerbasicchessengine.pieces.Rook;
 
 
 public class Board extends JPanel{
@@ -16,9 +26,54 @@ public class Board extends JPanel{
 
     ArrayList<Piece> pieceList = new ArrayList<>();
 
+    public Piece selectedPiece;
+
+    Input input = new Input(this);
+
     public Board(){
         this.setPreferredSize(new Dimension(cols * tileSize, rows * tileSize));
+        
+        this.addMouseListener(input);
+        this.addMouseMotionListener(input);
+        
         addPieces();
+    }
+
+    public Piece getPiece(int col, int row){
+
+        for(Piece piece : pieceList){
+            if(piece.col == col && piece.row == row){
+                return piece;
+            }
+        }
+
+        return null;
+    }
+
+    public void makeMove(Move move){
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+
+        move.piece.xPos = move.newCol * tileSize;
+        move.piece.yPos = move.newRow * tileSize;
+        
+        capture(move);
+    }
+
+    public void capture(Move move){
+        pieceList.remove(move.capture);
+    }
+
+    public boolean isValidMove(Move move){
+        // todo add more valid move checks
+
+        
+        return !sameTeam(move.piece, move.capture);
+
+    }
+
+    private boolean sameTeam(Piece piece1, Piece piece2){
+        return !(piece1 == null || piece2 == null || piece1.isWhite != piece2.isWhite);
     }
 
     public void addPieces(){

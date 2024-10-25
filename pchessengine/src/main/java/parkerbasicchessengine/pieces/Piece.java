@@ -1,12 +1,14 @@
 package parkerbasicchessengine.pieces;
 
 
-import parkerbasicchessengine.Board;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.*;
-import java.io.IOException;
+
+import parkerbasicchessengine.Board;
 
 public abstract class Piece {
 
