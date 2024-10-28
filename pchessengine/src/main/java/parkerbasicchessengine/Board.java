@@ -51,12 +51,15 @@ public class Board extends JPanel{
     }
 
     public void makeMove(Move move){
+
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
 
         move.piece.xPos = move.newCol * tileSize;
         move.piece.yPos = move.newRow * tileSize;
         
+        move.piece.isFirstMove = false;
+
         capture(move);
     }
 
@@ -65,10 +68,9 @@ public class Board extends JPanel{
     }
 
     public boolean isValidMove(Move move){
-        // todo add more valid move checks
-
-        
-        return !sameTeam(move.piece, move.capture);
+       
+        // returns true if move is legal for the respective piece and lands on an enemy piece or empty space
+        return move.piece.isValidMovement(move.newCol, move.newRow) && !sameTeam(move.piece, move.capture) && move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
 
     }
 
@@ -115,9 +117,10 @@ public class Board extends JPanel{
 
     }
 
+    
     public void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
-
+        // paints squares
         for(int rowIndex = 0; rowIndex < rows; rowIndex++){
             
             for(int colIndex = 0; colIndex < cols; colIndex++){
@@ -128,6 +131,20 @@ public class Board extends JPanel{
                     g2d.setColor(new Color(255,229,204));
                 }
                 g2d.fillRect(colIndex * tileSize, rowIndex * tileSize, tileSize, tileSize);
+            }
+        }
+
+        // paints valid piece movement tiles
+        if(selectedPiece != null){
+            for(int rowIndex = 0; rowIndex < rows; rowIndex++){
+            
+                for(int colIndex = 0; colIndex < cols; colIndex++){
+
+                    if(isValidMove(new Move(this, selectedPiece, rowIndex, colIndex))){
+                        g2d.setColor(new Color(68, 180, 57, 190));
+                        g2d.fillRect(rowIndex * tileSize, colIndex * tileSize, tileSize, tileSize);
+                    }
+                }
             }
         }
 

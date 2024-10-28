@@ -1,7 +1,10 @@
 package parkerbasicchessengine;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+
+import javax.swing.JFrame;
 
 public class Main {
     

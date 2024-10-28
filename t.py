@@ -4,7 +4,7 @@ def F(n : int):
   else:
     print(n)
     fib = F(n - 1) + F(n - 2)
-  print(fib)
+  print(n, fib)
   return fib
 
 F(4)
