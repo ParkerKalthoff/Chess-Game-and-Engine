@@ -67,12 +67,17 @@ public class Board extends JPanel{
         pieceList.remove(move.capture);
     }
 
-    public boolean isValidMove(Move move){
-       
-        // returns true if move is legal for the respective piece and lands on an enemy piece or empty space
-        return move.piece.isValidMovement(move.newCol, move.newRow) && !sameTeam(move.piece, move.capture) && move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
+    public boolean isValidMove(Move move) {
 
+        boolean isMovementPatternValid = move.piece.isValidMovement(move.newCol, move.newRow);
+        
+        boolean isTargetSquareValid = !sameTeam(move.piece, move.capture);
+        
+        boolean hasNoCollision = !move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
+    
+        return isMovementPatternValid && isTargetSquareValid && hasNoCollision;
     }
+    
 
     private boolean sameTeam(Piece piece1, Piece piece2){
         return !(piece1 == null || piece2 == null || piece1.isWhite != piece2.isWhite);
