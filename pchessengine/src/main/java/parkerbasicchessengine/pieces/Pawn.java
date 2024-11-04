@@ -49,6 +49,17 @@ public class Pawn extends Piece{
             return true;
         }
 
+        // En passant capture left
+        if (col == this.col - 1 && row == this.row - colorIndex && board.getTileNum(col, row) == board.enPassantTile &&  board.getPiece(col, this.row) != null &&  board.getPiece(col, this.row).isWhite != this.isWhite) {
+            return true;
+        }
+
+        // En passant capture right
+        if (col == this.col + 1 && row == this.row - colorIndex && board.getTileNum(col, row) == board.enPassantTile &&  board.getPiece(col, this.row) != null &&  board.getPiece(col, this.row).isWhite != this.isWhite) {
+            return true;
+        }
+
+
         return false;
     }
 }

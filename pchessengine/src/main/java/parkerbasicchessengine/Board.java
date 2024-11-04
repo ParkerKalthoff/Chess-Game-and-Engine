@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import parkerbasicchessengine.pieces.Bishop;
@@ -20,6 +21,8 @@ import parkerbasicchessengine.pieces.Rook;
 public class Board extends JPanel{
 
     public int tileSize = 85;
+
+    public int enPassantTile = -1;
 
     int rows = 8;
     int cols = 8;
@@ -52,6 +55,10 @@ public class Board extends JPanel{
 
     public void makeMove(Move move){
 
+        if(move.piece.name.equals("Pawn")){
+            movePawn(move);
+        } else {
+
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
 
@@ -60,11 +67,65 @@ public class Board extends JPanel{
         
         move.piece.isFirstMove = false;
 
-        capture(move);
+        capture(move.capture);
+        }
     }
 
-    public void capture(Move move){
-        pieceList.remove(move.capture);
+    public void movePawn(Move move){
+        
+        int colorIndex = move.piece.isWhite ? 1 : -1;
+
+        if(getTileNum(move.newCol, move.newRow) == this.enPassantTile){
+            move.capture = getPiece(move.newCol, move.newRow + colorIndex);
+        }
+
+        if(Math.abs(move.piece.row - move.newRow) == 2){
+            this.enPassantTile = getTileNum(move.newCol, move.newRow + colorIndex);
+        } else {
+            this.enPassantTile = -1;
+        }
+
+        // promote :D
+
+        colorIndex = move.piece.isWhite ? 0 : 7;
+
+        String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+        
+        int choice = JOptionPane.showOptionDialog(
+            null,
+            "Choose a piece for promotion:",
+            "Pawn Promotion",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+        
+        System.out.println(options[choice]);
+
+        if(move.newRow == colorIndex){
+            promotePawn(move);
+        }
+
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+
+        move.piece.xPos = move.newCol * tileSize;
+        move.piece.yPos = move.newRow * tileSize;
+        
+        move.piece.isFirstMove = false;
+
+        capture(move.capture);
+    }
+
+    public void promotePawn(Move move){
+        pieceList.add(new Queen(this, move.newCol, move.newRow, move.piece.isWhite));
+        capture(move.piece);
+    }    
+
+    public void capture(Piece piece){
+        pieceList.remove(piece);
     }
 
     public boolean isValidMove(Move move) {
@@ -120,6 +181,10 @@ public class Board extends JPanel{
         pieceList.add(new Knight(this, 6, 7, true));
         pieceList.add(new Rook(this, 7, 7, true));
 
+    }
+
+    public int getTileNum(int col, int row){
+        return row * 8 + col;
     }
 
     
