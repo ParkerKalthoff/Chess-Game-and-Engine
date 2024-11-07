@@ -20,7 +20,7 @@ public abstract class Piece {
     public int value;
     public boolean isFirstMove = true;
 
-    BufferedImage sheet;
+    public static BufferedImage sheet;
     {
         try{
             sheet = ImageIO.read(ClassLoader.getSystemResourceAsStream("pieces.png"));
@@ -29,7 +29,7 @@ public abstract class Piece {
         }
     }
 
-    protected int sheetScale = sheet.getWidth() / 6;
+    public int sheetScale = sheet.getWidth() / 6;
 
     Image sprite;
 

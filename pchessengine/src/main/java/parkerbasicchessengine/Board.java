@@ -4,10 +4,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import parkerbasicchessengine.pieces.Bishop;
 import parkerbasicchessengine.pieces.King;
@@ -87,25 +91,37 @@ public class Board extends JPanel{
 
         // promote :D
 
-        colorIndex = move.piece.isWhite ? 0 : 7;
-
-        String[] options = {"Queen", "Rook", "Bishop", "Knight"};
-        
-        int choice = JOptionPane.showOptionDialog(
-            null,
-            "Choose a piece for promotion:",
-            "Pawn Promotion",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            options,
-            options[0]
-        );
-        
-        System.out.println(options[choice]);
+        colorIndex = move.piece.isWhite ? 0 : 7;        
 
         if(move.newRow == colorIndex){
-            promotePawn(move);
+            
+            UIManager.put("OptionPane.background", Color.LIGHT_GRAY);
+            UIManager.put("Panel.background", Color.LIGHT_GRAY);
+
+            Image[] options = new Image[4];
+
+            options[0] = Piece.sheet.getSubimage(1 * move.piece.sheetScale, move.piece.isWhite ? 0 : move.piece.sheetScale, move.piece.sheetScale, move.piece.sheetScale).getScaledInstance(this.tileSize, this.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[1] = Piece.sheet.getSubimage(2 * move.piece.sheetScale, move.piece.isWhite ? 0 : move.piece.sheetScale, move.piece.sheetScale, move.piece.sheetScale).getScaledInstance(this.tileSize, this.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[2] = Piece.sheet.getSubimage(3 * move.piece.sheetScale, move.piece.isWhite ? 0 : move.piece.sheetScale, move.piece.sheetScale, move.piece.sheetScale).getScaledInstance(this.tileSize, this.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[3] = Piece.sheet.getSubimage(4 * move.piece.sheetScale, move.piece.isWhite ? 0 : move.piece.sheetScale, move.piece.sheetScale, move.piece.sheetScale).getScaledInstance(this.tileSize, this.tileSize, BufferedImage.SCALE_SMOOTH);
+            
+            ImageIcon[] icons = new ImageIcon[options.length];
+            for (int i = 0; i < options.length; i++) {
+                icons[i] = new ImageIcon(options[i]);
+            }
+
+            int choice = JOptionPane.showOptionDialog(
+                null,
+                "Choose a piece for promotion:",
+                "Pawn Promotion",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                icons,
+                icons[0]
+            );
+
+            promotePawn(move, choice + 1);
         }
 
         move.piece.col = move.newCol;
@@ -119,8 +135,16 @@ public class Board extends JPanel{
         capture(move.capture);
     }
 
-    public void promotePawn(Move move){
-        pieceList.add(new Queen(this, move.newCol, move.newRow, move.piece.isWhite));
+    public void promotePawn(Move move, int choice){
+
+        switch (choice) {
+            case 1 -> pieceList.add(new Queen(this, move.newCol, move.newRow, move.piece.isWhite));
+            case 2 -> pieceList.add(new Bishop(this, move.newCol, move.newRow, move.piece.isWhite));
+            case 3 -> pieceList.add(new Knight(this, move.newCol, move.newRow, move.piece.isWhite));
+            case 4 -> pieceList.add(new Rook(this, move.newCol, move.newRow, move.piece.isWhite));
+            default -> throw new AssertionError();
+        }
+
         capture(move.piece);
     }    
 
