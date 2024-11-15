@@ -22,7 +22,11 @@ public class Pawn extends Piece{
     
     @Override
     public boolean isValidMovement(int col, int row){
-        
+
+        if(col >= 8 || col <= -1 || row >= 8 || row <= -1){
+            return false;
+        }
+
         int colorIndex = isWhite ? 1 : -1;
 
         // Pawn forward 1

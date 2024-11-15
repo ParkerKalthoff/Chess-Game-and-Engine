@@ -21,6 +21,11 @@ public class Knight extends Piece{
     }
 
     public boolean isValidMovement(int col, int row){
+
+        if(col >= 8 || col <= -1 || row >= 8 || row <= -1){
+            return false;
+        }
+
         return Math.abs(col - this.col) * Math.abs(row - this.row) == 2;
     }
 }

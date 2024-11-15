@@ -37,22 +37,36 @@ public class Board extends JPanel{
 
     Input input = new Input(this);
 
+    CheckScanner checkScanner = new CheckScanner(this);
+
     public Board(){
-        this.setPreferredSize(new Dimension(cols * tileSize, rows * tileSize));
+        this.setPreferredSize(new Dimension(this.cols * this.tileSize, this.rows * this.tileSize));
         
-        this.addMouseListener(input);
-        this.addMouseMotionListener(input);
+        this.addMouseListener(this.input);
+        this.addMouseMotionListener(this.input);
         
         addPieces();
     }
 
     public Piece getPiece(int col, int row){
 
-        for(Piece piece : pieceList){
+        for(Piece piece : this.pieceList){
             if(piece.col == col && piece.row == row){
                 return piece;
             }
         }
+
+        return null;
+    }
+
+    public King findKing(boolean isWhite){
+
+        for(Piece piece : this.pieceList){
+            if(piece instanceof King && piece.isWhite == isWhite){
+                return (King) piece;
+            }
+        }
+        System.out.println("No king!");
 
         return null;
     }
@@ -66,8 +80,8 @@ public class Board extends JPanel{
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
 
-        move.piece.xPos = move.newCol * tileSize;
-        move.piece.yPos = move.newRow * tileSize;
+        move.piece.xPos = move.newCol * this.tileSize;
+        move.piece.yPos = move.newRow * this.tileSize;
         
         move.piece.isFirstMove = false;
 
@@ -127,8 +141,8 @@ public class Board extends JPanel{
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
 
-        move.piece.xPos = move.newCol * tileSize;
-        move.piece.yPos = move.newRow * tileSize;
+        move.piece.xPos = move.newCol * this.tileSize;
+        move.piece.yPos = move.newRow * this.tileSize;
         
         move.piece.isFirstMove = false;
 
@@ -159,12 +173,14 @@ public class Board extends JPanel{
         boolean isTargetSquareValid = !sameTeam(move.piece, move.capture);
         
         boolean hasNoCollision = !move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
+
+        boolean kingIsSafe = !checkScanner.isKingChecked(move);
     
-        return isMovementPatternValid && isTargetSquareValid && hasNoCollision;
+        return isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
     }
     
 
-    private boolean sameTeam(Piece piece1, Piece piece2){
+    public boolean sameTeam(Piece piece1, Piece piece2){
         return !(piece1 == null || piece2 == null || piece1.isWhite != piece2.isWhite);
     }
 

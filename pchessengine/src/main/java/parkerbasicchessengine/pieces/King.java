@@ -22,6 +22,11 @@ public class King extends Piece{
 
     @Override
     public boolean isValidMovement(int col, int row){
+
+        if(col >= 8 || col <= -1 || row >= 8 || row <= -1){
+            return false;
+        }
+
         return Math.abs((col - this.col) * (row - this.row)) == 1 || Math.abs((col - this.col)) + Math.abs((row - this.row)) == 1;
     }
 
