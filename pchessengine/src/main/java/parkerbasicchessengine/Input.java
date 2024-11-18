@@ -11,49 +11,52 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import parkerbasicchessengine.pieces.Bishop;
+import parkerbasicchessengine.pieces.Knight;
 import parkerbasicchessengine.pieces.Piece;
 import parkerbasicchessengine.pieces.Queen;
+import parkerbasicchessengine.pieces.Rook;
 
 public class Input extends MouseAdapter {
 
     Board board;
 
-    public Input(Board board){
+    public Input(Board board) {
         this.board = board;
     }
-    
-    
-        @Override
+
+    @Override
     public void mousePressed(MouseEvent e) {
         int col = e.getX() / board.tileSize;
         int row = e.getY() / board.tileSize;
-    
+
         Piece pieceXY = board.getPiece(col, row);
-    
-        if(pieceXY != null){
+
+        if (pieceXY != null) {
             board.selectedPiece = pieceXY;
         }
     }
-    
+
     @Override
     public void mouseDragged(MouseEvent e) {
-        if(board.selectedPiece != null) {
+        if (board.selectedPiece != null) {
             board.selectedPiece.xPos = e.getX() - board.tileSize / 2;
             board.selectedPiece.yPos = e.getY() - board.tileSize / 2;
-        
+
             board.repaint();
         }
     }
-    
+
     @Override
-    public void mouseReleased(MouseEvent e) {   
-        if(board.selectedPiece != null) {
+    public void mouseReleased(MouseEvent e) {
+        if (board.selectedPiece != null) {
+
+            Move move;
             int col = e.getX() / board.tileSize;
             int row = e.getY() / board.tileSize;
-        
-            int colorIndex = board.selectedPiece.isWhite ? 0 : 7;        
 
-            if(row == colorIndex){
+            int colorIndex = board.selectedPiece.isWhite ? 0 : 7;
+
+            if (row == colorIndex) {
 
                 UIManager.put("OptionPane.background", Color.LIGHT_GRAY);
                 UIManager.put("Panel.background", Color.LIGHT_GRAY);
@@ -71,38 +74,47 @@ public class Input extends MouseAdapter {
                 }
 
                 int choice = JOptionPane.showOptionDialog(
-                    null,
-                    "Choose a piece for promotion:",
-                    "Pawn Promotion",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    icons,
-                    icons[0]
+                        null,
+                        "Choose a piece for promotion:",
+                        "Pawn Promotion",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        icons,
+                        icons[0]
                 );
 
-                Piece promoteToPiece = switch(choice){
-                                    case 1 -> new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                                    case 2 -> new Bishop(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                                    case 3 -> new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite); 
-                                    case 4 -> new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                                    default -> throw new IllegalArgumentException("Unexpected value: " + choice);
+                Piece promoteToPiece = switch (choice) {
+                    case 1 ->
+                        new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                    case 2 ->
+                        new Bishop(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                    case 3 ->
+                        new Knight(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                    case 4 ->
+                        new Rook(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                    default ->
+                        throw new IllegalArgumentException("Unexpected value: " + choice);
                 };
 
                 promoteToPiece.isFirstMove = false;
-                
-                Move move = new Move(board, board.selectedPiece, col, row, promoteToPiece);
-                
-                if(board.isValidMove(move)){
-                    board.makeMove(move);
-                } else {
-                    board.selectedPiece.xPos = board.selectedPiece.col * board.tileSize;
-                    board.selectedPiece.yPos = board.selectedPiece.row * board.tileSize;
-                }
-        
-            board.selectedPiece = null;
-            board.repaint();
+
+                move = new Move(board, board.selectedPiece, col, row, promoteToPiece);
+
+            } else {
+                move = new Move(board, board.selectedPiece, col, row);
             }
+
+            if (board.isValidMove(move)) {
+                board.makeMove(move);
+            } else {
+                board.selectedPiece.xPos = board.selectedPiece.col * board.tileSize;
+                board.selectedPiece.yPos = board.selectedPiece.row * board.tileSize;
+            }
+            
+            //board.selectedPiece = null;
+            board.repaint();
+
         }
     }
 }

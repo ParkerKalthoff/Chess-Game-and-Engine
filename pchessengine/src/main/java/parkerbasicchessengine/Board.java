@@ -1,13 +1,12 @@
 package parkerbasicchessengine;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-
-import parkerbasicchessengine.Move;
-
 
 import parkerbasicchessengine.pieces.Bishop;
 import parkerbasicchessengine.pieces.King;
@@ -99,10 +98,7 @@ public class Board extends JPanel{
             this.enPassantTile = -1;
         }
 
-        // promote :D
-
-            capture(move.piece);
-        }
+        // promote :D   
 
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
