@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 
 import parkerbasicchessengine.pieces.Bishop;
 import parkerbasicchessengine.pieces.Knight;
+import parkerbasicchessengine.pieces.Pawn;
 import parkerbasicchessengine.pieces.Piece;
 import parkerbasicchessengine.pieces.Queen;
 import parkerbasicchessengine.pieces.Rook;
@@ -48,73 +49,75 @@ public class Input extends MouseAdapter {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (board.selectedPiece != null) {
-
-            Move move;
-            int col = e.getX() / board.tileSize;
-            int row = e.getY() / board.tileSize;
-
-            int colorIndex = board.selectedPiece.isWhite ? 0 : 7;
-
-            if (row == colorIndex) {
-
-                UIManager.put("OptionPane.background", Color.LIGHT_GRAY);
-                UIManager.put("Panel.background", Color.LIGHT_GRAY);
-
-                Image[] options = new Image[4];
-
-                options[0] = Piece.sheet.getSubimage(1 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
-                options[1] = Piece.sheet.getSubimage(2 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
-                options[2] = Piece.sheet.getSubimage(3 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
-                options[3] = Piece.sheet.getSubimage(4 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
-
-                ImageIcon[] icons = new ImageIcon[options.length];
-                for (int i = 0; i < options.length; i++) {
-                    icons[i] = new ImageIcon(options[i]);
-                }
-
-                int choice = JOptionPane.showOptionDialog(
-                        null,
-                        "Choose a piece for promotion:",
-                        "Pawn Promotion",
-                        JOptionPane.DEFAULT_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        icons,
-                        icons[0]
-                );
-
-                Piece promoteToPiece = switch (choice) {
-                    case 1 ->
-                        new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                    case 2 ->
-                        new Bishop(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                    case 3 ->
-                        new Knight(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                    case 4 ->
-                        new Rook(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
-                    default ->
-                        throw new IllegalArgumentException("Unexpected value: " + choice);
-                };
-
-                promoteToPiece.isFirstMove = false;
-
-                move = new Move(board, board.selectedPiece, col, row, promoteToPiece);
-
-            } else {
-                move = new Move(board, board.selectedPiece, col, row);
-            }
-
-            if (board.isValidMove(move)) {
-                board.makeMove(move);
-            } else {
-                board.selectedPiece.xPos = board.selectedPiece.col * board.tileSize;
-                board.selectedPiece.yPos = board.selectedPiece.row * board.tileSize;
-            }
-            
-            //board.selectedPiece = null;
-            board.repaint();
-
+        if (board.selectedPiece == null) {
+            // No piece selected
+            return;
         }
+
+        Move move;
+        int col = e.getX() / board.tileSize;
+        int row = e.getY() / board.tileSize;
+
+        int colorIndex = board.selectedPiece.isWhite ? 0 : 7;
+
+        if (board.selectedPiece instanceof Pawn && row == colorIndex && (col == board.selectedPiece.col || col == board.selectedPiece.col + 1 || col == board.selectedPiece.col - 1)) {
+
+            UIManager.put("OptionPane.background", Color.LIGHT_GRAY);
+            UIManager.put("Panel.background", Color.LIGHT_GRAY);
+
+            Image[] options = new Image[4];
+
+            options[0] = Piece.sheet.getSubimage(1 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[1] = Piece.sheet.getSubimage(2 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[2] = Piece.sheet.getSubimage(3 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
+            options[3] = Piece.sheet.getSubimage(4 * board.selectedPiece.sheetScale, board.selectedPiece.isWhite ? 0 : board.selectedPiece.sheetScale, board.selectedPiece.sheetScale, board.selectedPiece.sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
+
+            ImageIcon[] icons = new ImageIcon[options.length];
+            for (int i = 0; i < options.length; i++) {
+                icons[i] = new ImageIcon(options[i]);
+            }
+
+            int choice = JOptionPane.showOptionDialog(
+                    null,
+                    "Choose a piece for promotion:",
+                    "Pawn Promotion",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    icons,
+                    icons[0]
+            );
+
+            Piece promoteToPiece = switch (choice) {
+                case 0 ->
+                    new Queen(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                case 1 ->
+                    new Bishop(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                case 2 ->
+                    new Knight(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                case 3 ->
+                    new Rook(board, board.selectedPiece.col, board.selectedPiece.row, board.selectedPiece.isWhite);
+                default ->
+                    throw new IllegalArgumentException("Unexpected value: " + choice);
+            };
+
+            promoteToPiece.isFirstMove = false;
+
+            move = new Move(board, board.selectedPiece, col, row, promoteToPiece);
+
+        } else {
+            move = new Move(board, board.selectedPiece, col, row);
+        }
+
+        if (board.isValidMove(move)) {
+            board.makeMove(move);
+        } else {
+            board.selectedPiece.xPos = board.selectedPiece.col * board.tileSize;
+            board.selectedPiece.yPos = board.selectedPiece.row * board.tileSize;
+        }
+
+        board.selectedPiece = null;
+        board.repaint();
+
     }
 }

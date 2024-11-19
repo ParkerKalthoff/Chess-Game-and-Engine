@@ -16,8 +16,7 @@ import parkerbasicchessengine.pieces.Piece;
 import parkerbasicchessengine.pieces.Queen;
 import parkerbasicchessengine.pieces.Rook;
 
-
-public class Board extends JPanel{
+public class Board extends JPanel {
 
     public int tileSize = 85;
 
@@ -34,19 +33,19 @@ public class Board extends JPanel{
 
     CheckScanner checkScanner = new CheckScanner(this);
 
-    public Board(){
+    public Board() {
         this.setPreferredSize(new Dimension(this.cols * this.tileSize, this.rows * this.tileSize));
-        
+
         this.addMouseListener(this.input);
         this.addMouseMotionListener(this.input);
-        
+
         addPieces();
     }
 
-    public Piece getPiece(int col, int row){
+    public Piece getPiece(int col, int row) {
 
-        for(Piece piece : this.pieceList){
-            if(piece.col == col && piece.row == row){
+        for (Piece piece : this.pieceList) {
+            if (piece.col == col && piece.row == row) {
                 return piece;
             }
         }
@@ -54,10 +53,10 @@ public class Board extends JPanel{
         return null;
     }
 
-    public King findKing(boolean isWhite){
+    public King findKing(boolean isWhite) {
 
-        for(Piece piece : this.pieceList){
-            if(piece instanceof King && piece.isWhite == isWhite){
+        for (Piece piece : this.pieceList) {
+            if (piece instanceof King && piece.isWhite == isWhite) {
                 return (King) piece;
             }
         }
@@ -66,74 +65,75 @@ public class Board extends JPanel{
         return null;
     }
 
-    public void makeMove(Move move){
-
-        if(move.piece.name.equals("Pawn")){
+    public void makeMove(Move move) {
+        if (move.piece instanceof Pawn) {
             movePawn(move);
         } else {
-
-        move.piece.col = move.newCol;
-        move.piece.row = move.newRow;
-
-        move.piece.xPos = move.newCol * this.tileSize;
-        move.piece.yPos = move.newRow * this.tileSize;
-        
-        move.piece.isFirstMove = false;
-
-        capture(move.capture);
+            move.piece.col = move.newCol;
+            move.piece.row = move.newRow;
+    
+            move.piece.xPos = move.newCol * tileSize;
+            move.piece.yPos = move.newRow * tileSize;
+            move.piece.isFirstMove = false;
+    
+            capture(move.capture);
         }
     }
 
-    public void movePawn(Move move){
-        
+    public void movePawn(Move move) {
         int colorIndex = move.piece.isWhite ? 1 : -1;
 
-        if(getTileNum(move.newCol, move.newRow) == this.enPassantTile){
+        if (getTileNum(move.newCol, move.newRow) == this.enPassantTile) {
             move.capture = getPiece(move.newCol, move.newRow + colorIndex);
         }
 
-        if(Math.abs(move.piece.row - move.newRow) == 2){
+        if (Math.abs(move.piece.row - move.newRow) == 2) {
             this.enPassantTile = getTileNum(move.newCol, move.newRow + colorIndex);
         } else {
             this.enPassantTile = -1;
         }
 
-        // promote :D   
+        // Handle Promotion
+        if (move.piece instanceof Pawn && (move.newRow == 0 || move.newRow == 7)) {
+            pieceList.remove(move.piece); // Remove the pawn
+            pieceList.add(move.promotedToPiece); // Add the promoted piece
+            move.piece = move.promotedToPiece;
+        }
 
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
-
         move.piece.xPos = move.newCol * this.tileSize;
         move.piece.yPos = move.newRow * this.tileSize;
-        
         move.piece.isFirstMove = false;
+        
 
-        capture(move.capture);
-    }  
+        capture(move.capture); // Capture any opponent piece
+    }
 
-    public void capture(Piece piece){
+    
+
+    public void capture(Piece piece) {
         pieceList.remove(piece);
     }
 
     public boolean isValidMove(Move move) {
 
         boolean isMovementPatternValid = move.piece.isValidMovement(move.newCol, move.newRow);
-        
+
         boolean isTargetSquareValid = !sameTeam(move.piece, move.capture);
-        
+
         boolean hasNoCollision = !move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
 
         boolean kingIsSafe = !checkScanner.isKingChecked(move);
-    
+
         return isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
     }
-    
 
-    public boolean sameTeam(Piece piece1, Piece piece2){
+    public boolean sameTeam(Piece piece1, Piece piece2) {
         return !(piece1 == null || piece2 == null || piece1.isWhite != piece2.isWhite);
     }
 
-    public void addPieces(){
+    public void addPieces() {
         // Black
 
         // Back rank
@@ -146,17 +146,14 @@ public class Board extends JPanel{
         pieceList.add(new Knight(this, 6, 0, false));
         pieceList.add(new Rook(this, 7, 0, false));
 
-        
         // Pawns
-
-        for(int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             pieceList.add(new Pawn(this, i, 1, false));
         }
 
         // White
         // Pawns
-
-        for(int i = 0; i < 8; i++){
+        for (int i = 0; i < 8; i++) {
             pieceList.add(new Pawn(this, i, 6, true));
         }
 
@@ -172,34 +169,33 @@ public class Board extends JPanel{
 
     }
 
-    public int getTileNum(int col, int row){
+    public int getTileNum(int col, int row) {
         return row * 8 + col;
     }
 
-    
-    public void paintComponent(Graphics g){
+    public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         // paints squares
-        for(int rowIndex = 0; rowIndex < rows; rowIndex++){
-            
-            for(int colIndex = 0; colIndex < cols; colIndex++){
+        for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
 
-                if((rowIndex + colIndex) % 2 == 0){
-                    g2d.setColor(new Color(153,76,0));
+            for (int colIndex = 0; colIndex < cols; colIndex++) {
+
+                if ((rowIndex + colIndex) % 2 == 0) {
+                    g2d.setColor(new Color(153, 76, 0));
                 } else {
-                    g2d.setColor(new Color(255,229,204));
+                    g2d.setColor(new Color(255, 229, 204));
                 }
                 g2d.fillRect(colIndex * tileSize, rowIndex * tileSize, tileSize, tileSize);
             }
         }
 
         // paints valid piece movement tiles
-        if(selectedPiece != null){
-            for(int rowIndex = 0; rowIndex < rows; rowIndex++){
-            
-                for(int colIndex = 0; colIndex < cols; colIndex++){
+        if (selectedPiece != null) {
+            for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
 
-                    if(isValidMove(new Move(this, selectedPiece, rowIndex, colIndex))){
+                for (int colIndex = 0; colIndex < cols; colIndex++) {
+
+                    if (isValidMove(new Move(this, selectedPiece, rowIndex, colIndex))) {
                         g2d.setColor(new Color(68, 180, 57, 190));
                         g2d.fillRect(rowIndex * tileSize, colIndex * tileSize, tileSize, tileSize);
                     }
@@ -207,7 +203,7 @@ public class Board extends JPanel{
             }
         }
 
-        for(Piece piece : pieceList){
+        for (Piece piece : pieceList) {
             piece.paint(g2d);
         }
 
