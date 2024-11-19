@@ -31,7 +31,7 @@ public class Board extends JPanel {
 
     Input input = new Input(this);
 
-    CheckScanner checkScanner = new CheckScanner(this);
+    public CheckScanner checkScanner = new CheckScanner(this);
 
     public Board() {
         this.setPreferredSize(new Dimension(this.cols * this.tileSize, this.rows * this.tileSize));
@@ -66,18 +66,40 @@ public class Board extends JPanel {
     }
 
     public void makeMove(Move move) {
+
         if (move.piece instanceof Pawn) {
             movePawn(move);
-        } else {
-            move.piece.col = move.newCol;
-            move.piece.row = move.newRow;
-    
-            move.piece.xPos = move.newCol * tileSize;
-            move.piece.yPos = move.newRow * tileSize;
-            move.piece.isFirstMove = false;
-    
-            capture(move.capture);
         }
+
+        if (move.piece instanceof King) {
+            moveKing(move);
+        }
+
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+        move.piece.xPos = move.newCol * this.tileSize;
+        move.piece.yPos = move.newRow * this.tileSize;
+        move.piece.isFirstMove = false;
+
+        capture(move.capture);
+    }
+
+    public void moveKing(Move move) {
+
+        if (Math.abs(move.piece.col - move.newCol) == 2) {
+            Piece rook;
+
+            if (move.piece.col < move.newCol) {
+                rook = getPiece(7, move.piece.row);
+                rook.col = 5;
+            } else {
+                rook = getPiece(0, move.piece.row);
+                rook.col = 3;
+            }
+            rook.xPos = rook.col * this.tileSize;
+
+        }
+
     }
 
     public void movePawn(Move move) {
@@ -95,22 +117,11 @@ public class Board extends JPanel {
 
         // Handle Promotion
         if (move.piece instanceof Pawn && (move.newRow == 0 || move.newRow == 7)) {
-            pieceList.remove(move.piece); // Remove the pawn
-            pieceList.add(move.promotedToPiece); // Add the promoted piece
+            pieceList.remove(move.piece);
+            pieceList.add(move.promotedToPiece);
             move.piece = move.promotedToPiece;
         }
-
-        move.piece.col = move.newCol;
-        move.piece.row = move.newRow;
-        move.piece.xPos = move.newCol * this.tileSize;
-        move.piece.yPos = move.newRow * this.tileSize;
-        move.piece.isFirstMove = false;
-        
-
-        capture(move.capture); // Capture any opponent piece
     }
-
-    
 
     public void capture(Piece piece) {
         pieceList.remove(piece);
@@ -203,7 +214,7 @@ public class Board extends JPanel {
             }
         }
 
-        for (Piece piece : pieceList) {
+        for (Piece piece : this.pieceList) {
             piece.paint(g2d);
         }
 
