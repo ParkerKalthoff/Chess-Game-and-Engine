@@ -40,14 +40,19 @@ public class King extends Piece {
         if (col == 6) {
             Piece rook = board.getPiece(7, row);
             if (rook != null && rook.isFirstMove && this.isFirstMove) {
-                return board.getPiece(5, row) == null && board.getPiece(6, row) == null && !board.checkScanner.isKingChecked(new Move(board, this, 5, row));
+                return board.getPiece(5, row) == null 
+                    && board.getPiece(6, row) == null 
+                    && !board.checkScanner.isKingChecked(new Move(board, this, 5, row));
             }
-        }
+        } 
 
         if (col == 2) {
             Piece rook = board.getPiece(0, row);
             if (rook != null && rook.isFirstMove && this.isFirstMove) {
-                return board.getPiece(3, row) == null && board.getPiece(2, row) == null && board.getPiece(1, row) == null && !board.checkScanner.isKingChecked(new Move(board, this, 5, row));
+                return board.getPiece(3, row) == null 
+                    && board.getPiece(2, row) == null 
+                    && board.getPiece(1, row) == null 
+                    && !board.checkScanner.isKingChecked(new Move(board, this, 3, row));
             }
         }
 

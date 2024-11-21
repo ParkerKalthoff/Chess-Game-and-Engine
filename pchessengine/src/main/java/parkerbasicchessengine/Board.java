@@ -60,7 +60,6 @@ public class Board extends JPanel {
                 return (King) piece;
             }
         }
-        System.out.println("No king!");
 
         return null;
     }
@@ -84,7 +83,7 @@ public class Board extends JPanel {
         capture(move.capture);
     }
 
-    public void moveKing(Move move) {
+    private void moveKing(Move move) {
 
         if (Math.abs(move.piece.col - move.newCol) == 2) {
             Piece rook;
@@ -136,6 +135,14 @@ public class Board extends JPanel {
         boolean hasNoCollision = !move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
 
         boolean kingIsSafe = !checkScanner.isKingChecked(move);
+
+        //if(move.piece instanceof King && move.newRow == (move.piece.isWhite ? 7 : 0) && (move.newCol == 2 || move.newCol == 6)){
+        //    return true;
+        //}
+
+        if(move.piece instanceof King king && king.canCastle(move.newCol, move.newRow)){ 
+            return isTargetSquareValid && hasNoCollision && kingIsSafe;
+        }
 
         return isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
     }
