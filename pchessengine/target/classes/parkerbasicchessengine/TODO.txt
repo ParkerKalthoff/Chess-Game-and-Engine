@@ -1,2 +1,5 @@
-1) promotion
-2) 
+1) stalemate by insufficeint materials
+2) main menu
+    a) time
+    b) select color
+3) fen string support

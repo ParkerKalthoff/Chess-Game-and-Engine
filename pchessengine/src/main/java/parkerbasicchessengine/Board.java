@@ -29,6 +29,9 @@ public class Board extends JPanel {
 
     public Piece selectedPiece;
 
+    private boolean isWhiteToMove = true;
+    private boolean isGameOver = false;
+
     Input input = new Input(this);
 
     public CheckScanner checkScanner = new CheckScanner(this);
@@ -81,6 +84,10 @@ public class Board extends JPanel {
         move.piece.isFirstMove = false;
 
         capture(move.capture);
+
+        this.isWhiteToMove = !this.isWhiteToMove;
+
+        updateGameState();
     }
 
     private void moveKing(Move move) {
@@ -128,6 +135,8 @@ public class Board extends JPanel {
 
     public boolean isValidMove(Move move) {
 
+        boolean isCorrectTurn = move.piece.isWhite == this.isWhiteToMove;
+
         boolean isMovementPatternValid = move.piece.isValidMovement(move.newCol, move.newRow);
 
         boolean isTargetSquareValid = !sameTeam(move.piece, move.capture);
@@ -141,10 +150,10 @@ public class Board extends JPanel {
         //}
 
         if(move.piece instanceof King king && king.canCastle(move.newCol, move.newRow)){ 
-            return isTargetSquareValid && hasNoCollision && kingIsSafe;
+            return isCorrectTurn && isTargetSquareValid && hasNoCollision && kingIsSafe;
         }
 
-        return isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
+        return isCorrectTurn && isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
     }
 
     public boolean sameTeam(Piece piece1, Piece piece2) {
@@ -185,6 +194,17 @@ public class Board extends JPanel {
         pieceList.add(new Knight(this, 6, 7, true));
         pieceList.add(new Rook(this, 7, 7, true));
 
+    }
+
+    private void updateGameState(){
+        Piece king = findKing(this.isWhiteToMove);
+        if(checkScanner.isGameOver(king)){
+            if(checkScanner.isKingChecked(new Move(this, king, king.col, king.row))){
+                System.out.println(isWhiteToMove ? "Black Wins" : "White Wins");
+            } else {
+                System.out.println("Stalemate");
+            }
+        }
     }
 
     public int getTileNum(int col, int row) {
