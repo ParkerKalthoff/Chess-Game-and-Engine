@@ -285,21 +285,80 @@ public class Board extends JPanel {
         }
 
         int openSpaces = 0;
-        String fenString;
 
-        for(int i = 0; i < 64; i++){
-            if(pieces[i] == null){
-                openSpaces++;
-                continue;
-            } else {
+        StringBuilder fenString = new StringBuilder("");        
 
-                if(openSpaces != 0){
-                    
+        // build position
+        for (int i = 0; i < 64; i++) {
+
+            if (pieces[i] != null) {
+                if (openSpaces > 0) {
+                    fenString.append(openSpaces);
+                    openSpaces = 0;
                 }
-
+                fenString.append(pieces[i].abbreviation);
+            } else {
+                openSpaces++;
             }
-            
+    
+            if ((i + 1) % 8 == 0) {
+                if (openSpaces > 0) {
+                    fenString.append(openSpaces);
+                    openSpaces = 0;
+                }
+                if (i != 63) {
+                    fenString.append("/");
+                }
+            }
         }
+
+        // turn
+        fenString.append(" ");
+        fenString.append(this.isWhiteToMove ? "w" : "b");
+
+        // castling rights
+
+        fenString.append(" ");
+        boolean blankCastlingString = true;
+
+        Piece wkr = getPiece(7, 7);
+        if(wkr instanceof Rook && wkr.isWhite == true && wkr.isFirstMove && this.findKing(true).isFirstMove){
+            fenString.append("K");
+            blankCastlingString = false;
+        }
+        Piece wqr = getPiece(0, 7);
+        if(wqr instanceof Rook && wqr.isWhite == true && wqr.isFirstMove && this.findKing(true).isFirstMove){
+            fenString.append("Q");
+            blankCastlingString = false;
+        }
+        Piece bkr = getPiece(7, 0);
+        if(bkr instanceof Rook && bkr.isWhite == false && bkr.isFirstMove && this.findKing(false).isFirstMove){
+            fenString.append("k");
+            blankCastlingString = false;
+        }
+        Piece bqr = getPiece(0, 0);
+        if(bqr instanceof Rook && bqr.isWhite == false && bqr.isFirstMove && this.findKing(false).isFirstMove){
+            fenString.append("q");
+            blankCastlingString = false;
+        }
+
+        if(blankCastlingString){
+            fenString.append("-");
+        }
+
+        // enpassant
+        fenString.append(" ");
+        fenString.append(this.enPassantTile == -1 ? "-" : "" + ((char) ('a' + this.enPassantTile % 8)) + (8 - (this.enPassantTile / 8)));
+
+        // half move 
+        fenString.append(" ");
+        fenString.append(this.halfMoveClock / 2);
+
+        // full move
+        fenString.append(" ");
+        fenString.append(this.fullMoveCounter);
+
+        return fenString.toString();
     }
 
     private boolean insufficientMaterial(boolean isWhite){
