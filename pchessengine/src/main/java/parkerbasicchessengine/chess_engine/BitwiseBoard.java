@@ -9,10 +9,46 @@ public class BitwiseBoard {
     public int halfMoveClock;
     public int fullMoveCounter;
 
-    public BitwiseBoard(String fenString){
-        String parts[] = fenString.split("");
+    public BitwiseBoard(String fenString) {
+        String parts[] = fenString.split(" ");
+        char piecePlacementChars[] = parts[0].toCharArray();
+    
+        for (int i = 0; i < piecePlacementChars.length; i++) {
+    
+            if (piecePlacementChars[i] == '/') {
+                continue;
+            }
+    
+            if (Character.isDigit(piecePlacementChars[i])) {
+                i += Character.getNumericValue(piecePlacementChars[i]) - 1;
+                continue;
+            }
+    
+            boolean team = Character.isUpperCase(piecePlacementChars[i]) ? 0 : 1;
+    
+            switch (Character.toUpperCase(piecePlacementChars[i])) {
+                case 'P':
+                    piece_bitboards[team][5] |= (1L << i);
+                    break;
+                case 'K':
+                    piece_bitboards[team][0] |= (1L << i);
+                    break;
+                case 'Q':
+                    piece_bitboards[team][1] |= (1L << i);
+                    break;
+                case 'B':
+                    piece_bitboards[team][2] |= (1L << i);
+                    break;
+                case 'R':
+                    piece_bitboards[team][4] |= (1L << i);
+                    break;
+                case 'N':
+                    piece_bitboards[team][3] |= (1L << i);
+                    break;
+            }
+        }
 
-        String piecePlacement = parts[0];
+    
 
         this.whiteToMove = parts[1].equals("w");
 
