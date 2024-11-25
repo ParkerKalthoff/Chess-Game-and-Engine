@@ -11,6 +11,7 @@ public class Knight extends Piece{
         this.col = col;
         this.row = row;
         this.isWhite = isWhite;
+        this.abbreviation = isWhite ? 'N' : 'n';
 
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;

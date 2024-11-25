@@ -11,6 +11,9 @@ public class Pawn extends Piece{
         this.col = col;
         this.row = row;
         this.isWhite = isWhite;
+        this.abbreviation = isWhite ? 'P' : 'p';
+
+        this.isFirstMove = (this.isWhite && row == 6) || (!this.isWhite && row == 1);
 
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;

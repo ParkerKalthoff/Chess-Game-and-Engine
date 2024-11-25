@@ -16,6 +16,7 @@ public abstract class Piece {
 
     public boolean isWhite;
     public String name;
+    public char abbreviation;
     public int value;
     public boolean isFirstMove = true;
 
