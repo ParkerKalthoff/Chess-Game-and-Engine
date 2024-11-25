@@ -18,6 +18,9 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
+        boolean playerOneIsHuman = true;
+        boolean playerTwoIsHuman = true;
+
         Board board = new Board();
         frame.add(board);
 

@@ -47,4 +47,12 @@ public abstract class Piece {
         g2d.drawImage(sprite, xPos, yPos, null);
     }
 
+    public int index(){
+        return this.row * 8 + this.col;
+    }
+
+    public String coord(){
+        return "" + ((char) ('A' + col)) + (8 - row);
+    }
+
 }
