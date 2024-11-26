@@ -8,7 +8,10 @@ import javax.swing.JFrame;
 
 public class Main {
     
+    public final static boolean ai_verses_ai = false;
+    
     public static void main(String[] args){
+
 
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
@@ -18,8 +21,10 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
-        boolean playerOneIsHuman = true;
-        boolean playerTwoIsHuman = true;
+        // boolean playerOneIsHuman = true;
+        // boolean playerTwoIsHuman = true;
+
+
 
         Board board = new Board();
         frame.add(board);

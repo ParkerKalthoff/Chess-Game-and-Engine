@@ -39,8 +39,10 @@ public class Board extends JPanel {
     public int halfMoveClock = 0;
     public int fullMoveCounter = 1;
 
-    private boolean isWhiteToMove = true;
+    public boolean isWhiteToMove = true;
     public boolean isGameOver = false;
+
+    public String gameState = "";
 
     Input input = new Input(this);
 
@@ -260,21 +262,22 @@ public class Board extends JPanel {
         Piece king = findKing(this.isWhiteToMove);
 
         if(insufficientMaterial(true) && insufficientMaterial(false)) {
-            System.out.println("Insufficient Material");
-            this.isGameOver = true;
+            this.gameState = "Insufficient Material";
         }
 
         if(checkScanner.isGameOver(king)){
             if(checkScanner.isKingChecked(new Move(this, king, king.col, king.row))){
-                System.out.println(this.isWhiteToMove ? "Black Wins" : "White Wins");
+                this.gameState = this.isWhiteToMove ? "Black Wins" : "White Wins";
             } else {
-                System.out.println("Stalemate");
+                this.gameState = "Stalemate";
             }
-            this.isGameOver = true;
         }
 
         if(this.halfMoveClock >= 100){
-            System.out.println("50 Move Rule");
+            this.gameState = "50 Move Rule";
+        }
+
+        if(!this.gameState.equals("")){
             this.isGameOver = true;
         }
 
