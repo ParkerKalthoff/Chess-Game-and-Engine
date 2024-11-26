@@ -1,3 +1,5 @@
+package parkerbasicchessengine.chess_engine;
+
 public class BitwiseBoard {
 
    
@@ -8,6 +10,8 @@ public class BitwiseBoard {
     public byte castlingRights;
     public int halfMoveClock;
     public int fullMoveCounter;
+
+    public long historical_piece_bitboards[][][];
 
     public BitwiseBoard(String fenString) {
         String parts[] = fenString.split(" ");
@@ -24,35 +28,31 @@ public class BitwiseBoard {
                 continue;
             }
     
-            boolean team = Character.isUpperCase(piecePlacementChars[i]) ? 0 : 1;
+            int team = Character.isUpperCase(piecePlacementChars[i]) ? 0 : 1;
     
             switch (Character.toUpperCase(piecePlacementChars[i])) {
-                case 'P':
-                    piece_bitboards[team][5] |= (1L << i);
-                    break;
-                case 'K':
-                    piece_bitboards[team][0] |= (1L << i);
-                    break;
-                case 'Q':
-                    piece_bitboards[team][1] |= (1L << i);
-                    break;
-                case 'B':
-                    piece_bitboards[team][2] |= (1L << i);
-                    break;
-                case 'R':
-                    piece_bitboards[team][4] |= (1L << i);
-                    break;
-                case 'N':
-                    piece_bitboards[team][3] |= (1L << i);
-                    break;
+                case 'P' -> piece_bitboards[team][5] |= (1L << i);
+                case 'K' -> piece_bitboards[team][0] |= (1L << i);
+                case 'Q' -> piece_bitboards[team][1] |= (1L << i);
+                case 'B' -> piece_bitboards[team][2] |= (1L << i);
+                case 'R' -> piece_bitboards[team][4] |= (1L << i);
+                case 'N' -> piece_bitboards[team][3] |= (1L << i);
             }
         }
 
-    
-
         this.whiteToMove = parts[1].equals("w");
 
-        this.castlingRights = parts[2];
+        if(parts[2].equals("-")){
+            this.castlingRights = 0;
+        } else {
+            if(parts[2].contains("K")){this.castlingRights |= (1 << 3);}
+            if(parts[2].contains("Q")){this.castlingRights |= (1 << 2);}
+            if(parts[2].contains("k")){this.castlingRights |= (1 << 1);}
+            if(parts[2].contains("q")){this.castlingRights |= 1;}
+        }
+
+
+        
         String enPassantSquare = parts[3];
         this.halfMoveClock = Integer.parseInt(parts[4] * 2 + this.whiteToMove ? 0 : 1);
         String fullMove = parts[5];

@@ -1,5 +1,4 @@
-package parkerbasicchessengine;
-import parkerbasicchessengine.Board;
+package parkerbasicchessengine.chess_engine;
 
 abstract class abstract_chess_engine {
 

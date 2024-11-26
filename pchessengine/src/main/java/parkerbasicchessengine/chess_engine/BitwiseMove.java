@@ -1,11 +1,11 @@
-package parkerbasicchessengine;
+package parkerbasicchessengine.chess_engine;
 
 public class BitwiseMove {
 
     private short move;
 
     // Constructor to initialize a move
-    public BitMove(int start, int end, int promotion) {
+    public BitwiseMove(int start, int end, int promotion) {
         if (start < 0 || start >= 64 || end < 0 || end >= 64) {
             throw new IllegalArgumentException("Square indices must be in the range 0-63");
         }
@@ -46,7 +46,8 @@ public class BitwiseMove {
         boolean isWhite = (promotion & 0x4) != 0;
         String team = isWhite ? "White" : "Black";
 
-        String pieceType;
+        String pieceType = "None";
+        
         switch (promotion & 0x3) {
             case 0 -> pieceType = "Queen";
             case 1 -> pieceType = "Bishop";

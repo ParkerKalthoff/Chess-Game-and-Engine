@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
@@ -21,13 +22,15 @@ public class Board extends JPanel {
 
     public boolean muteSound = false;
 
+    HashMap<String, Integer> pieceHistory = new HashMap<>();
+
     public int tileSize = 85;
     public int enPassantTile = -1;
 
     int rows = 8;
     int cols = 8;
 
-    String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     ArrayList<Piece> pieceList = new ArrayList<>();
 
