@@ -35,17 +35,17 @@ public class BitwiseBoard {
 
             switch (Character.toUpperCase(piecePlacementChars[i])) {
                 case 'P' ->
-                    piece_bitboards[team][5] |= (1L << i);
+                    this.piece_bitboards[team][5] |= (1L << i);
                 case 'K' ->
-                    piece_bitboards[team][0] |= (1L << i);
+                    this.piece_bitboards[team][0] |= (1L << i);
                 case 'Q' ->
-                    piece_bitboards[team][1] |= (1L << i);
+                    this.piece_bitboards[team][1] |= (1L << i);
                 case 'B' ->
-                    piece_bitboards[team][2] |= (1L << i);
+                    this.piece_bitboards[team][2] |= (1L << i);
                 case 'R' ->
-                    piece_bitboards[team][4] |= (1L << i);
+                    this.piece_bitboards[team][4] |= (1L << i);
                 case 'N' ->
-                    piece_bitboards[team][3] |= (1L << i);
+                    this.piece_bitboards[team][3] |= (1L << i);
             }
         }
 
