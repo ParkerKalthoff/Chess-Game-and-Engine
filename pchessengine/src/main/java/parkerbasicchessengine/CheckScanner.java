@@ -1,5 +1,7 @@
 package parkerbasicchessengine;
 
+import javax.management.RuntimeErrorException;
+
 import parkerbasicchessengine.pieces.King;
 import parkerbasicchessengine.pieces.Piece;
 
@@ -14,7 +16,10 @@ public class CheckScanner {
     public boolean isKingChecked(int col, int row, boolean isWhite) {
         King king = board.findKing(isWhite);
 
-        //assert != null;
+        if(king == null){
+            throw new RuntimeErrorException(null, "board.findKing(isWhite : "+isWhite+") is finding a null value");
+        }
+
         int kingCol = king.col;
         int kingRow = king.row;
 

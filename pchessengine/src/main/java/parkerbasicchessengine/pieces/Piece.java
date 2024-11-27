@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import parkerbasicchessengine.Board;
+import parkerbasicchessengine.Move;
 
 public abstract class Piece {
 
@@ -56,7 +57,7 @@ public abstract class Piece {
     }
 
     public boolean canMakeMove(Piece piece, int col, int row) {
-        return !(board.sameTeam(piece, this) || board.checkScanner.isKingChecked(col, row, this.isWhite));
+        return !(board.sameTeam(piece, this) || board.checkScanner.isKingChecked(col, row, this.isWhite) || board.isValidMove(new Move(board, this, col, row)));
     }
 
 }

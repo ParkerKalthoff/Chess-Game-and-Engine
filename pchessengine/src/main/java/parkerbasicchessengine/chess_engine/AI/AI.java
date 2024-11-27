@@ -20,7 +20,7 @@ public class AI {
     public final int positiveInfinity = 9999999;
     public final int negativeInfinity = -positiveInfinity;
 
-    public final int depth = 3;
+    public final int depth = 1;
 
     public AI(Board board) {
         this.board = board;
@@ -28,7 +28,7 @@ public class AI {
 
     public void aiMove() {
         if (true) {
-            if (ai_verses_ai || !board.isWhiteToMove) {
+            if (ai_verses_ai || board.isWhiteToMove) {
                 if (ai_verses_ai) {
                     board.repaint();
                     try {
@@ -61,12 +61,14 @@ public class AI {
         int low = Integer.MAX_VALUE;
         for (Move move : validMoves) {
             board.makeMove(move);
+            board.repaint();
             int search = search(depth, negativeInfinity, positiveInfinity);
             if (search < low) {
                 chosenMove = move;
                 low = search;
             }
             board.unMakeMove(move);
+            board.repaint();
         }
 
         board.makeMove(chosenMove);

@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import javax.management.RuntimeErrorException;
 import javax.swing.JPanel;
 
+import parkerbasicchessengine.chess_engine.AI.AI;
 import parkerbasicchessengine.pieces.*;
 
 public class Board extends JPanel {
@@ -23,6 +25,8 @@ public class Board extends JPanel {
 
     public int rows = 8;
     public int cols = 8;
+
+    public AI ai = new AI(this);
 
     final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -64,14 +68,12 @@ public class Board extends JPanel {
     }
 
     public King findKing(boolean isWhite) {
-
         for (Piece piece : this.pieceList) {
             if (piece instanceof King && piece.isWhite == isWhite) {
                 return (King) piece;
             }
         }
-
-        return null;
+        throw new IllegalStateException("King not found for " + (isWhite ? "White" : "Black") + " side.");
     }
 
     public void makeMove(Move move) {
@@ -93,13 +95,13 @@ public class Board extends JPanel {
         move.piece.yPos = move.newRow * this.tileSize;
         move.piece.isFirstMove = false;
 
-        if(move.capture != null){
+        if (move.capture != null) {
             this.halfMoveClock = 0;
             capture(move.capture);
         }
 
         // Checks if finished blacks turn for incrementing next turn
-        if(this.isWhiteToMove == false){
+        if (this.isWhiteToMove == false) {
             this.fullMoveCounter++;
         }
 
@@ -108,7 +110,7 @@ public class Board extends JPanel {
 
         this.gameState = updateGameState(this.isWhiteToMove);
 
-        if(!this.gameState.equals("")){
+        if (!this.gameState.equals("")) {
             this.isGameOver = true;
         }
 
@@ -137,11 +139,11 @@ public class Board extends JPanel {
                 capturedPieceList.remove(promo);
             }
 
-            if(this.isWhiteToMove == false){
+            if (this.isWhiteToMove == false) {
                 this.fullMoveCounter--;
                 this.halfMoveClock--;
             }
-    
+
             // flip whose turns it is >:)
             this.isWhiteToMove = !this.isWhiteToMove;
 
@@ -204,7 +206,7 @@ public class Board extends JPanel {
 
         boolean kingIsSafe = !checkScanner.isKingChecked(move);
 
-        if(move.piece instanceof King king && king.canCastle(move.newCol, move.newRow)){ 
+        if (move.piece instanceof King king && king.canCastle(move.newCol, move.newRow)) {
             return isCorrectTurn && isTargetSquareValid && hasNoCollision && kingIsSafe;
         }
 
@@ -216,36 +218,47 @@ public class Board extends JPanel {
     }
 
     public void loadPositionFromFEN(String fenString) {
-        
+
         this.pieceList.clear();
 
         String[] parts = fenString.split(" ");
 
-
         // load piece positions
-        String position = parts[0]; 
+        String position = parts[0];
         int row = 0;
         int col = 0;
 
-        for(int i = 0; i < position.length(); i++){
+        for (int i = 0; i < position.length(); i++) {
             char ch = position.charAt(i);
 
-            if(ch == '/'){
+            if (ch == '/') {
                 row++;
                 col = 0;
-            } else if (Character.isDigit(ch)){
+            } else if (Character.isDigit(ch)) {
                 col += Character.getNumericValue(ch);
             } else {
 
                 boolean isWhite = Character.isUpperCase(ch);
 
                 switch (Character.toLowerCase(ch)) {
-                    case 'p' -> {pieceList.add(new Pawn(this, col, row, isWhite));}
-                    case 'r' -> {pieceList.add(new Rook(this, col, row, isWhite));}
-                    case 'b' -> {pieceList.add(new Bishop(this, col, row, isWhite));}
-                    case 'n' -> {pieceList.add(new Knight(this, col, row, isWhite));}
-                    case 'q' -> {pieceList.add(new Queen(this, col, row, isWhite));}
-                    case 'k' -> {pieceList.add(new King(this, col, row, isWhite));}
+                    case 'p' -> {
+                        pieceList.add(new Pawn(this, col, row, isWhite));
+                    }
+                    case 'r' -> {
+                        pieceList.add(new Rook(this, col, row, isWhite));
+                    }
+                    case 'b' -> {
+                        pieceList.add(new Bishop(this, col, row, isWhite));
+                    }
+                    case 'n' -> {
+                        pieceList.add(new Knight(this, col, row, isWhite));
+                    }
+                    case 'q' -> {
+                        pieceList.add(new Queen(this, col, row, isWhite));
+                    }
+                    case 'k' -> {
+                        pieceList.add(new King(this, col, row, isWhite));
+                    }
 
                     default -> throw new AssertionError();
                 }
@@ -260,25 +273,25 @@ public class Board extends JPanel {
         // load castling rights
 
         Piece bqr = getPiece(0, 0);
-        if(bqr instanceof Rook && bqr.isWhite == false){
+        if (bqr instanceof Rook && bqr.isWhite == false) {
             bqr.isFirstMove = parts[2].contains("q");
         }
         Piece bkr = getPiece(7, 0);
-        if(bkr instanceof Rook && bkr.isWhite == false){
+        if (bkr instanceof Rook && bkr.isWhite == false) {
             bkr.isFirstMove = parts[2].contains("k");
         }
         Piece wqr = getPiece(0, 7);
-        if(wqr instanceof Rook && wqr.isWhite == true){
+        if (wqr instanceof Rook && wqr.isWhite == true) {
             wqr.isFirstMove = parts[2].contains("Q");
         }
         Piece wkr = getPiece(7, 7);
-        if(wkr instanceof Rook && wkr.isWhite == true){
+        if (wkr instanceof Rook && wkr.isWhite == true) {
             wkr.isFirstMove = parts[2].contains("K");
         }
 
         // enpassant
 
-        if(parts[3].equals("-")){
+        if (parts[3].equals("-")) {
             this.enPassantTile = -1;
         } else {
             this.enPassantTile = (7 - (parts[3].charAt(1) - '1') * 8 + (parts[3].charAt(0) - 'a'));
@@ -293,38 +306,42 @@ public class Board extends JPanel {
         this.fullMoveCounter = Integer.parseInt(parts[5]);
     }
 
-    public String updateGameState(boolean isWhiteToMove){
+    public String updateGameState(boolean isWhiteToMove) {
         Piece king = findKing(isWhiteToMove);
 
-        if(insufficientMaterial(true) && insufficientMaterial(false)) {
+        if (king == null) {
+            throw new RuntimeErrorException(null, "king is null");
+        }
+
+        if (insufficientMaterial(true) && insufficientMaterial(false)) {
             return "Insufficient Material";
         }
 
-        if(checkScanner.isGameOver(king)){
-            if(checkScanner.isKingChecked(new Move(this, king, king.col, king.row))){
+        if (checkScanner.isGameOver(king)) {
+            if (checkScanner.isKingChecked(new Move(this, king, king.col, king.row))) {
                 return isWhiteToMove ? "Black Wins" : "White Wins";
             } else {
                 return "Stalemate";
             }
         }
 
-        if(this.halfMoveClock >= 100){
+        if (this.halfMoveClock >= 100) {
             return "50 Move Rule";
         }
         return "";
 
     }
 
-    public String convertPostionToFEN(){
+    public String convertPostionToFEN() {
         Piece pieces[] = new Piece[64];
 
-        for(Piece piece : this.pieceList){
+        for (Piece piece : this.pieceList) {
             pieces[piece.col + piece.row * 8] = piece;
         }
 
         int openSpaces = 0;
 
-        StringBuilder fenString = new StringBuilder("");        
+        StringBuilder fenString = new StringBuilder("");
 
         // build position
         for (int i = 0; i < 64; i++) {
@@ -338,7 +355,7 @@ public class Board extends JPanel {
             } else {
                 openSpaces++;
             }
-    
+
             if ((i + 1) % 8 == 0) {
                 if (openSpaces > 0) {
                     fenString.append(openSpaces);
@@ -360,35 +377,36 @@ public class Board extends JPanel {
         boolean blankCastlingString = true;
 
         Piece wkr = getPiece(7, 7);
-        if(wkr instanceof Rook && wkr.isWhite == true && wkr.isFirstMove && this.findKing(true).isFirstMove){
+        if (wkr instanceof Rook && wkr.isWhite == true && wkr.isFirstMove && this.findKing(true).isFirstMove) {
             fenString.append("K");
             blankCastlingString = false;
         }
         Piece wqr = getPiece(0, 7);
-        if(wqr instanceof Rook && wqr.isWhite == true && wqr.isFirstMove && this.findKing(true).isFirstMove){
+        if (wqr instanceof Rook && wqr.isWhite == true && wqr.isFirstMove && this.findKing(true).isFirstMove) {
             fenString.append("Q");
             blankCastlingString = false;
         }
         Piece bkr = getPiece(7, 0);
-        if(bkr instanceof Rook && bkr.isWhite == false && bkr.isFirstMove && this.findKing(false).isFirstMove){
+        if (bkr instanceof Rook && bkr.isWhite == false && bkr.isFirstMove && this.findKing(false).isFirstMove) {
             fenString.append("k");
             blankCastlingString = false;
         }
         Piece bqr = getPiece(0, 0);
-        if(bqr instanceof Rook && bqr.isWhite == false && bqr.isFirstMove && this.findKing(false).isFirstMove){
+        if (bqr instanceof Rook && bqr.isWhite == false && bqr.isFirstMove && this.findKing(false).isFirstMove) {
             fenString.append("q");
             blankCastlingString = false;
         }
 
-        if(blankCastlingString){
+        if (blankCastlingString) {
             fenString.append("-");
         }
 
         // enpassant
         fenString.append(" ");
-        fenString.append(this.enPassantTile == -1 ? "-" : "" + ((char) ('a' + this.enPassantTile % 8)) + (8 - (this.enPassantTile / 8)));
+        fenString.append(this.enPassantTile == -1 ? "-"
+                : "" + ((char) ('a' + this.enPassantTile % 8)) + (8 - (this.enPassantTile / 8)));
 
-        // half move 
+        // half move
         fenString.append(" ");
         fenString.append(this.halfMoveClock / 2);
 
@@ -399,17 +417,17 @@ public class Board extends JPanel {
         return fenString.toString();
     }
 
-    private boolean insufficientMaterial(boolean isWhite){
+    private boolean insufficientMaterial(boolean isWhite) {
 
         ArrayList<String> activePieces = this.pieceList.stream()
-            .filter(p -> p.isWhite == isWhite)
-            .map(p -> p.name)
-            .collect(Collectors.toCollection(ArrayList :: new));
+                .filter(p -> p.isWhite == isWhite)
+                .map(p -> p.name)
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        if(activePieces.contains("Queen") || activePieces.contains("Rook") || activePieces.contains("Pawn")){
+        if (activePieces.contains("Queen") || activePieces.contains("Rook") || activePieces.contains("Pawn")) {
             return false;
         }
-        
+
         return activePieces.size() < 3;
     }
 
