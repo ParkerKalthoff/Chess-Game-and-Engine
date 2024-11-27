@@ -62,4 +62,5 @@ public class BitwiseMove {
     public String toString() {
         return "{Start : " + getStartingSquareCoord() + ", End : " + getEndSquareCoord() + (getPromotion() == 0 ? "" : ", Promotion : " + getPromotionString()) + "}";
     }
+    
 }

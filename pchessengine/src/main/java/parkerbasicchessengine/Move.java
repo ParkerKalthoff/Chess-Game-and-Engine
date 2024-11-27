@@ -6,8 +6,9 @@ import parkerbasicchessengine.pieces.Piece;
 
 public class Move {
 
-    int oldCol, oldRow, newCol, newRow;
-    Piece piece, capture, promotedToPiece;
+    public int oldCol, oldRow, newCol, newRow;
+    public Piece piece, capture, promotedToPiece;
+    public String previousGameState;
 
     
     public Move(Board board, Piece piece, int newCol, int newRow){

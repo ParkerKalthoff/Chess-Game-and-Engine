@@ -13,6 +13,8 @@ public class Knight extends Piece{
         this.isWhite = isWhite;
         this.abbreviation = isWhite ? 'N' : 'n';
 
+        this.value = 300;
+
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;
 

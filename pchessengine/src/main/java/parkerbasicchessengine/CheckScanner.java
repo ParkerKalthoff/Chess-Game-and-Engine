@@ -11,6 +11,41 @@ public class CheckScanner {
         this.board = board;
     }
 
+    public boolean isKingChecked(int col, int row, boolean isWhite) {
+        King king = board.findKing(isWhite);
+
+        //assert != null;
+        int kingCol = king.col;
+        int kingRow = king.row;
+
+        if (board.selectedPiece != null && board.selectedPiece instanceof King) {
+            kingCol = col;
+            kingRow = row;
+        }
+
+        return hitByRook(col, row, king, kingCol, kingRow, 0, 1)
+                || // up
+                hitByRook(col, row, king, kingCol, kingRow, 1, 0)
+                || // right
+                hitByRook(col, row, king, kingCol, kingRow, 0, -1)
+                || // down
+                hitByRook(col, row, king, kingCol, kingRow, -1, 0)
+                || // left
+                hitByBishop(col, row, king, kingCol, kingRow, -1, -1)
+                || // up left
+                hitByBishop(col, row, king, kingCol, kingRow, 1, -1)
+                || // up right
+                hitByBishop(col, row, king, kingCol, kingRow, 1, 1)
+                || // down right
+                hitByBishop(col, row, king, kingCol, kingRow, -1, 1)
+                || // down left
+                hitByKnight(col, row, king, kingCol, kingRow)
+                || 
+                hitByPawn(col, row, king, kingCol, kingRow)
+                || 
+                hitByKing(king, kingRow, kingRow);
+    }
+
     public boolean isKingChecked(Move move) {
         King king = board.findKing(move.piece.isWhite);
 
@@ -40,8 +75,10 @@ public class CheckScanner {
                 hitByBishop(move.newCol, move.newRow, king, kingCol, kingRow, -1, 1)
                 || // down left
                 hitByKnight(move.newCol, move.newRow, king, kingCol, kingRow)
-                || hitByPawn(move.newCol, move.newRow, king, kingCol, kingRow)
-                || hitByKing(king, kingRow, kingRow);
+                || 
+                hitByPawn(move.newCol, move.newRow, king, kingCol, kingRow)
+                || 
+                hitByKing(king, kingRow, kingRow);
     }
 
     private boolean hitByRook(int col, int row, King king, int kingCol, int kingRow, int colVal, int rowVal) {

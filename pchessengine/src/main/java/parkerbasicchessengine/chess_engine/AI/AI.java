@@ -1,4 +1,4 @@
-
+package parkerbasicchessengine.chess_engine.AI;
 
 import parkerbasicchessengine.pieces.*;
 
@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static parkerbasicchessengine.Main.ai_verses_ai;
 
@@ -15,6 +16,7 @@ import parkerbasicchessengine.Move;
 public class AI {
 
     Board board;
+
     public final int positiveInfinity = 9999999;
     public final int negativeInfinity = -positiveInfinity;
 
@@ -69,12 +71,14 @@ public class AI {
 
         board.makeMove(chosenMove);
 
-        String gameState = board.getGameState(board.isWhiteToMove);
+        String gameState = board.updateGameState(board.isWhiteToMove);
 
-        if (!gameState.equals("Continue")) {
+        if (!gameState.equals("")) {
             board.gameState = gameState;
         }
+
         board.repaint();
+
         aiMove();
     }
 
@@ -85,7 +89,7 @@ public class AI {
 
         ArrayList<Move> moves = findValidMoves();
         if (moves.isEmpty()) {
-            Piece king = board.findKing(board.isWhiteToMove);
+            King king = (King) board.findKing(board.isWhiteToMove);
             if (king.inCheck(king.col, king.row)) {
                 return Integer.MIN_VALUE;
             }
@@ -121,13 +125,17 @@ public class AI {
     }
 
     public int countMaterial(boolean isWhite) {
+        
         int material = 0;
 
-        material += board.pieceCount(isWhite, 'p') * board.pawnVal;
-        material += board.pieceCount(isWhite, 'n') * board.knightVal;
-        material += board.pieceCount(isWhite, 'b') * board.bishopVal;
-        material += board.pieceCount(isWhite, 'r') * board.rookVal;
-        material += board.pieceCount(isWhite, 'q') * board.queenVal;
+        ArrayList<Integer> teamMaterial = board.pieceList.stream()
+            .filter(p -> p.isWhite == isWhite)
+            .map(p -> p.value)
+            .collect(Collectors.toCollection(ArrayList :: new));
+
+        for(Integer value : teamMaterial){
+            material += value;
+        }
 
         return material;
     }
@@ -138,17 +146,16 @@ public class AI {
             Piece piece = move.piece;
 
             int moveScoreGuess = 0;
-            char pieceName = piece.name;
             char pieceCapName = 'e';
             if (move.capture != null) {
-                pieceCapName = move.capture.name;
+                pieceCapName = move.capture.abbreviation;
             }
 
             if (pieceCapName != 'e') {
-                moveScoreGuess = 10 * move.capture.val - piece.val;
+                moveScoreGuess = 10 * move.capture.value - piece.value;
             }
-            if (pieceName == 'p' && (piece.isWhite ? piece.row == 0 : piece.row == 7)) {
-                moveScoreGuess += move.promo.val;
+            if (piece instanceof Pawn && (piece.isWhite ? piece.row == 0 : piece.row == 7)) {
+                moveScoreGuess += move.promotedToPiece.value;
             }
 
         }
@@ -173,17 +180,16 @@ public class AI {
                             Piece pieceXY = board.getPiece(col, row);
                             if (piece.canMakeMove(pieceXY, col, row)) {
 
-                                // handle pawns differently
-                                if (piece.name == 'p' && row == (piece.isWhite ? 0 : 7)) {
+                                if (piece instanceof Pawn && row == (piece.isWhite ? 0 : 7)) {
 
-                                    moves.add(new Move(board.getSpareQueen(piece.isWhite), col, row, pieceXY, piece));
-                                    moves.add(new Move(board.getSpareRook(piece.isWhite), col, row, pieceXY, piece));
-                                    moves.add(new Move(board.getSpareBishop(piece.isWhite), col, row, pieceXY, piece));
-                                    moves.add(new Move(board.getSpareKnight(piece.isWhite), col, row, pieceXY, piece));
+                                    moves.add(new Move(this.board, piece, col, row, new Queen(board, piece.col, piece.row, piece.isWhite)));
+                                    moves.add(new Move(this.board, piece, col, row, new Rook(board, piece.col, piece.row, piece.isWhite)));
+                                    moves.add(new Move(this.board, piece, col, row, new Bishop(board, piece.col, piece.row, piece.isWhite)));
+                                    moves.add(new Move(this.board, piece, col, row, new Knight(board, piece.col, piece.row, piece.isWhite)));
 
                                 } else {
 
-                                    moves.add(new Move(piece, col, row, pieceXY, null));
+                                    moves.add(new Move(board, piece, col, row, null));
 
                                 }
 
@@ -210,35 +216,14 @@ public class AI {
 
         for (Move move : moves) {
 
-            //            if (move.description.equals("w pawn b6")) pause(move);
             board.makeMove(move);
-            pause(move);
 
             totalPositions += moveGenerationTest(depth - 1);
 
             board.unMakeMove(move);
-            pause(move);
 
         }
 
         return totalPositions;
     }
-
-    void pause(Move move) {
-
-        //        if (move.description.equals("w pawn b6") && board.enPassantCol == 1) {
-        if (false) {
-
-            try {
-                //                Thread.sleep(10);
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            board.repaint();
-        }
-
-    }
-
 }

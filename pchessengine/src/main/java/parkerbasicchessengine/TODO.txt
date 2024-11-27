@@ -1,5 +1,3 @@
 2) main menu
     a) time
     b) select color
-3) fen string support
-    - output fen only

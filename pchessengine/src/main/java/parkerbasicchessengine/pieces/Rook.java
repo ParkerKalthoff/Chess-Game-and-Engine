@@ -13,6 +13,8 @@ public class Rook extends Piece{
         this.isWhite = isWhite;
         this.abbreviation = isWhite ? 'R' : 'r';
 
+        this.value = 500;
+
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;
 

@@ -14,12 +14,18 @@ public class King extends Piece {
         this.isWhite = isWhite;
         this.abbreviation = isWhite ? 'K' : 'k';
 
+        this.value = 999999;
+
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;
 
         this.name = "King";
 
         this.sprite = sheet.getSubimage(0, isWhite ? 0 : sheetScale, sheetScale, sheetScale).getScaledInstance(board.tileSize, board.tileSize, BufferedImage.SCALE_SMOOTH);
+    }
+
+    public boolean inCheck(int col, int row){
+        return this.board.checkScanner.isKingChecked(col, row, isWhite);
     }
 
     @Override

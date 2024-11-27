@@ -10,13 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 
-import parkerbasicchessengine.pieces.Bishop;
-import parkerbasicchessengine.pieces.King;
-import parkerbasicchessengine.pieces.Knight;
-import parkerbasicchessengine.pieces.Pawn;
-import parkerbasicchessengine.pieces.Piece;
-import parkerbasicchessengine.pieces.Queen;
-import parkerbasicchessengine.pieces.Rook;
+import parkerbasicchessengine.pieces.*;
 
 public class Board extends JPanel {
 
@@ -27,12 +21,13 @@ public class Board extends JPanel {
     public int tileSize = 85;
     public int enPassantTile = -1;
 
-    int rows = 8;
-    int cols = 8;
+    public int rows = 8;
+    public int cols = 8;
 
     final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    ArrayList<Piece> pieceList = new ArrayList<>();
+    public ArrayList<Piece> pieceList = new ArrayList<>();
+    public ArrayList<Piece> capturedPieceList = new ArrayList<>();
 
     public Piece selectedPiece;
 
@@ -111,7 +106,46 @@ public class Board extends JPanel {
         // flip whose turns it is >:)
         this.isWhiteToMove = !this.isWhiteToMove;
 
-        updateGameState();
+        this.gameState = updateGameState(this.isWhiteToMove);
+
+        if(!this.gameState.equals("")){
+            this.isGameOver = true;
+        }
+
+    }
+
+    public void unMakeMove(Move move) {
+        if (move != null) {
+
+            Piece piece = move.piece;
+            Piece capture = move.capture;
+            Piece promo = move.promotedToPiece;
+            int col = move.oldCol;
+            int row = move.oldRow;
+
+            piece.col = col;
+            piece.row = row;
+            piece.xPos = col * tileSize;
+            piece.yPos = row * tileSize;
+
+            if (capture != null) {
+                pieceList.add(capture);
+                capturedPieceList.remove(capture);
+            }
+            if (promo != null) {
+                pieceList.add(promo);
+                capturedPieceList.remove(promo);
+            }
+
+            if(this.isWhiteToMove == false){
+                this.fullMoveCounter--;
+                this.halfMoveClock--;
+            }
+    
+            // flip whose turns it is >:)
+            this.isWhiteToMove = !this.isWhiteToMove;
+
+        }
     }
 
     private void moveKing(Move move) {
@@ -154,6 +188,7 @@ public class Board extends JPanel {
     }
 
     public void capture(Piece piece) {
+        capturedPieceList.add(piece);
         pieceList.remove(piece);
     }
 
@@ -258,28 +293,25 @@ public class Board extends JPanel {
         this.fullMoveCounter = Integer.parseInt(parts[5]);
     }
 
-    private void updateGameState(){
-        Piece king = findKing(this.isWhiteToMove);
+    public String updateGameState(boolean isWhiteToMove){
+        Piece king = findKing(isWhiteToMove);
 
         if(insufficientMaterial(true) && insufficientMaterial(false)) {
-            this.gameState = "Insufficient Material";
+            return "Insufficient Material";
         }
 
         if(checkScanner.isGameOver(king)){
             if(checkScanner.isKingChecked(new Move(this, king, king.col, king.row))){
-                this.gameState = this.isWhiteToMove ? "Black Wins" : "White Wins";
+                return isWhiteToMove ? "Black Wins" : "White Wins";
             } else {
-                this.gameState = "Stalemate";
+                return "Stalemate";
             }
         }
 
         if(this.halfMoveClock >= 100){
-            this.gameState = "50 Move Rule";
+            return "50 Move Rule";
         }
-
-        if(!this.gameState.equals("")){
-            this.isGameOver = true;
-        }
+        return "";
 
     }
 

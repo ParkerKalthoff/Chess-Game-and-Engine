@@ -13,6 +13,8 @@ public class Queen extends Piece{
         this.isWhite = isWhite;
         this.abbreviation = isWhite ? 'Q' : 'q';
 
+        this.value = 900;
+
         this.xPos = col * board.tileSize;
         this.yPos = row * board.tileSize;
 
