@@ -56,8 +56,7 @@ public abstract class Piece {
         return "" + ((char) ('A' + col)) + (8 - row);
     }
 
-    public boolean canMakeMove(Piece piece, int col, int row) {
-        return !(board.sameTeam(piece, this) || board.checkScanner.isKingChecked(col, row, this.isWhite) || board.isValidMove(new Move(board, this, col, row)));
+    public boolean canMakeMove(Piece Targetpiece, int col, int row) {
+        return board.isValidMove(new Move(board, this, col, row));
     }
-
 }

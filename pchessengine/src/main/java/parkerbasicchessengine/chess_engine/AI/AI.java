@@ -20,15 +20,17 @@ public class AI {
     public final int positiveInfinity = 9999999;
     public final int negativeInfinity = -positiveInfinity;
 
-    public final int depth = 1;
+    public final int depth = 3;
+
+    public String boardFEN;
 
     public AI(Board board) {
         this.board = board;
     }
 
-    public void aiMove() {
+    public void aiMove(boolean isWhite) {
         if (true) {
-            if (ai_verses_ai || board.isWhiteToMove) {
+            if (isWhite != board.isWhiteToMove) {
                 if (ai_verses_ai) {
                     board.repaint();
                     try {
@@ -37,13 +39,19 @@ public class AI {
                         e.printStackTrace();
                     }
                 }
-                makeMove();
+                board.repaint();
+
+                if(boardFEN == null){
+                    boardFEN = board.convertPostionToFEN();
+                }
+
+                makeMove(isWhite);
 
             }
         }
     }
 
-    public void makeMove() {
+    public void makeMove(boolean isWhite) {
 
         ArrayList<Move> validMoves = findValidMoves();
 
@@ -61,16 +69,15 @@ public class AI {
         int low = Integer.MAX_VALUE;
         for (Move move : validMoves) {
             board.makeMove(move);
-            board.repaint();
             int search = search(depth, negativeInfinity, positiveInfinity);
             if (search < low) {
                 chosenMove = move;
                 low = search;
             }
             board.unMakeMove(move);
-            board.repaint();
         }
 
+        //board.loadPositionFromFEN(boardFEN); // reset board
         board.makeMove(chosenMove);
 
         String gameState = board.updateGameState(board.isWhiteToMove);
@@ -81,7 +88,7 @@ public class AI {
 
         board.repaint();
 
-        aiMove();
+        aiMove(isWhite);
     }
 
     int search(int depth, int alpha, int beta) {
@@ -188,23 +195,22 @@ public class AI {
                                     moves.add(new Move(this.board, piece, col, row, new Rook(board, piece.col, piece.row, piece.isWhite)));
                                     moves.add(new Move(this.board, piece, col, row, new Bishop(board, piece.col, piece.row, piece.isWhite)));
                                     moves.add(new Move(this.board, piece, col, row, new Knight(board, piece.col, piece.row, piece.isWhite)));
-
+                                    
                                 } else {
 
-                                    moves.add(new Move(board, piece, col, row, null));
+                                    moves.add(new Move(this.board, piece, col, row, null));
 
                                 }
-
                             }
                         }
                     }
-
                 }
             }
         }
 
         board.selectedPiece = null;
         return moves;
+
     }
 
     public int moveGenerationTest(int depth) {

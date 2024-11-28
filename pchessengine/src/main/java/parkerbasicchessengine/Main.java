@@ -21,8 +21,8 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
-        // boolean playerOneIsHuman = true;
-        // boolean playerTwoIsHuman = true;
+        boolean playerOneIsHuman = false;
+        boolean playerTwoIsHuman = true;
 
 
 
@@ -31,6 +31,29 @@ public class Main {
 
         frame.setVisible(true);
 
-        
+        board.repaint();
+
+        while(true){
+         
+            if(board.isWhiteToMove){
+
+                if(playerOneIsHuman){
+
+                } else {
+                    board.ai.aiMove(true);
+                }
+
+            } else {
+
+                if(playerTwoIsHuman){
+
+                } else {
+                    board.ai.aiMove(false);
+                }
+
+            }
+
+        }
+
     }
 }

@@ -68,6 +68,7 @@ public class Board extends JPanel {
     }
 
     public King findKing(boolean isWhite) {
+
         for (Piece piece : this.pieceList) {
             if (piece instanceof King && piece.isWhite == isWhite) {
                 return (King) piece;
