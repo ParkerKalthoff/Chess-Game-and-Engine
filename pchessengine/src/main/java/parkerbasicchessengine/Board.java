@@ -471,6 +471,7 @@ public class Board extends JPanel {
             }
         }
 
+        
         for (Piece piece : this.pieceList) {
             piece.paint(g2d);
         }

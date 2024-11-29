@@ -33,7 +33,7 @@ public class Main {
 
         board.repaint();
 
-        board.ai.aiMove();
+        //board.ai.aiMove();
 
     }
 }

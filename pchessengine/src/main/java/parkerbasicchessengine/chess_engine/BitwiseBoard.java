@@ -1,22 +1,24 @@
 package parkerbasicchessengine.chess_engine;
 
+import java.util.HashMap;
+
+import parkerbasicchessengine.Board;
+
 public class BitwiseBoard {
 
     // [0 white, 1 black] - [0 king, 1 queen, 2 bishop, 3 knight, 4 rook, 5 pawn]
     public long piece_bitboards[][];
     public int enpassantIndex;
-    public boolean whiteToMove;
+    public boolean isWhiteToMove;
     public byte castlingRights;
+    //          xxxx KQkq
     public int halfMoveClock;
     public int fullMoveCounter;
 
-    public long historical_piece_bitboards[][][];
-
-    public BitwiseBoard() {
-        // declare empty board object
-    }
+    public HashMap<Long, Integer> historicalPostions = new HashMap<>();
 
     public BitwiseBoard(String fenString) {
+
         String parts[] = fenString.split(" ");
         char piecePlacementChars[] = parts[0].toCharArray();
 
@@ -49,7 +51,7 @@ public class BitwiseBoard {
             }
         }
 
-        this.whiteToMove = parts[1].equals("w");
+        this.isWhiteToMove = parts[1].equals("w");
 
         if (parts[2].equals("-")) {
             this.castlingRights = 0;
@@ -68,45 +70,16 @@ public class BitwiseBoard {
             }
         }
 
-        //String enPassantSquare = parts[3];
-        //this.halfMoveClock = Integer.parseInt(parts[4] * 2 + this.whiteToMove ? 0 : 1);
-        //String fullMove = parts[5];
-    }
-
-    public BitwiseBoard clone() {
-        BitwiseBoard bwB = new BitwiseBoard();
-
-        // Copy all primitives
-        bwB.castlingRights = this.castlingRights;
-        bwB.enpassantIndex = this.enpassantIndex;
-        bwB.whiteToMove = this.whiteToMove;
-        bwB.halfMoveClock = this.halfMoveClock;
-        bwB.fullMoveCounter = this.fullMoveCounter;
-
-        if (this.piece_bitboards != null) {
-            bwB.piece_bitboards = new long[this.piece_bitboards.length][];
-            for (int i = 0; i < this.piece_bitboards.length; i++) {
-                if (this.piece_bitboards[i] != null) {
-                    bwB.piece_bitboards[i] = this.piece_bitboards[i].clone();
-                }
-            }
+        if(parts[3].equals("-")){
+            this.enpassantIndex = -1;
+        } else {
+            this.enpassantIndex = Integer.parseInt(parts[3]);
         }
 
-        if (this.historical_piece_bitboards != null) {
-            bwB.historical_piece_bitboards = new long[this.historical_piece_bitboards.length][][];
-            for (int i = 0; i < this.historical_piece_bitboards.length; i++) {
-                if (this.historical_piece_bitboards[i] != null) {
-                    bwB.historical_piece_bitboards[i] = new long[this.historical_piece_bitboards[i].length][];
-                    for (int j = 0; j < this.historical_piece_bitboards[i].length; j++) {
-                        if (this.historical_piece_bitboards[i][j] != null) {
-                            bwB.historical_piece_bitboards[i][j] = this.historical_piece_bitboards[i][j].clone();
-                        }
-                    }
-                }
-            }
-        }
+        this.halfMoveClock = Integer.parseInt(parts[4]) * 2 + (this.isWhiteToMove ? 0 : 1);
 
-        return bwB;
+        this.fullMoveCounter = Integer.parseInt(parts[5]);
     }
 
+    
 }
