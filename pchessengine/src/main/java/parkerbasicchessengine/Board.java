@@ -74,7 +74,7 @@ public class Board extends JPanel {
                 return (King) piece;
             }
         }
-        throw new IllegalStateException("King not found for " + (isWhite ? "White" : "Black") + " side.");
+        return null;
     }
 
     public void makeMove(Move move) {
@@ -115,6 +115,8 @@ public class Board extends JPanel {
             this.isGameOver = true;
         }
 
+        this.isWhiteToMove = !this.isWhiteToMove;
+
     }
 
     public void unMakeMove(Move move) {
@@ -135,6 +137,7 @@ public class Board extends JPanel {
                 pieceList.add(capture);
                 capturedPieceList.remove(capture);
             }
+
             if (promo != null) {
                 pieceList.add(promo);
                 capturedPieceList.remove(promo);
@@ -311,7 +314,8 @@ public class Board extends JPanel {
         Piece king = findKing(isWhiteToMove);
 
         if (king == null) {
-            throw new RuntimeErrorException(null, "king is null");
+            // only done by engine, engine checks king captures
+            return "";
         }
 
         if (insufficientMaterial(true) && insufficientMaterial(false)) {

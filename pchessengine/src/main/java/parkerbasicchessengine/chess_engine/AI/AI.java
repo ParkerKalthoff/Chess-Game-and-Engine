@@ -28,9 +28,9 @@ public class AI {
         this.board = board;
     }
 
-    public void aiMove(boolean isWhite) {
+    public void aiMove() {
         if (true) {
-            if (isWhite != board.isWhiteToMove) {
+            if (board.isWhiteToMove) {
                 if (ai_verses_ai) {
                     board.repaint();
                     try {
@@ -45,13 +45,13 @@ public class AI {
                     boardFEN = board.convertPostionToFEN();
                 }
 
-                makeMove(isWhite);
+                makeMove();
 
             }
         }
     }
 
-    public void makeMove(boolean isWhite) {
+    public void makeMove() {
 
         ArrayList<Move> validMoves = findValidMoves();
 
@@ -77,7 +77,7 @@ public class AI {
             board.unMakeMove(move);
         }
 
-        //board.loadPositionFromFEN(boardFEN); // reset board
+        
         board.makeMove(chosenMove);
 
         String gameState = board.updateGameState(board.isWhiteToMove);
@@ -88,17 +88,22 @@ public class AI {
 
         board.repaint();
 
-        aiMove(isWhite);
+        aiMove();
     }
 
     int search(int depth, int alpha, int beta) {
-        if (depth == 0) {
+        if (depth == 0 || board.isGameOver) {
             return evaluate();
         }
 
         ArrayList<Move> moves = findValidMoves();
         if (moves.isEmpty()) {
             King king = (King) board.findKing(board.isWhiteToMove);
+
+            if(king == null){ //
+                return board.isWhiteToMove ? positiveInfinity : negativeInfinity;
+            }
+
             if (king.inCheck(king.col, king.row)) {
                 return Integer.MIN_VALUE;
             }
@@ -107,9 +112,19 @@ public class AI {
 
         for (Move move : moves) {
 
+            boolean isFirstMovePrimary = move.piece.isFirstMove;
+            boolean isFirstMoveCapture = move.capture != null ? move.capture.isFirstMove : false;
+
             board.makeMove(move);
             int evaluation = -search(depth - 1, -beta, -alpha);
             board.unMakeMove(move);
+
+            move.piece.isFirstMove = isFirstMovePrimary;
+
+            if(isFirstMoveCapture){
+                move.capture.isFirstMove = isFirstMoveCapture;
+            }
+
             if (evaluation >= beta) {
                 return beta;
             }

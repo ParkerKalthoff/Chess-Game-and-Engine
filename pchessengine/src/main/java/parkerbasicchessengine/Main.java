@@ -33,27 +33,7 @@ public class Main {
 
         board.repaint();
 
-        while(true){
-         
-            if(board.isWhiteToMove){
-
-                if(playerOneIsHuman){
-
-                } else {
-                    board.ai.aiMove(true);
-                }
-
-            } else {
-
-                if(playerTwoIsHuman){
-
-                } else {
-                    board.ai.aiMove(false);
-                }
-
-            }
-
-        }
+        board.ai.aiMove();
 
     }
 }
