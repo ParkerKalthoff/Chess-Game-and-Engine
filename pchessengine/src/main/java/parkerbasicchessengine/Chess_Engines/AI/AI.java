@@ -101,7 +101,7 @@ public class AI {
             King king = (King) board.findKing(board.isWhiteToMove);
 
             if(king == null){ //
-                return board.isWhiteToMove ? positiveInfinity : negativeInfinity;
+                return negativeInfinity;
             }
 
             if (king.inCheck(king.col, king.row)) {

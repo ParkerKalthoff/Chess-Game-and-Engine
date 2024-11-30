@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import javax.management.RuntimeErrorException;
 import javax.swing.JPanel;
 
-import parkerbasicchessengine.chess_engine.AI.AI;
+import parkerbasicchessengine.Chess_Engines.AI.AI;
 import parkerbasicchessengine.pieces.*;
 
 public class Board extends JPanel {

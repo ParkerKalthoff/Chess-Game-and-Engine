@@ -1,16 +1,16 @@
-package parkerbasicchessengine.chess_engine;
+package parkerbasicchessengine.Chess_Engines;
 
 import java.util.Random;
 
 import parkerbasicchessengine.Board;
 
-abstract class AbstractChessEngine {
+public abstract class AbstractChessEngine {
 
     // used to simplify making new boards by implimenting basic functions
 
-    private Board board; // for interfacing with the game
+    public Board board; // for interfacing with the game
 
-    public String engineName;
+    public String engineName = "Parkers Engine";
 
     
     public final int positiveInfinity = 9999999;

@@ -22,7 +22,7 @@ public class Main {
         frame.setLocationRelativeTo(null);
 
         boolean playerOneIsHuman = false;
-        boolean playerTwoIsHuman = true;
+        boolean playerTwoIsHuman = false;
 
 
 

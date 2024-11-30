@@ -1,10 +1,14 @@
-package parkerbasicchessengine.chess_engine;
+package parkerbasicchessengine.Chess_Engines;
 
 import java.util.HashMap;
-
 import parkerbasicchessengine.Board;
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
 
 public class BitwiseBoard {
+
+    // bitwise board is meant to be a lightweight way of encapsulating chess data
+    // the intention is to have a way to mutate board state for an engine
+    // is not meant for generating legal moves or verifying legal positions
 
     // [0 white, 1 black] - [0 king, 1 queen, 2 bishop, 3 knight, 4 rook, 5 pawn]
     public long piece_bitboards[][];
@@ -14,6 +18,10 @@ public class BitwiseBoard {
     //          xxxx KQkq
     public int halfMoveClock;
     public int fullMoveCounter;
+
+    public boolean isGameOver;
+
+    private ZorbistHasher zorbistHasher = new ZorbistHasher();
 
     public HashMap<Long, Integer> historicalPostions = new HashMap<>();
 
@@ -81,5 +89,30 @@ public class BitwiseBoard {
         this.fullMoveCounter = Integer.parseInt(parts[5]);
     }
 
+    private long hashPosition(){
+        return this.zorbistHasher.generateZorbistHash(this);
+    }
+
+    private void addPositionToHistoricalPositions(){
+
+        long hash = hashPosition();
+
+        this.historicalPostions.computeIfAbsent(hash, value -> 0);
+        this.historicalPostions.put(hash, this.historicalPostions.get(hash) + 1); 
+
+    }
     
+    private void removePositionFromHistoricalPositions(){
+
+        long hash = hashPosition();
+
+        this.historicalPostions.put(hash, this.historicalPostions.get(hash) - 1); 
+    }
+
+    public void movePiece(int move){
+        //
+
+
+    }
+
 }

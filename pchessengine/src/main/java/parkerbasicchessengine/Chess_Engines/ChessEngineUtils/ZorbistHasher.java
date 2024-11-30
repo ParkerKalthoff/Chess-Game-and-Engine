@@ -1,10 +1,24 @@
-package parkerbasicchessengine.chess_engine.ChessEngineUtils;
+package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
 
 import java.util.Random;
 
-import parkerbasicchessengine.chess_engine.BitwiseBoard;
+import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
+
 
 public class ZorbistHasher {
+
+    // a Zorbist hasher is a type of algorithm that associates a random number with every unique datapoint in the game
+    // so White rooks on A3 gets its own unique hash, Black knights on B3 have a different number than Black knights on B4
+    // 
+    // so in effect, you get a bunch of unique numbers describing different aspects of state of the board
+    //
+    // When you want to get a hash for a board, you iterate over each of the piece bitboards, and get the unique number for each
+    // piece on each position, every time theres a 'hit', you XOR your zorbist key with that number
+    // Then you XOR the zorbist key with your castling rights, En passant, and isWhiteToMove numbers
+    //
+    // So its like generating a unique hash for a given position, this is useful for three-move repitions and memoization for move generation
+    // There is a possibility of 2 distinct positions generating the same key, as you use more than 64 bits of data to generate a 64 number
+    // there a very low posibility of this happening though
 
     public ZorbistHasher(){
         this.computeZorbistTables(0);
