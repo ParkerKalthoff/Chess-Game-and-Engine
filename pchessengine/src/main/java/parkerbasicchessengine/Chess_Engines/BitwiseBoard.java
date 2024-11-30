@@ -1,6 +1,9 @@
 package parkerbasicchessengine.Chess_Engines;
 
 import java.util.HashMap;
+
+import javax.management.RuntimeErrorException;
+
 import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
 
@@ -115,4 +118,47 @@ public class BitwiseBoard {
 
     }
 
+    public int getPieceType(int square){
+
+        long bitboardSquare = 1L << square;
+
+        for(int i = 0; i < 2; i++){
+            for(int y = 0; y < 6; y++){
+                if((piece_bitboards[i][y] & bitboardSquare) != 0){
+                    return y + (i * 6);
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public int getPieceValue(int pieceType){
+        // for chess engine 0 - 11 case
+
+        if(pieceType == -1){
+            return 0;
+        }
+
+        if(pieceType > 5){
+            pieceType -= 6;
+        }
+
+        switch (pieceType) {
+            case 0: return 999999;
+            case 1: return 900;
+            case 2: return 300;
+            case 3: return 300;
+            case 4: return 500;
+            case 5: return 100;
+            case 6: return 999999;
+            case 7: return 900;
+            case 8: return 300;
+            case 9: return 300;
+            case 10: return 500;
+            case 11: return 100;
+            default:    
+                throw new RuntimeErrorException(null, "getPieceValue cannot assign a value to a piecetype not 0 - 11");
+        }
+    }
 }

@@ -44,4 +44,22 @@ public class parkerfish_v1 extends AbstractChessEngine {
         return alpha;
     }
 
+    public void orderMoves(BitwiseMove[] moves){
+
+        for(BitwiseMove move : moves){
+
+            int moveScoreGuess = 0;
+            int movePieceType = bwB.getPieceType(move.fromSquare);
+            int capturePieceType = bwB.getPieceType(move.toSquare);
+            
+            if(capturePieceType != -1){
+                moveScoreGuess = 10 * bwB.getPieceValue(capturePieceType) - bwB.getPieceValue(movePieceType);
+            }
+
+            
+
+        }
+
+    }
+
 }
