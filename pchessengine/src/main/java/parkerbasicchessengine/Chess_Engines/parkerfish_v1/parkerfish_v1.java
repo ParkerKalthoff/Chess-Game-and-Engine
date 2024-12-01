@@ -5,8 +5,11 @@ import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.MoveGenerator;
 
 public class parkerfish_v1 extends AbstractChessEngine {
+
+    private MoveGenerator moveGenerator;
 
     public BitwiseBoard bwB = new BitwiseBoard(board.convertPostionToFEN());
 
@@ -49,8 +52,8 @@ public class parkerfish_v1 extends AbstractChessEngine {
         for(BitwiseMove move : moves){
 
             int moveScoreGuess = 0;
-            int movePieceType = bwB.getPieceType(move.fromSquare);
-            int capturePieceType = bwB.getPieceType(move.toSquare);
+            int movePieceType = bwB.getPieceType(move.getFromSquare());
+            int capturePieceType = bwB.getPieceType(move.getToSquare());
             
             if(capturePieceType != -1){
                 moveScoreGuess = 10 * bwB.getPieceValue(capturePieceType) - bwB.getPieceValue(movePieceType);
@@ -60,6 +63,12 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         }
 
+    }
+
+    public int evaluate(){
+        int eval;
+
+        return eval;
     }
 
 }

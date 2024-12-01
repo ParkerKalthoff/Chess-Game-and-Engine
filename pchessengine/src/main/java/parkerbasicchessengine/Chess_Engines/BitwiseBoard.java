@@ -161,4 +161,16 @@ public class BitwiseBoard {
                 throw new RuntimeErrorException(null, "getPieceValue cannot assign a value to a piecetype not 0 - 11");
         }
     }
+
+    public void movePiece(BitwiseMove move){
+        
+        throw new UnsupportedOperationException("Make move is not implimented");
+        
+    }
+
+    
+    public void unmovePiece(BitwiseMove move){
+        
+        throw new UnsupportedOperationException("unmake move is not implimented");
+    }
 }
