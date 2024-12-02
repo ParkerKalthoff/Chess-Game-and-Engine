@@ -1,4 +1,6 @@
-package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
+package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
+
+import javax.management.RuntimeErrorException;
 
 public class LSBLoopGenerator {
 
@@ -19,7 +21,7 @@ public class LSBLoopGenerator {
     public long getNext(){
 
         if(!hasNext){
-            return 0;
+            throw new RuntimeErrorException(null, "LSBLoopGenerator is trying to access next bit after bitboard is empty, check .hasNext before running");
         }
 
         this.currentBit = this.bitboard & -this.bitboard;

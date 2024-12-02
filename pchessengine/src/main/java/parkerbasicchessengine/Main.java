@@ -3,7 +3,6 @@ package parkerbasicchessengine;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-
 import javax.swing.JFrame;
 
 public class Main {
@@ -34,6 +33,5 @@ public class Main {
         board.repaint();
 
         //board.ai.aiMove();
-
     }
 }

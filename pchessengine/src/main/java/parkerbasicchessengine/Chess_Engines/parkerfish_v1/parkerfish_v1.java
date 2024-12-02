@@ -47,7 +47,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
         return alpha;
     }
 
+    @SuppressWarnings("unused")
     public void orderMoves(BitwiseMove[] moves){
+        
+        // alpha beta pruning is most effective when best moves are searched first and worst last
+        // this function give an extremely rough eval to each position to then optimize the search function
 
         for(BitwiseMove move : moves){
 
@@ -56,11 +60,18 @@ public class parkerfish_v1 extends AbstractChessEngine {
             int capturePieceType = bwB.getPieceType(move.getToSquare());
             
             if(capturePieceType != -1){
+                // priortize good captures
                 moveScoreGuess = 10 * bwB.getPieceValue(capturePieceType) - bwB.getPieceValue(movePieceType);
             }
 
-            
+            if(move.isPromoting()){
+                moveScoreGuess += bwB.getPieceValue(move.getFlag());
+            }
 
+            // TODO 
+            if(false /* move lands into enemy pawns */){
+                movePieceType -= bwB.getPieceValue(move.getToSquare());
+            }
         }
 
     }

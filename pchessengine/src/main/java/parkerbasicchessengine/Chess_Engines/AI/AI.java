@@ -1,4 +1,4 @@
-package parkerbasicchessengine.chess_engine.AI;
+package parkerbasicchessengine.Chess_Engines.AI;
 
 import parkerbasicchessengine.pieces.*;
 

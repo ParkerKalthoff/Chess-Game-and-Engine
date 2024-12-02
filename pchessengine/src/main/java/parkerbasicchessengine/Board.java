@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import javax.management.RuntimeErrorException;
 import javax.swing.JPanel;
 
 import parkerbasicchessengine.Chess_Engines.AI.AI;
@@ -18,6 +17,8 @@ public class Board extends JPanel {
 
     public boolean muteSound = false;
 
+    private soundManager soundManager = new soundManager();
+
     HashMap<String, Integer> pieceHistory = new HashMap<>();
 
     public int tileSize = 85;
@@ -25,6 +26,8 @@ public class Board extends JPanel {
 
     public int rows = 8;
     public int cols = 8;
+
+    public String moveType;
 
     public AI ai = new AI(this);
 
@@ -79,6 +82,8 @@ public class Board extends JPanel {
 
     public void makeMove(Move move) {
 
+        moveType = "Move";
+
         if (move.piece instanceof Pawn) {
             this.halfMoveClock = 0;
             movePawn(move);
@@ -88,6 +93,11 @@ public class Board extends JPanel {
 
         if (move.piece instanceof King) {
             moveKing(move);
+
+            if (Math.abs(move.newCol - move.oldCol) > 1) {
+                moveType = "Castle";
+            }
+
         }
 
         move.piece.col = move.newCol;
@@ -99,10 +109,15 @@ public class Board extends JPanel {
         if (move.capture != null) {
             this.halfMoveClock = 0;
             capture(move.capture);
+            moveType = "Capture";
+        }
+
+        if (checkScanner.isKingChecked(move.newCol, move.newRow, !this.isWhiteToMove)) {
+            moveType = "Check";
         }
 
         // Checks if finished blacks turn for incrementing next turn
-        if (this.isWhiteToMove == false) {
+        if (!this.isWhiteToMove) {
             this.fullMoveCounter++;
         }
 
@@ -115,8 +130,27 @@ public class Board extends JPanel {
             this.isGameOver = true;
         }
 
-        this.isWhiteToMove = !this.isWhiteToMove;
-
+        if (!muteSound) {
+            switch (moveType) {
+                case "Move":
+                    soundManager.playMoveSound();
+                    break;
+                case "Capture":
+                    soundManager.playCaptureSound();
+                    break;
+                case "Castle":
+                    soundManager.playCastleSound();
+                    break;
+                case "Check":
+                    soundManager.playCheckSound();
+                    break;
+                case "Promote":
+                    soundManager.playPromoteSound();
+                    break;
+                default:
+                    throw new IllegalArgumentException("moveType has illegal value of : " + moveType);
+            }
+        }
     }
 
     public void unMakeMove(Move move) {
@@ -190,6 +224,8 @@ public class Board extends JPanel {
             pieceList.remove(move.piece);
             pieceList.add(move.promotedToPiece);
             move.piece = move.promotedToPiece;
+
+            moveType = "Promote";
         }
     }
 
@@ -471,7 +507,6 @@ public class Board extends JPanel {
             }
         }
 
-        
         for (Piece piece : this.pieceList) {
             piece.paint(g2d);
         }
