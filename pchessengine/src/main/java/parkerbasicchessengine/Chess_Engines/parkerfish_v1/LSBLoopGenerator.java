@@ -2,6 +2,8 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 public class LSBLoopGenerator {
 
+    // efficient object for looping over a bitboard
+
     private long bitboard;
     
     public boolean hasNext;
@@ -11,10 +13,7 @@ public class LSBLoopGenerator {
 
     public void setBitboard(long bitboard){
         this.bitboard = bitboard;
-
-        if(bitboard != 0){
-            this.hasNext = true;
-        }
+        this.hasNext = bitboard != 0;
     }
 
     public long getNext(){

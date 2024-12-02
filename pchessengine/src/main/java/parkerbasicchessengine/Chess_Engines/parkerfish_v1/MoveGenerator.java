@@ -8,7 +8,8 @@ public class MoveGenerator {
     private BitwiseBoard bwB;
 
     private long generateTeamMask(int team){
-        long teamMask;
+
+        long teamMask = 0L;
 
         long[] team_bitboards = bwB.piece_bitboards[team]; 
 
@@ -26,7 +27,15 @@ public class MoveGenerator {
     }
 
     public BitwiseMove[] generateMoves(){
-        return null;
+        
+        BitwiseMove[] generatedMoves = new BitwiseMove[218 /* Theoretical max */];
+
+        int team = bwB.isWhiteToMove ? 0 : 1;
+
+        // generate piece moves
+
+        
+        return generatedMoves;
     }
 
 }

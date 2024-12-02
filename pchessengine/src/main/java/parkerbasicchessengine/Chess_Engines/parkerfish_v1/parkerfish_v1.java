@@ -66,7 +66,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
     }
 
     public int evaluate(){
-        int eval;
+        int eval = 1;
 
         return eval;
     }

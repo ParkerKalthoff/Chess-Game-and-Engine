@@ -17,7 +17,7 @@ public class ZorbistHasher {
     // Then you XOR the zorbist key with your castling rights, En passant, and isWhiteToMove numbers
     //
     // So its like generating a unique hash for a given position, this is useful for three-move repitions and memoization for move generation
-    // There is a possibility of 2 distinct positions generating the same key, as you use more than 64 bits of data to generate a 64 number
+    // There is a possibility of 2 distinct positions generating the same key, as you use more than 64 bits of data to generate a 64 bit number
     // there a very low posibility of this happening though
 
     public ZorbistHasher(){
