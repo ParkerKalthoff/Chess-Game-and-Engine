@@ -106,14 +106,31 @@ public class Board extends JPanel {
         move.piece.yPos = move.newRow * this.tileSize;
         move.piece.isFirstMove = false;
 
+        // check if check sound needed
+
+        if (!muteSound /* dont do expensive move search if muted */) {
+
+            Piece friendlyPieces[] = this.pieceList.stream()
+                    .filter(p -> p.isWhite == this.isWhiteToMove)
+                    .toArray(Piece[]::new);
+
+            Piece enemyKing = findKing(!this.isWhiteToMove);
+
+            if (enemyKing != null) {
+                for (Piece piece : friendlyPieces) {
+                    if (__isValidMove(new Move(this, piece, enemyKing.col, enemyKing.row))) {
+                        moveType = "Check";
+                        break;
+                    }
+                    ;
+                }
+            }
+        }
+
         if (move.capture != null) {
             this.halfMoveClock = 0;
             capture(move.capture);
-            moveType = "Capture";
-        }
-
-        if (checkScanner.isKingChecked(move.newCol, move.newRow, !this.isWhiteToMove)) {
-            moveType = "Check";
+            moveType = moveType.equals("Check") ? "Check" : "Capture";
         }
 
         // Checks if finished blacks turn for incrementing next turn
@@ -253,6 +270,17 @@ public class Board extends JPanel {
         return isCorrectTurn && isMovementPatternValid && isTargetSquareValid && hasNoCollision && kingIsSafe;
     }
 
+    private boolean __isValidMove(Move move) {
+
+        boolean isMovementPatternValid = move.piece.isValidMovement(move.newCol, move.newRow);
+
+        boolean isTargetSquareValid = !sameTeam(move.piece, move.capture);
+
+        boolean hasNoCollision = !move.piece.moveCollidesWithPiece(move.newCol, move.newRow);
+
+        return isMovementPatternValid && isTargetSquareValid && hasNoCollision;
+    }
+
     public boolean sameTeam(Piece piece1, Piece piece2) {
         return !(piece1 == null || piece2 == null || piece1.isWhite != piece2.isWhite);
     }
@@ -339,7 +367,7 @@ public class Board extends JPanel {
 
         // half move
 
-        this.halfMoveClock = Integer.parseInt(parts[4]);
+        this.halfMoveClock = Integer.parseInt(parts[4]) * 2;
 
         // full move
 
