@@ -9,9 +9,12 @@ public class LSBLoopGenerator {
     private long bitboard;
     
     public boolean hasNext;
-    public long currentBit;
+    private long currentBit;
 
-    public LSBLoopGenerator(){}
+    public LSBLoopGenerator(long bitboard){
+        this.bitboard = bitboard;
+        this.hasNext = bitboard != 0;
+    }
 
     public void setBitboard(long bitboard){
         this.bitboard = bitboard;

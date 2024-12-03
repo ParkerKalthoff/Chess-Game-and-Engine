@@ -1,6 +1,11 @@
-package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
+package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
-public class MovementBitboards {
+import java.util.HashMap;
+import java.util.Map;
+
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
+
+public class MovementBitboards extends Constants{
     
     public static long bit_pawncaptures[][] = new long[2][64]; 
     public static long bit_pawndefends[][] = new long[2][64];
@@ -34,10 +39,10 @@ public class MovementBitboards {
     public static long mask[] = new long[64];
     public static long not_mask[] = new long[64];
     public static long mask_isolated[] = new long[64];
-    public static long kingside = 0xf0f0f0f0f0f0f0f0L;
-    public static long queenside = 0x0f0f0f0f0f0f0f0fL;
-    public static long not_a_file = 0xfefefefefefefefeL;
-    public static long not_h_file = 0x7f7f7f7f7f7f7f7fL;
+    public static final long kingside = 0xf0f0f0f0f0f0f0f0L;
+    public static final long queenside = 0x0f0f0f0f0f0f0f0fL;
+    public static final long not_a_file = 0xfefefefefefefefeL;
+    public static final long not_h_file = 0x7f7f7f7f7f7f7f7fL;
 
     public static int bits_row[] = {0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7};
     public static int bits_rank[] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
@@ -52,8 +57,22 @@ public class MovementBitboards {
     public static int pawnleft[][] = new int[2][64];
     public static int pawnright[][] = new int[2][64];
 
+    public static Map<Long, Integer> bitboardToIndex = new HashMap<>();
+
+    final static int[] Flip = {
+        56, 57, 58, 59, 60, 61, 62, 63,
+        48, 49, 50, 51, 52, 53, 54, 55,
+        40, 41, 42, 43, 44, 45, 46, 47,
+        32, 33, 34, 35, 36, 37, 38, 39,
+        24, 25, 26, 27, 28, 29, 30, 31,
+        16, 17, 18, 19, 20, 21, 22, 23,
+        8, 9, 10, 11, 12, 13, 14, 15,
+        0, 1, 2, 3, 4, 5, 6, 7
+    };
+
     public MovementBitboards(){
         SetPawnBits();
+        initializeBitboardToIndex();
     }
 
     public static long SetBit(long bb, int square){
@@ -308,6 +327,12 @@ public class MovementBitboards {
                 }
             }
         }
+    }
 
+    public void initializeBitboardToIndex(){
+
+        for(int i = 0; i < 64; i++){
+            bitboardToIndex.put(1L << i, i);
+        }
     }
 }

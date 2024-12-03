@@ -1,11 +1,13 @@
-package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
+package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 
-public class MoveGenerator {
+public class MoveGenerator extends Constants {
 
     private BitwiseBoard bwB;
+    public static long teamMask[] = new long[2];
 
     private long generateTeamMask(int team){
 
@@ -24,6 +26,9 @@ public class MoveGenerator {
 
     public MoveGenerator(BitwiseBoard bwB){
         this.bwB = bwB;
+
+        this.teamMask[White] = generateTeamMask(White);
+        this.teamMask[Black] = generateTeamMask(Black);
     }
 
     public BitwiseMove[] generateMoves(){
@@ -37,5 +42,7 @@ public class MoveGenerator {
         
         return generatedMoves;
     }
+
+    
 
 }
