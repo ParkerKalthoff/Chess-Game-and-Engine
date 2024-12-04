@@ -89,13 +89,20 @@ public class MoveGenerator extends Constants {
 
         while(loop.hasNext){
             long attackBit = loop.getNext();
-
             int attackIndex = MovementBitboards.bitboardToIndex.get(attackBit);
             int fromIndex = attackIndex + adjustment;
-
-
             moveList.append(new BitwiseMove(0, attackIndex, fromIndex));
+        }
 
+        loop.setBitboard(doublePushes);
+        
+        adjustment = bwB.isWhiteToMove ? -16 : 16; 
+
+        while(loop.hasNext){
+            long attackBit = loop.getNext();
+            int attackIndex = MovementBitboards.bitboardToIndex.get(attackBit);
+            int fromIndex = attackIndex + adjustment;
+            moveList.append(new BitwiseMove(6, attackIndex, fromIndex));
         }
 
 
