@@ -2,12 +2,13 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.LSBLoopGenerator;
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 
 public class MoveGenerator extends Constants {
 
     private BitwiseBoard bwB;
-    public static long teamMask[] = new long[2];
+    public long teamMask[] = new long[2];
 
     private long generateTeamMask(int team){
 
@@ -33,16 +34,64 @@ public class MoveGenerator extends Constants {
 
     public BitwiseMove[] generateMoves(){
         
-        BitwiseMove[] generatedMoves = new BitwiseMove[218 /* Theoretical max */];
+        MoveList moveList = new MoveList();
 
-        int team = bwB.isWhiteToMove ? 0 : 1;
-
-        // generate piece moves
+        pawnMoveGen(moveList);
 
         
-        return generatedMoves;
+        return moveList.moves;
     }
 
-    
+    private void pawnMoveGen(MoveList moveList) {
 
-}
+        int team = bwB.isWhiteToMove ? White : Black;
+        int opponent = bwB.isWhiteToMove ? Black : White;
+        long emptySquares = ~(this.teamMask[White] | this.teamMask[Black]);
+        long activePawns = bwB.piece_bitboards[team][P];
+
+        long singlePushes;
+        long doublePushes;
+        long leftCaptures;
+        long rightCaptures;
+        long enPassantSquare;
+        long enPassantMoves;
+        long promotions;
+    
+        if (bwB.isWhiteToMove) {
+            singlePushes = (activePawns << 8) & emptySquares;
+            doublePushes = ((singlePushes & RANK_3) << 8) & emptySquares;
+    
+            leftCaptures = (activePawns << 7) & this.teamMask[Black] & ~FILE_H;
+            rightCaptures = (activePawns << 9) & this.teamMask[Black] & ~FILE_A;
+    
+            enPassantSquare = (bwB.enpassantIndex >= 0 && bwB.enpassantIndex < 64) ? (1L << bwB.enpassantIndex) : 0L;
+            enPassantMoves = (activePawns << 7 & enPassantSquare & ~FILE_H) |
+                                  (activePawns << 9 & enPassantSquare & ~FILE_A);
+    
+            promotions = (singlePushes & RANK_7) | (leftCaptures & RANK_7) | (rightCaptures & RANK_7);
+        } else {
+            singlePushes = (activePawns >>> 8) & emptySquares;
+            doublePushes = ((singlePushes & RANK_6) >>> 8) & emptySquares; 
+    
+            leftCaptures = (activePawns >>> 7) & this.teamMask[White] & ~FILE_A; 
+            rightCaptures = (activePawns >>> 9) & this.teamMask[White] & ~FILE_H;
+    
+            enPassantSquare = (bwB.enpassantIndex >= 0 && bwB.enpassantIndex < 64) ? (1L << bwB.enpassantIndex) : 0L;
+            enPassantMoves = (activePawns >>> 7 & enPassantSquare & ~FILE_A) |
+                                  (activePawns >>> 9 & enPassantSquare & ~FILE_H);
+
+            promotions = (singlePushes & RANK_2) | (leftCaptures & RANK_2) | (rightCaptures & RANK_2);
+        }
+
+        LSBLoopGenerator loop = new LSBLoopGenerator(singlePushes);
+
+        while(loop.hasNext){
+            long currentBit = loop.getNext();
+
+
+        }
+
+
+
+    }
+}    
