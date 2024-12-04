@@ -12,7 +12,11 @@ public class BitwiseMove {
     public static final byte CASTLE_KINGSIDE = 6;    // Kingside castle
     public static final byte CASTLE_QUEENSIDE = 7;   // Queenside castle
 
-    public BitwiseMove(byte fromSquare, byte toSquare, byte flag) {
+    public BitwiseMove(byte fromSquare, byte toSquare, short flag) {
+        this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
+    }
+
+    public BitwiseMove(int fromSquare, int toSquare, int flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
     }
 

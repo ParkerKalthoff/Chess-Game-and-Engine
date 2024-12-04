@@ -1,9 +1,9 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
+import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.LSBLoopGenerator;
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 
 public class MoveGenerator extends Constants {
 
@@ -84,10 +84,17 @@ public class MoveGenerator extends Constants {
         }
 
         LSBLoopGenerator loop = new LSBLoopGenerator(singlePushes);
+        
+        int adjustment = bwB.isWhiteToMove ? -8 : 8; 
 
         while(loop.hasNext){
-            long currentBit = loop.getNext();
+            long attackBit = loop.getNext();
 
+            int attackIndex = MovementBitboards.bitboardToIndex.get(attackBit);
+            int fromIndex = attackIndex + adjustment;
+
+
+            moveList.append(new BitwiseMove(0, attackIndex, fromIndex));
 
         }
 
