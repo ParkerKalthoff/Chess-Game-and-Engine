@@ -45,7 +45,9 @@ public class MoveGenerator extends Constants {
     private void pawnMoveGen(MoveList moveList) {
 
         int team = bwB.isWhiteToMove ? White : Black;
+
         int opponent = bwB.isWhiteToMove ? Black : White;
+
         long emptySquares = ~(this.teamMask[White] | this.teamMask[Black]);
         long activePawns = bwB.piece_bitboards[team][P];
 
@@ -57,7 +59,7 @@ public class MoveGenerator extends Constants {
         long enPassantMoves;
         long promotions;
     
-        if (bwB.isWhiteToMove) {
+        if (bwB.isWhiteToMove) { // gen bitboards
             singlePushes = (activePawns << 8) & emptySquares;
             doublePushes = ((singlePushes & RANK_3) << 8) & emptySquares;
     
@@ -82,14 +84,50 @@ public class MoveGenerator extends Constants {
 
             promotions = (singlePushes & RANK_2) | (leftCaptures & RANK_2) | (rightCaptures & RANK_2);
         }
+        
 
         LSBLoopGenerator loop = new LSBLoopGenerator(singlePushes);
 
+        int adjustDirection = bwB.isWhiteToMove ? 8 : -8;
+
+        // create regular pawn moves
         while(loop.hasNext){
-            long currentBit = loop.getNext();
 
+            int toIndex = MovementBitboards.bitboardToIndex.get(loop.getNext());
+            int fromIndex = toIndex + adjustDirection;
 
+            moveList.append(new BitwiseMove(fromIndex, toIndex, 0));
         }
+
+        // create double pushes
+
+        loop.setBitboard(doublePushes);
+
+        adjustDirection = bwB.isWhiteToMove ? 16 : -16;
+
+        while(loop.hasNext){
+
+            int toIndex = MovementBitboards.bitboardToIndex.get(loop.getNext());
+            int fromIndex = toIndex + adjustDirection;
+
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PAWN_MOVE_DOUBLE));
+        }
+
+        // create double pushes
+
+        loop.setBitboard(doublePushes);
+
+        adjustDirection = bwB.isWhiteToMove ? 16 : -16;
+
+        while(loop.hasNext){
+
+            int toIndex = MovementBitboards.bitboardToIndex.get(loop.getNext());
+            int fromIndex = toIndex + adjustDirection;
+
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PAWN_MOVE_DOUBLE));
+        }
+
+
 
 
 

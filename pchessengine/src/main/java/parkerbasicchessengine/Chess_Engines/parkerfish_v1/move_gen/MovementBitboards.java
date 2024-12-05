@@ -57,7 +57,7 @@ public class MovementBitboards extends Constants{
     public static int pawnleft[][] = new int[2][64];
     public static int pawnright[][] = new int[2][64];
 
-    public static Map<Long, Integer> bitboardToIndex = new HashMap<>();
+    public static Map<Long, Short> bitboardToIndex = new HashMap<>();
 
     final static int[] Flip = {
         56, 57, 58, 59, 60, 61, 62, 63,
@@ -332,7 +332,7 @@ public class MovementBitboards extends Constants{
     public void initializeBitboardToIndex(){
 
         for(int i = 0; i < 64; i++){
-            bitboardToIndex.put(1L << i, i);
+            bitboardToIndex.put(1L << i, (short) i);
         }
     }
 }
