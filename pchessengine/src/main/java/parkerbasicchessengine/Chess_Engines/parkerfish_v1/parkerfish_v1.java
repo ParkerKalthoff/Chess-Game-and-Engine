@@ -11,6 +11,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator moveGenerator;
 
+
     public BitwiseBoard bwB = new BitwiseBoard(board.convertPostionToFEN());
 
     private int search(int depth, int alpha, int beta){
