@@ -25,10 +25,6 @@ public class BitwiseMove {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
     }
 
-    public BitwiseMove(int fromSquare, int toSquare, int flag) {
-        this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
-    }
-
     public BitwiseMove(short fromSquare, short toSquare, short flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
     }
