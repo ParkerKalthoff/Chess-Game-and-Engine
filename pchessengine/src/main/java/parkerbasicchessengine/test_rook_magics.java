@@ -44,17 +44,83 @@ public class test_rook_magics {
             0x6E10101010101000L, 0x5E20202020202000L, 0x3E40404040404000L, 0x7E80808080808000L
     };
 
-    public static final int[] relavantBits = 
-          { 55, 55, 55, 55, 55, 55, 55, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 52, 52, 52, 52, 52, 52, 55,
-            55, 55, 55, 55, 55, 55, 55, 55 };
+    public static final bishopMask = 
+              { 9241421688590303744L, 36099303471056128L, 141012904249856L, 550848566272L, 
+                6480472064L, 1108177604608L, 283691315142656L, 72624976668147712L, 
+                4620710844295151618L, 9241421688590368773L, 36099303487963146L, 141017232965652L, 
+                1659000848424L, 283693466779728L, 72624976676520096L, 145249953336262720L, 
+                2310355422147510788L, 4620710844311799048L, 9241421692918565393L, 36100411639206946L, 
+                424704217196612L, 72625527495610504L, 145249955479592976L, 290499906664153120L, 1
+                155177711057110024L, 2310355426409252880L, 4620711952330133792L, 9241705379636978241L, 
+                108724279602332802L, 145390965166737412L, 290500455356698632L, 580999811184992272L, 
+                577588851267340304L, 1155178802063085600L, 2310639079102947392L, 4693335752243822976L, 
+                9386671504487645697L, 326598935265674242L, 581140276476643332L, 1161999073681608712L, 
+                288793334762704928L, 577868148797087808L, 1227793891648880768L, 2455587783297826816L, 
+                4911175566595588352L, 9822351133174399489L, 1197958188344280066L, 2323857683139004420L, 
+                144117404414255168L, 360293502378066048L, 720587009051099136L, 1441174018118909952L, 
+                2882348036221108224L, 5764696068147249408L, 11529391036782871041L, 4611756524879479810L, 
+                567382630219904L, 1416240237150208L, 2833579985862656L, 5667164249915392L, 
+                11334324221640704L, 22667548931719168L, 45053622886727936L, 18049651735527937L}
 
-    public static long[][] magicIndexToMoves = new long[64][4096];
+    public static final int[] RookShifts = 
+              { 52, 52, 52, 52, 52, 52, 52, 52, 
+                53, 53, 53, 54, 53, 53, 54, 53, 
+                53, 54, 54, 54, 53, 53, 54, 53, 
+                53, 54, 53, 53, 54, 54, 54, 53, 
+                52, 54, 53, 53, 53, 53, 54, 53, 
+                52, 53, 54, 54, 53, 53, 54, 53, 
+                53, 54, 54, 54, 53, 53, 54, 53, 
+                52, 53, 53, 53, 53, 53, 53, 52 };
+
+    public static final int[] BishopShifts = 
+                { 58, 60, 59, 59, 59, 59, 60, 58, 
+                  60, 59, 59, 59, 59, 59, 59, 60, 
+                  59, 59, 57, 57, 57, 57, 59, 59, 
+                  59, 59, 57, 55, 55, 57, 59, 59, 
+                  59, 59, 57, 55, 55, 57, 59, 59, 
+                  59, 59, 57, 57, 57, 57, 59, 59, 
+                  60, 60, 59, 59, 59, 59, 60, 60, 
+                  58, 60, 59, 59, 59, 59, 59, 58 };
+
+    public static long[] RookMagics = 
+                { 468374916371625120L, 18428729537625841661L, 2531023729696186408L, 6093370314119450896L, 
+                  13830552789156493815L, 16134110446239088507L, 12677615322350354425L, 5404321144167858432L, 
+                  2111097758984580L, 18428720740584907710L, 17293734603602787839L, 4938760079889530922L, 
+                  7699325603589095390L, 9078693890218258431L, 578149610753690728L, 9496543503900033792L, 
+                  1155209038552629657L, 9224076274589515780L, 1835781998207181184L, 509120063316431138L, 
+                  16634043024132535807L, 18446673631917146111L, 9623686630121410312L, 4648737361302392899L, 
+                  738591182849868645L, 1732936432546219272L, 2400543327507449856L, 5188164365601475096L, 
+                  10414575345181196316L, 1162492212166789136L, 9396848738060210946L, 622413200109881612L, 
+                  7998357718131801918L, 7719627227008073923L, 16181433497662382080L, 18441958655457754079L, 
+                  1267153596645440L, 18446726464209379263L, 1214021438038606600L, 4650128814733526084L, 
+                  9656144899867951104L, 18444421868610287615L, 3695311799139303489L, 10597006226145476632L, 
+                  18436046904206950398L, 18446726472933277663L, 3458977943764860944L, 39125045590687766L, 
+                  9227453435446560384L, 6476955465732358656L, 1270314852531077632L, 2882448553461416064L, 
+                  11547238928203796481L, 1856618300822323264L, 2573991788166144L, 4936544992551831040L, 
+                  13690941749405253631L, 15852669863439351807L, 18302628748190527413L, 12682135449552027479L, 
+                  13830554446930287982L, 18302628782487371519L, 7924083509981736956L, 4734295326018586370L };
+
+    public static long[] BishopMagics = 
+                { 16509839532542417919L, 14391803910955204223L, 1848771770702627364L, 347925068195328958L, 
+                  5189277761285652493L, 3750937732777063343L, 18429848470517967340L, 17870072066711748607L, 
+                  16715520087474960373L, 2459353627279607168L, 7061705824611107232L, 8089129053103260512L, 
+                  7414579821471224013L, 9520647030890121554L, 17142940634164625405L, 9187037984654475102L, 
+                  4933695867036173873L, 3035992416931960321L, 15052160563071165696L, 5876081268917084809L, 
+                  1153484746652717320L, 6365855841584713735L, 2463646859659644933L, 1453259901463176960L, 
+                  9808859429721908488L, 2829141021535244552L, 576619101540319252L, 5804014844877275314L, 
+                  4774660099383771136L, 328785038479458864L, 2360590652863023124L, 569550314443282L, 
+                  17563974527758635567L, 11698101887533589556L, 5764964460729992192L, 6953579832080335136L, 
+                  1318441160687747328L, 8090717009753444376L, 16751172641200572929L, 5558033503209157252L, 
+                  17100156536247493656L, 7899286223048400564L, 4845135427956654145L, 2368485888099072L, 
+                  2399033289953272320L, 6976678428284034058L, 3134241565013966284L, 8661609558376259840L, 
+                  17275805361393991679L, 15391050065516657151L, 11529206229534274423L, 9876416274250600448L, 
+                  16432792402597134585L, 11975705497012863580L, 11457135419348969979L, 9763749252098620046L, 
+                  16960553411078512574L, 15563877356819111679L, 14994736884583272463L, 9441297368950544394L, 
+                  14537646123432199168L, 9888547162215157388L, 18140215579194907366L, 18374682062228545019L };
+
+
+    public static long[][] rookMagicIndexToMoves = new long[64][4096];
+    public static long[][] bishopMagicIndexToMoves = new long[64][4096];
 
     private static void printBitboard(long bitboard) {
         for (int rank = 7; rank >= 0; rank--) {
@@ -69,18 +135,7 @@ public class test_rook_magics {
     }
 
     public void test() {
-        for (int rookIndex = 0; rookIndex < 64; rookIndex++) {
-            for (long blockers = 0; blockers < 64; blockers++) {
-                int magicIndex = (int) ((blockers * rookMagics[rookIndex]) >>> (relavantBits[rookIndex]));
-                long moves = calculateRookMove(rookIndex, blockers);
-                magicIndexToMoves[rookIndex][magicIndex] = moves;
-            }
-        }
-        try {
-            saveRookMovesBinary(magicIndexToMoves, "RookMagicIndexToMove.dat");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        generateMoves();
 
         System.out.println("Done");
     }
@@ -126,20 +181,92 @@ public class test_rook_magics {
     public long genRookMoves(int rookIndex, long blockerBitboard) {
 
         long blockers = blockerBitboard & rookMask[rookIndex];
-        int magicIndex = (int) ((blockers * rookMagics[rookIndex]) >>> (64 - relavantBits[rookIndex]));
-        long possibleMoves = magicIndexToMoves[rookIndex][magicIndex];
+        int magicIndex = (int) ((blockers * rookMagics[rookIndex]) >>> (64 - RookShifts[rookIndex]));
+        long possibleMoves = rookMagicIndexToMoves[rookIndex][magicIndex];
 
         return possibleMoves;
     }
 
     public static void saveRookMovesBinary(long[][] rookMoves, String fileName) throws IOException {
         try (DataOutputStream out = new DataOutputStream(new FileOutputStream(fileName))) {
-            for (int i = 0; i < rookMoves.length; i++) {
-                for (int j = 0; j < rookMoves[i].length; j++) {
-                    out.writeLong(rookMoves[i][j]);
+            for (long[] rookMove : rookMoves) {
+                for (int j = 0; j < rookMove.length; j++) {
+                    out.writeLong(rookMove[j]);
                 }
             }
         }
     }
+
+    public void generateMoves() {
+        // Generate rook moves
+        for (int rookIndex = 0; rookIndex < 64; rookIndex++) {
+            for (long blockers = 0; blockers < (1L << RookShifts[rookIndex]); blockers++) {
+                int magicIndex = (int) ((blockers * rookMagics[rookIndex]) >>> (64 - RookShifts[rookIndex]));
+                long moves = calculateRookMove(rookIndex, blockers);
+                rookMagicIndexToMoves[rookIndex][magicIndex] = moves;
+            }
+        }
+    
+        // Generate bishop moves
+        for (int bishopIndex = 0; bishopIndex < 64; bishopIndex++) {
+            for (long blockers = 0; blockers < (1L << BishopShifts[bishopIndex]); blockers++) {
+                int magicIndex = (int) ((blockers * BishopMagics[bishopIndex]) >>> (64 - BishopShifts[bishopIndex]));
+                long moves = calculateBishopMove(bishopIndex, blockers);
+                bishopMagicIndexToMoves[bishopIndex][magicIndex] = moves;
+            }
+        }
+    
+        try {
+            saveRookMovesBinary(rookMagicIndexToMoves, "RookMagicIndexToMove.dat");
+            saveRookMovesBinary(bishopMagicIndexToMoves, "BishopMagicIndexToMove.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    
+        System.out.println("Done");
+    }
+    
+    private long calculateBishopMove(int bishopIndex, long relevantBlockers) {
+        long bishopMove = 0L;
+    
+        // Northeast
+        int square = bishopIndex + 9;
+        while (square < 64 && square % 8 != 0 && (relevantBlockers & (1L << square)) == 0) {
+            bishopMove |= (1L << square);
+            square += 9;
+        }
+    
+        // Northwest
+        square = bishopIndex + 7;
+        while (square < 64 && square % 8 != 7 && (relevantBlockers & (1L << square)) == 0) {
+            bishopMove |= (1L << square);
+            square += 7;
+        }
+    
+        // Southeast
+        square = bishopIndex - 7;
+        while (square >= 0 && square % 8 != 0 && (relevantBlockers & (1L << square)) == 0) {
+            bishopMove |= (1L << square);
+            square -= 7;
+        }
+    
+        // Southwest
+        square = bishopIndex - 9;
+        while (square >= 0 && square % 8 != 7 && (relevantBlockers & (1L << square)) == 0) {
+            bishopMove |= (1L << square);
+            square -= 9;
+        }
+    
+        return bishopMove;
+    }
+    
+    public long genBishopMoves(int bishopIndex, long blockerBitboard) {
+        long blockers = blockerBitboard & bishopMask[bishopIndex];
+        int magicIndex = (int) ((blockers * bishopMagics[bishopIndex]) >>> (64 - relavantBits[bishopIndex]));
+        long possibleMoves = bishopMagicIndexToMoves[bishopIndex][magicIndex];
+    
+        return possibleMoves;
+    }
+    
 
 }
