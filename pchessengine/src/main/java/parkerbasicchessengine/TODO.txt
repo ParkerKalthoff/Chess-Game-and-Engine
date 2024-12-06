@@ -1,4 +1,1 @@
-2) main menu
-    a) time
-    b) select color
-    c) engine works for both sides
+FINSIH ENGINE
