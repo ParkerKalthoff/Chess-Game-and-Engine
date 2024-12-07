@@ -12,11 +12,10 @@ public class Main {
     public static void main(String[] args){
 
         test_rook_magics t = new test_rook_magics();
-
         t.test();
 
+        
         /*
-
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
 
@@ -25,8 +24,8 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
-        boolean playerOneIsHuman = false;
-        boolean playerTwoIsHuman = false;
+        boolean playerOneIsHuman = true;
+        boolean playerTwoIsHuman = true;
 
 
 
@@ -35,8 +34,9 @@ public class Main {
 
         frame.setVisible(true);
 
-        board.repaint();*/
+        board.repaint();
 
         //board.ai.aiMove();
+         */
     }
 }

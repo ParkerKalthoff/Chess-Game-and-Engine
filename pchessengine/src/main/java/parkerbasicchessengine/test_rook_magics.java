@@ -3,6 +3,9 @@ package parkerbasicchessengine;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class test_rook_magics {
 
@@ -105,45 +108,35 @@ public class test_rook_magics {
         generateMoves();
 
         System.out.println("Done");
+
     }
 
     private long calculateRookMove(int rookIndex, long relevantBlockers) {
-        long rookMove = 0L;        
+        long rookMove = 0L;
     
-        if (rookIndex / 8 != 0) {
-            int square = rookIndex + 8;
-            while (square < 64 && (relevantBlockers & (1L << square)) == 0) {
-                rookMove |= (1L << square);
-                square += 8;
-            }
-        }
-
-        if (rookIndex / 8 != 7) {
-            int square = rookIndex - 8;
-            while (square >= 0 && (relevantBlockers & (1L << square)) == 0) {
-                rookMove |= (1L << square);
-                square -= 8;
-            }
+        for (int square = rookIndex + 8; square < 64; square += 8) {
+            rookMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) break;
         }
     
-        if (rookIndex % 8 != 7) {
-            int square = rookIndex + 1;
-            while (square % 8 != 0 && (relevantBlockers & (1L << square)) == 0) {
-                rookMove |= (1L << square);
-                square += 1;
-            }
+        for (int square = rookIndex - 8; square >= 0; square -= 8) {
+            rookMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) break;
         }
     
-        if (rookIndex % 8 != 0) {  
-            int square = rookIndex - 1;
-            while (square % 8 != 7 && (relevantBlockers & (1L << square)) == 0) {  
-                rookMove |= (1L << square);
-                square -= 1;
-            }
+        for (int square = rookIndex + 1; square % 8 != 0; square++) {
+            rookMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) break;
+        }
+    
+        for (int square = rookIndex - 1; square % 8 != 7 && square >= 0; square--) {
+            rookMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) break;
         }
     
         return rookMove;
     }
+    
     
     public long genRookMoves(int rookIndex, long blockerBitboard) {
 
@@ -164,45 +157,58 @@ public class test_rook_magics {
         }
     }
 
-    public void generateMoves() {
-        // Generate rook moves
-        for (int rookIndex = 0; rookIndex < 64; rookIndex++) {
-            System.out.println("starting rook loop : " + rookIndex);
-            for (long blockers = 0; blockers < (1L << RookShifts[rookIndex]); blockers++) {
-                int magicIndex = (int) ((blockers * RookMagics[rookIndex]) >>> (RookShifts[rookIndex]));
-                long moves = calculateRookMove(rookIndex, blockers);
-                rookMagicIndexToMoves[rookIndex][magicIndex] = moves;
-            }
-        }
-        
-        System.out.println("starting Rook Gen");
-        try {
-            saveRookMovesBinary(rookMagicIndexToMoves, "RookMagicIndexToMove.dat");
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void generateMoves(){
 
-        // Generate bishop moves
-        for (int bishopIndex = 0; bishopIndex < 64; bishopIndex++) {
-            System.out.println("finished bishop loop : " + bishopIndex);
-            for (long blockers = 0; blockers < (1L << BishopShifts[bishopIndex]); blockers++) {
-                int magicIndex = (int) ((blockers * BishopMagics[bishopIndex]) >>> (BishopShifts[bishopIndex]));
-                long moves = calculateBishopMove(bishopIndex, blockers);
-                bishopMagicIndexToMoves[bishopIndex][magicIndex] = moves;
-            }
-        }
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Finished Bishop Gen");
-    
-        try {
+        for(int index = 0; index < 64; index++){
+            long currentBitboard = rookMask[index];
+
+            List<Long> blockerMasks = generatePermutations(currentBitboard);
             
-            saveRookMovesBinary(bishopMagicIndexToMoves, "BishopMagicIndexToMove.dat");
-        } catch (IOException e) {
-            e.printStackTrace();
+            for(Long blockerMask : blockerMasks){
+                int magicIndex = (int) ((blockerMask * RookMagics[index]) >>> (RookShifts[index]));
+                rookMagicIndexToMoves[index][magicIndex] = calculateRookMove(index, blockerMask);
+
+                if(index == 35){
+                    System.out.println("-----------------------");
+                    System.out.println("Magic Index : " + magicIndex);
+                    System.err.println("Rook Index : " + index);
+                    System.out.println("Rook Magic : " + RookMagics[index]);
+                    System.out.println("Blocker Mask : ");
+                    printBitboard(blockerMask);
+                    System.out.println("Rook Mask : ");
+                    printBitboard(currentBitboard);
+                    System.out.println("Movement Bitboard : ");
+                    printBitboard(rookMagicIndexToMoves[index][magicIndex]);
+                    scanner.nextLine();    
+                }
+                }
+
+                
+                
+                
+                
+                
+                
+                
+                
         }
-    
-        System.out.println("Done");
+
+        System.out.println("Done with Rook move generation...");
+    }
+
+    public static List<Long> generatePermutations(long bitmask) {
+        List<Long> permutations = new ArrayList<>();
+        
+        // Generate all subsets of the bitmask
+        long subset = 0;
+        do {
+            permutations.add(subset);
+            subset = (subset - bitmask) & bitmask;
+        } while (subset != 0);
+        
+        return permutations;
     }
     
     private long calculateBishopMove(int bishopIndex, long relevantBlockers) {
