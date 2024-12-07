@@ -11,6 +11,20 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator moveGenerator;
 
+    public parkerfish_v1(){
+        System.out.println(
+        " (                                (                                  \r\n" + //
+        " )\\ )               )             )\\ )             )              )  \r\n" + //
+        "(()/(    )  (    ( /(    (   (   (()/(  (       ( /(   (   (   ( /(  \r\n" + //
+        " /(_))( /(  )(   )\\())  ))\\  )(   /(_)) )\\  (   )\\())  )\\  )\\  )\\()) \r\n" + //
+        "(_))  )(_))(()\\ ((_)\\  /((_)(()\\ (_))_|((_) )\\ ((_)\\  ((_)((_)((_)\\  \r\n" + //
+        "| _ \\((_)_  ((_)| |(_)(_))   ((_)| |_   (_)((_)| |(_) \\ \\ / /  / (_) \r\n" + //
+        "|  _// _` || '_|| / / / -_) | '_|| __|  | |(_-<| ' \\   \\ V /   | |   \r\n" + //
+        "|_|  \\__,_||_|  |_\\_\\ \\___| |_|  |_|    |_|/__/|_||_|   \\_/    |_|   \r\n" + //
+        "                                                                     "
+        );
+    }
+
 
     public BitwiseBoard bwB = new BitwiseBoard(board.convertPostionToFEN());
 

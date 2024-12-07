@@ -10,10 +10,6 @@ public class Main {
     public final static boolean ai_verses_ai = false;
     
     public static void main(String[] args){
-
-        test_rook_magics t = new test_rook_magics();
-        t.test();
-
         
         /*
         JFrame frame = new JFrame();
