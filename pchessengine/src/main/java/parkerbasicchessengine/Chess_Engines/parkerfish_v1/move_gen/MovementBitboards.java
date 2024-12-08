@@ -6,6 +6,8 @@ import java.util.Map;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 
 public class MovementBitboards extends Constants{
+
+    // probably remove, this was from an old project and it SUCKS
     
     public static long bit_pawncaptures[][] = new long[2][64]; 
     public static long bit_pawndefends[][] = new long[2][64];

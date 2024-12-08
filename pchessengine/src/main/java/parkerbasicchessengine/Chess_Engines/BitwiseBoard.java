@@ -112,12 +112,6 @@ public class BitwiseBoard {
         this.historicalPostions.put(hash, this.historicalPostions.get(hash) - 1); 
     }
 
-    public void movePiece(int move){
-        //
-
-
-    }
-
     public int getPieceType(int square){
 
         long bitboardSquare = 1L << square;
@@ -172,5 +166,13 @@ public class BitwiseBoard {
     public void unmovePiece(BitwiseMove move){
         
         throw new UnsupportedOperationException("unmake move is not implimented");
+    }
+
+    public boolean canCastleQueenside(){
+        return (this.castlingRights & (1 << (this.isWhiteToMove ? 2 : 0))) != 0;
+    }
+
+    public boolean canCastleKingside(){
+        return (this.castlingRights & (2 << (this.isWhiteToMove ? 2 : 0))) != 0;
     }
 }
