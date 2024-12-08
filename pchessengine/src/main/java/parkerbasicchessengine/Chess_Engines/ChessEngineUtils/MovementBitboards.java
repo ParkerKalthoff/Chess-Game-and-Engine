@@ -1,9 +1,7 @@
-package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
+package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 
 public class MovementBitboards extends Constants{
 
