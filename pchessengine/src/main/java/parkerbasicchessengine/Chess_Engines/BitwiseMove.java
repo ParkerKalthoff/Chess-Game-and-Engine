@@ -57,4 +57,42 @@ public class BitwiseMove {
     public int getFlag() {
         return (move >> 12) & 0xF;
     }
+
+    public String toString(){
+
+        int flag = getFlag();
+
+        if(flag == CASTLE_KINGSIDE){
+            return "O-O";
+        }
+
+        if(flag == CASTLE_QUEENSIDE){
+            return "O-O-O";
+        }
+
+        int fromIndex = this.getFromSquare();
+
+        int fromFile = fromIndex % 8;
+        int fromRank = fromIndex / 8;
+    
+        char fromFileChar = (char) ('a' + fromFile);
+        int fromRankNumber = fromRank + 1;
+
+        String fromSquare = String.valueOf(fromFileChar) + fromRankNumber;
+
+        // -----
+
+        int toIndex = this.getToSquare();
+
+        int toFile = toIndex % 8;
+        int toRank = toIndex / 8;
+    
+        char toFileChar = (char) ('a' + toFile);
+        int toRankNumber = toRank + 1;
+
+        String toSquare = String.valueOf(toFileChar) + toRankNumber;
+
+        
+        return fromSquare+toSquare;
+    }
 }

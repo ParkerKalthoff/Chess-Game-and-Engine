@@ -17,4 +17,14 @@ public class MoveList {
         this.index++;
     }
 
+    public BitwiseMove[] toArray(){
+
+        BitwiseMove[] shrunkArray = new BitwiseMove[index];
+
+        for(int i = 0; i < this.index; i++){
+            shrunkArray[i] = this.moves[i];
+        }
+
+        return shrunkArray;
+    }
 }

@@ -33,6 +33,10 @@ public class MoveGenerator extends Constants {
     public long teamMask[] = new long[2];
     public long allPieces;
 
+    public int piecesCheckingKingCount;
+    public long enemyVision;
+    public long blockCheck;
+
     private long generateTeamMask(int team) {
 
         long teamMask = 0L;
@@ -40,11 +44,8 @@ public class MoveGenerator extends Constants {
         long[] team_bitboards = bwB.piece_bitboards[team];
 
         for (long pieceMask : team_bitboards) {
-
             teamMask |= pieceMask;
-
         }
-
         return teamMask;
     }
 
@@ -57,15 +58,18 @@ public class MoveGenerator extends Constants {
         this.teamMask[White] = generateTeamMask(White);
         this.teamMask[Black] = generateTeamMask(Black);
         this.allPieces = this.teamMask[White] | this.teamMask[Black];
-
+        
         MoveList moveList = new MoveList();
+
+        // pass in a moveList to save moves, otherwise move generator assumes 
+        // you are generating opposition vision and pins
 
         pawnMoveGen(moveList);
         slidingPieceMoveGen(moveList);
         knightMoveGen(moveList);
         kingMoveGen(moveList);
 
-        BitwiseMove[] endMoveList = new BitwiseMove[moveList.index];
+        BitwiseMove[] endMoveList = moveList.toArray();
 
         for(int i = 0; i < moveList.index; i++){
             endMoveList[i] = moveList.moves[i];
@@ -203,6 +207,7 @@ public class MoveGenerator extends Constants {
         if (enPassantRight != 0L) {
             generatePawnMoves(enPassantRight, bwB.isWhiteToMove ? -9 : 9, BitwiseMove.EN_PASSANT_CAPTURE, moveList);
         }
+        
     }
 
     private void generatePawnMoves(long bitboard, int adjustDirection, int moveFlag, MoveList moveList) {

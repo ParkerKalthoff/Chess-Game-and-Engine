@@ -16,8 +16,15 @@ import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator moveGenerator;
+    private Board board;
+    public BitwiseBoard bwB; 
 
-    public parkerfish_v1(){
+    public parkerfish_v1(Board board){
+
+        this.board = board;
+        this.bwB = new BitwiseBoard(board.convertPostionToFEN());
+        this.moveGenerator = new MoveGenerator(this.bwB);
+
         System.out.println(
         " (                                (                                  \r\n" + //
         " )\\ )               )             )\\ )             )              )  \r\n" + //
@@ -32,7 +39,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
     }
 
 
-    public BitwiseBoard bwB = new BitwiseBoard(board.convertPostionToFEN());
 
     // minimax algorithm
     // generates all positions and when depth is at zero does an evaluation on all positions
@@ -56,6 +62,41 @@ public class parkerfish_v1 extends AbstractChessEngine {
     //   I do a 'move ordering' algorithm that does a super basic scoring of each move, so I give :
     //   promotions a boost, a lower value piece capturing a higher value piece a boost, and lower the score
     //   for moves that put pieces in front of enemy pawns. 
+
+    public void makeMove() {
+        BitwiseMove[] legalMoves = moveGenerator.generateMoves();
+    
+        if (legalMoves.length == 0) {
+            if (legalMoves.length == 0 /* <--- fake code - Player in check */) {
+                System.out.println("Checkmate!");
+            } else {
+                System.out.println("Stalemate!");
+            }
+            return;
+        }
+    
+        int depth = 3; 
+        int alpha = Integer.MIN_VALUE;
+        int beta = Integer.MAX_VALUE;
+        BitwiseMove bestMove = null;
+        int bestEval = Integer.MIN_VALUE;
+    
+        for (BitwiseMove move : legalMoves) {
+            bwB.movePiece(move);
+            int eval = -search(depth - 1, -beta, -alpha);
+            bwB.unmovePiece(move);
+    
+            if (eval > bestEval) {
+                bestEval = eval;
+                bestMove = move;
+            }
+        }
+    
+        if (bestMove != null) {
+            bwB.movePiece(bestMove);
+            System.out.println("Best move: " + bestMove);
+        }
+    }
 
     private int search(int depth, int alpha, int beta){
 
@@ -94,7 +135,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
         return alpha;
     }
 
-    @SuppressWarnings("unused")
     public BitwiseMove[] orderMoves(BitwiseMove[] moves){
         
         // alpha beta pruning is most effective when best moves are searched first and worst last
@@ -141,9 +181,29 @@ public class parkerfish_v1 extends AbstractChessEngine {
     }
 
     public int evaluate(){
-        int eval = 1;
+        
+        // using a placeholder of checking material difference
 
-        return eval;
+        // plan to account for piece placement, connected pawns, is castled weighted by remaining material
+
+        int whiteScore = 0;
+        int blackScore = 0;
+        
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][0]) * 999999;
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][1]) * 900;
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][2]) * 300;
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][3]) * 300;
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][4]) * 500;
+        whiteScore += Long.bitCount(bwB.piece_bitboards[0][5]) * 100;
+
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][0]) * 999999;
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][1]) * 900;
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][2]) * 300;
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][3]) * 300;
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][4]) * 500;
+        blackScore += Long.bitCount(bwB.piece_bitboards[1][5]) * 100;
+
+        return whiteScore - blackScore;
     }
 
 }

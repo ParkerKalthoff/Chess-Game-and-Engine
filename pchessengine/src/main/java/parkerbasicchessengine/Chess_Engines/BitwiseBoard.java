@@ -24,6 +24,8 @@ public class BitwiseBoard {
 
     public boolean isGameOver;
 
+    public boolean kingIsInCheck;
+
     private ZorbistHasher zorbistHasher = new ZorbistHasher();
 
     public HashMap<Long, Integer> historicalPostions = new HashMap<>();
@@ -112,6 +114,10 @@ public class BitwiseBoard {
         this.historicalPostions.put(hash, this.historicalPostions.get(hash) - 1); 
     }
 
+    private void removePositionFromHistoricalPositions(long hash){
+        this.historicalPostions.put(hash, this.historicalPostions.get(hash) - 1); 
+    }
+
     public int getPieceType(int square){
 
         long bitboardSquare = 1L << square;
@@ -156,9 +162,50 @@ public class BitwiseBoard {
         }
     }
 
-    public void movePiece(BitwiseMove move){
+    public int movePiece(BitwiseMove move){
+        // handles moving a piece, returns the last captured piece
+
+        int fromSquare = move.getFromSquare();
+        int toSquare = move.getToSquare();
+        int flag =  move.getFlag();
+
+        int pieceType = getPieceType(fromSquare);
+
+        int team = pieceType > 5 ? 0 : 1;
+        int boardPieceType = pieceType - (6 * team); 
+        // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
+
+        int capturePieceType = getPieceType(toSquare); // should be -1 if no capture
+        int captureTeam = team ^ 1;
+        int enemyBoardPieceType = pieceType - (6 * captureTeam); 
+
+        switch (flag) {
+            case BitwiseMove.NORMAL_MOVE:
+
+                this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+                this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
+
+                if(boardPieceType == 0){
+                    int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
+                    this.castlingRights &= ~activeCastlingBits;
+                }
+
+                if(boardPieceType == 4){
+                    int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
+                    this.castlingRights &= ~activeCastlingBits;
+                }
+
+                if(capturePieceType != -1){
+                    this.piece_bitboards[captureTeam][enemyBoardPieceType] ^= (1L << toSquare);
+                }
+
+                break;
         
-        throw new UnsupportedOperationException("Make move is not implimented");
+            default:
+                break;
+        }
+
+        return capturePieceType;
         
     }
 
