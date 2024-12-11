@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
-import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
 
 public class BitwiseBoard {
@@ -29,6 +28,21 @@ public class BitwiseBoard {
     private ZorbistHasher zorbistHasher = new ZorbistHasher();
 
     public HashMap<Long, Integer> historicalPostions = new HashMap<>();
+
+    public void printBitboard(long bitboard) {
+        System.out.println();
+        for (int rank = 7; rank >= 0; rank--) {  // Loop through ranks (8 rows)
+            for (int file = 0; file < 8; file++) { // Loop through files (8 columns)
+                int squareIndex = rank * 8 + file;  // Calculate index of the current square
+                if ((bitboard & (1L << squareIndex)) != 0) {
+                    System.out.print("1 ");  // Piece present on this square
+                } else {
+                    System.out.print("0 ");  // No piece on this square
+                }
+            }
+            System.out.println();  // Move to the next line after each rank
+        }
+    }
 
     public BitwiseBoard(String fenString) {
 
@@ -92,6 +106,14 @@ public class BitwiseBoard {
         this.halfMoveClock = Integer.parseInt(parts[4]) * 2 + (this.isWhiteToMove ? 0 : 1);
 
         this.fullMoveCounter = Integer.parseInt(parts[5]);
+
+        printBitboard(this.piece_bitboards[0][0]);
+        printBitboard(this.piece_bitboards[0][1]);
+        printBitboard(this.piece_bitboards[0][2]);
+        printBitboard(this.piece_bitboards[0][3]);
+        printBitboard(this.piece_bitboards[0][4]);
+        printBitboard(this.piece_bitboards[0][5]);
+
     }
 
     private long hashPosition(){
@@ -171,17 +193,28 @@ public class BitwiseBoard {
 
         int pieceType = getPieceType(fromSquare);
 
-        System.out.println("piece type -- " + pieceType);
-        
-        System.out.println("from -- " + fromSquare);
+        int team = pieceType <= 5 ? 0 : 1;
 
-        int team = pieceType > 5 ? 0 : 1;
         int boardPieceType = pieceType - (6 * team); 
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
 
         int capturePieceType = getPieceType(toSquare); // should be -1 if no capture
         int captureTeam = team ^ 1;
         int captureBoardPieceType = capturePieceType % 6; 
+
+        /*
+        System.out.println("-------------------");
+
+        System.out.println("fromSquare "+ fromSquare); 
+        System.out.println("toSquare "+ toSquare); 
+        System.out.println("flag "+ flag); 
+        System.out.println("pieceType "+ pieceType); 
+        System.out.println("team "+ team); 
+        System.out.println("boardPieceType "+ boardPieceType); 
+        System.out.println("capturePieceType "+ capturePieceType); 
+        System.out.println("captureTeam "+ captureTeam); 
+        System.out.println("captureBoardPieceType "+ captureBoardPieceType); 
+        */
 
         switch (flag) {
             case BitwiseMove.NORMAL_MOVE:
@@ -219,7 +252,7 @@ public class BitwiseBoard {
 
                 if(this.isWhiteToMove){
 
-                    this.piece_bitboards[team][4] ^= (1L << 0);                
+                    this.piece_bitboards[team][4] ^= (1L);                
                     this.piece_bitboards[team][4] ^= (1L << 2);
                     
                 } else {
@@ -293,7 +326,7 @@ public class BitwiseBoard {
         int flag = move.getFlag();
     
         int pieceType = getPieceType(toSquare);
-        int team = pieceType > 5 ? 0 : 1;
+        int team = pieceType <= 5 ? 0 : 1;
         int boardPieceType = pieceType - (6 * team);
     
     
@@ -328,7 +361,7 @@ public class BitwiseBoard {
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
                 if (team == 1) { // White
                     this.piece_bitboards[team][4] ^= (1L << 2);
-                    this.piece_bitboards[team][4] ^= (1L << 0);
+                    this.piece_bitboards[team][4] ^= (1L);
                 } else { // Black
                     this.piece_bitboards[team][4] ^= (1L << 58);
                     this.piece_bitboards[team][4] ^= (1L << 56);
@@ -367,7 +400,7 @@ public class BitwiseBoard {
                 break;
     
             default:
-                new RuntimeErrorException(null, "Flag does not match pattern in undo move");
+                throw new RuntimeErrorException(null, "Flag does not match pattern in undo move");
         }
     }
 
@@ -379,19 +412,58 @@ public class BitwiseBoard {
         return (this.castlingRights & (2 << (this.isWhiteToMove ? 2 : 0))) != 0;
     }
 
+    public String bitboardsToString() {
+        // chat gtp'd a printer cause I CANT BE BOTHERED AHHH
+        StringBuilder sb = new StringBuilder();
+        
+        // Define a piece representation for each type
+        char[][] pieceRepresentation = {
+            {'K', 'Q', 'B', 'N', 'R', 'P'}, // White pieces
+            {'k', 'q', 'b', 'n', 'r', 'p'}  // Black pieces
+        };
+
+        // Create the chessboard string (8x8 grid)
+        for (int rank = 7; rank >= 0; rank--) {  // Loop through ranks (8 rows)
+            for (int file = 0; file < 8; file++) { // Loop through files (8 columns)
+                boolean piecePlaced = false;
+                // Check for each piece (white and black)
+                for (int color = 0; color < 2; color++) {
+                    for (int pieceType = 0; pieceType < 6; pieceType++) {
+                        long bitboard = piece_bitboards[color][pieceType];
+                        if ((bitboard & (1L << (rank * 8 + file))) != 0) {
+                            sb.append(pieceRepresentation[color][pieceType]);
+                            piecePlaced = true;
+                            break;
+                        }
+                    }
+                    if (piecePlaced) break;
+                }
+                
+                // If no piece is placed, add a dot (empty square)
+                if (!piecePlaced) sb.append('.');
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     //-------------
 
     private void performMove(int team, int boardPieceType, int fromSquare, int toSquare, int captureTeam, int captureBoardPieceType, int capturePieceType, int promotionType, int newEnPassantSquare) {
         
-        System.out.println("int team " + team);
-        System.out.println("int boardPieceType " + boardPieceType) ;
-        System.out.println("int fromSquare " + fromSquare) ;
-        System.out.println("int toSquare " + toSquare) ;
-        System.out.println("int captureTeam " + captureTeam) ;
-        System.out.println("int captureBoardPieceType " + captureBoardPieceType) ;
-        System.out.println("int capturePieceType " + capturePieceType) ;
-        System.out.println("int promotionType " + promotionType) ;
+        /*
+        System.out.println("int team " + team); 
+        System.out.println("int boardPieceType " + boardPieceType); 
+        System.out.println("int fromSquare " + fromSquare); 
+        System.out.println("int toSquare " + toSquare); 
+        System.out.println("int captureTeam " + captureTeam); 
+        System.out.println("int captureBoardPieceType " + captureBoardPieceType); 
+        System.out.println("int capturePieceType " + capturePieceType); 
+        System.out.println("int promotionType " + promotionType); 
         System.out.println("int newEnPassantSquare " + newEnPassantSquare);
+         */
+
+
 
         this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
         this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);

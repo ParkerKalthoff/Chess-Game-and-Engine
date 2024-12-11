@@ -1,18 +1,16 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 import parkerbasicchessengine.Board;
-import parkerbasicchessengine.Move;
+import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
+import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator;
-import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
+import parkerbasicchessengine.Move;
 
 public class parkerfish_v1 extends AbstractChessEngine {
 
@@ -87,7 +85,9 @@ public class parkerfish_v1 extends AbstractChessEngine {
             byte preMoveCastlingRights = bwB.castlingRights;
             int capturePieceType = bwB.movePiece(move);
 
+            System.out.println(bwB.bitboardsToString()); 
             int eval = -search(depth - 1, -beta, -alpha);
+
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
     
             if (eval > bestEval) {
@@ -181,7 +181,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
             }
 
             if(canBeCapturedByEnemyPawns){
-                movePieceType -= bwB.getPieceValue(move.getToSquare());
+                moveScoreGuess -= bwB.getPieceValue(move.getToSquare());
             }
             moveScores.put(move, moveScoreGuess);
         }

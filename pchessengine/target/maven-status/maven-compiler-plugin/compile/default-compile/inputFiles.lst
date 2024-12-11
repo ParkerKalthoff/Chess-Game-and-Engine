@@ -1,5 +1,18 @@
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Board.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\CheckScanner.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\AbstractChessEngine.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\AI\AI.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\BitwiseBoard.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\BitwiseMove.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\ChessEngineUtils\Constants.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\ChessEngineUtils\EvalBoards.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\ChessEngineUtils\LSBLoopGenerator.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\ChessEngineUtils\MovementBitboards.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\ChessEngineUtils\ZorbistHasher.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\parkerfish_v1\move_gen\MoveGenerator.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\parkerfish_v1\move_gen\MoveList.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\parkerfish_v1\move_gen\SlidingMovementGeneration.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Chess_Engines\parkerfish_v1\parkerfish_v1.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Input.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Main.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\Move.java
@@ -10,3 +23,4 @@ C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\jav
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\pieces\Piece.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\pieces\Queen.java
 C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\pieces\Rook.java
+C:\Users\Parker Kalthoff\Desktop\parker_chess_engine_2\pchessengine\src\main\java\parkerbasicchessengine\soundManager.java
