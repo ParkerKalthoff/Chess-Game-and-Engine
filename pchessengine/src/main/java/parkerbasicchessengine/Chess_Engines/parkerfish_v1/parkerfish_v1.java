@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import parkerbasicchessengine.Board;
+import parkerbasicchessengine.Move;
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator;
@@ -82,9 +83,12 @@ public class parkerfish_v1 extends AbstractChessEngine {
         int bestEval = Integer.MIN_VALUE;
     
         for (BitwiseMove move : legalMoves) {
-            bwB.movePiece(move);
+
+            byte preMoveCastlingRights = bwB.castlingRights;
+            int capturePieceType = bwB.movePiece(move);
+
             int eval = -search(depth - 1, -beta, -alpha);
-            bwB.unmovePiece(move);
+            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
     
             if (eval > bestEval) {
                 bestEval = eval;
@@ -94,6 +98,13 @@ public class parkerfish_v1 extends AbstractChessEngine {
     
         if (bestMove != null) {
             bwB.movePiece(bestMove);
+
+            int oldCol = bestMove.getFromSquare() % 8;
+            int oldRow = bestMove.getFromSquare() / 8;
+            int newCol = bestMove.getToSquare() % 8;
+            int newRow = bestMove.getToSquare() / 8;
+
+            board.makeMove(new Move(board, board.getPiece(oldCol, oldRow), newCol, newRow));
             System.out.println("Best move: " + bestMove);
         }
     }
@@ -119,9 +130,12 @@ public class parkerfish_v1 extends AbstractChessEngine {
         moves = orderMoves(moves);
 
         for(BitwiseMove move : moves){
-            bwB.movePiece(move);
-            int eval = -this.search(depth - 1, -beta, -alpha);
-            bwB.unmovePiece(move);
+
+            byte preMoveCastlingRights = bwB.castlingRights;
+            int capturePieceType = bwB.movePiece(move);
+
+            int eval = -search(depth - 1, -beta, -alpha);
+            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
 
             if(eval >= beta){
                 // determines if opponent will likely avoid position

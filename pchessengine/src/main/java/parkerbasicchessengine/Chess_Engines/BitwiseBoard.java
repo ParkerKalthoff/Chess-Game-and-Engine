@@ -14,7 +14,7 @@ public class BitwiseBoard {
     // is not meant for generating legal moves or verifying legal positions
 
     // [0 white, 1 black] - [0 king, 1 queen, 2 bishop, 3 knight, 4 rook, 5 pawn]
-    public long piece_bitboards[][];
+    public long piece_bitboards[][] = {{0L, 0L, 0L, 0L, 0L, 0L}, {0L, 0L, 0L, 0L, 0L, 0L}};
     public int enpassantIndex;
     public boolean isWhiteToMove;
     public byte castlingRights;
@@ -171,48 +171,204 @@ public class BitwiseBoard {
 
         int pieceType = getPieceType(fromSquare);
 
+        System.out.println("piece type -- " + pieceType);
+        
+        System.out.println("from -- " + fromSquare);
+
         int team = pieceType > 5 ? 0 : 1;
         int boardPieceType = pieceType - (6 * team); 
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
 
         int capturePieceType = getPieceType(toSquare); // should be -1 if no capture
         int captureTeam = team ^ 1;
-        int enemyBoardPieceType = pieceType - (6 * captureTeam); 
+        int captureBoardPieceType = capturePieceType % 6; 
 
         switch (flag) {
             case BitwiseMove.NORMAL_MOVE:
+ 
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, capturePieceType, -1, -1);
+
+                break;
+
+            case BitwiseMove.PAWN_MOVE_DOUBLE:
+
+                int newEnPassantSquare = (fromSquare + toSquare) / 2;
+
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, -1, -1, newEnPassantSquare);
+                
+                break;
+
+            case BitwiseMove.EN_PASSANT_CAPTURE:
+
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, -1, -1, -1);
+                
+                // manual capture :o
+                this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << this.enpassantIndex);
+
+                this.enpassantIndex = -1;
+
+                break;
+
+            
+            case BitwiseMove.CASTLE_KINGSIDE:
+
+                // handling this special move type manually :o
 
                 this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
                 this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
 
-                if(boardPieceType == 0){
-                    int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
-                    this.castlingRights &= ~activeCastlingBits;
+                if(this.isWhiteToMove){
+
+                    this.piece_bitboards[team][4] ^= (1L << 0);                
+                    this.piece_bitboards[team][4] ^= (1L << 2);
+                    
+                } else {
+
+                    this.piece_bitboards[team][4] ^= (1L << 56);                
+                    this.piece_bitboards[team][4] ^= (1L << 58);
+                    
+                }
+                
+                int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
+                this.castlingRights &= ~activeCastlingBits;
+                this.enpassantIndex = -1;
+
+                break; 
+            
+            case BitwiseMove.CASTLE_QUEENSIDE:
+
+                this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+                this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
+                
+                if(this.isWhiteToMove){
+
+                    this.piece_bitboards[team][4] ^= (1L << 7);                
+                    this.piece_bitboards[team][4] ^= (1L << 4);
+                    
+                } else {
+
+                    this.piece_bitboards[team][4] ^= (1L << 63);                
+                    this.piece_bitboards[team][4] ^= (1L << 60);
+                    
                 }
 
-                if(boardPieceType == 4){
-                    int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
-                    this.castlingRights &= ~activeCastlingBits;
-                }
+                int activeCastlingBit = this.isWhiteToMove ? 0b1100 : 0b0011;
+                this.castlingRights &= ~activeCastlingBit;
+                this.enpassantIndex = -1;
 
-                if(capturePieceType != -1){
-                    this.piece_bitboards[captureTeam][enemyBoardPieceType] ^= (1L << toSquare);
-                }
-
+                break; 
+            
+            case BitwiseMove.PROMOTE_TO_BISHOP:
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, capturePieceType, BitwiseMove.PROMOTE_TO_BISHOP, -1);
                 break;
-        
+            
+            case BitwiseMove.PROMOTE_TO_QUEEN:
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, capturePieceType, BitwiseMove.PROMOTE_TO_QUEEN, -1);
+                break;
+                
+            case BitwiseMove.PROMOTE_TO_KNIGHT:
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, capturePieceType, BitwiseMove.PROMOTE_TO_KNIGHT, -1);
+                break;
+                
+            case BitwiseMove.PROMOTE_TO_ROOK:
+                performMove(team, boardPieceType, fromSquare, toSquare, captureTeam, captureBoardPieceType, capturePieceType, BitwiseMove.PROMOTE_TO_ROOK, -1);
+                break;
+                
+                
             default:
                 break;
         }
+
+        this.addPositionToHistoricalPositions();
 
         return capturePieceType;
         
     }
 
     
-    public void unmovePiece(BitwiseMove move){
-        
-        throw new UnsupportedOperationException("unmake move is not implimented");
+    public void unmovePiece(BitwiseMove move, int capturePieceType, byte previousCastlingRights) {
+
+        int fromSquare = move.getFromSquare();
+        int toSquare = move.getToSquare();
+        int flag = move.getFlag();
+    
+        int pieceType = getPieceType(toSquare);
+        int team = pieceType > 5 ? 0 : 1;
+        int boardPieceType = pieceType - (6 * team);
+    
+    
+        this.castlingRights = previousCastlingRights;
+    
+        if (capturePieceType != -1) {
+            int captureTeam = capturePieceType > 5 ? 1 : 0;
+            int captureBoardPieceType = capturePieceType % 6;
+    
+            this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << toSquare);
+        }
+    
+        switch (flag) {
+            case BitwiseMove.NORMAL_MOVE:
+                performUndoMove(team, boardPieceType, fromSquare, toSquare);
+                break;
+    
+            case BitwiseMove.PAWN_MOVE_DOUBLE:
+                performUndoMove(team, boardPieceType, fromSquare, toSquare);
+                this.enpassantIndex = -1; 
+                break;
+    
+            case BitwiseMove.EN_PASSANT_CAPTURE:
+                performUndoMove(team, boardPieceType, fromSquare, toSquare);
+                int captureSquare = this.enpassantIndex;
+                int captureTeam = team ^ 1;
+                this.piece_bitboards[captureTeam][0] ^= (1L << captureSquare);
+                this.enpassantIndex = -1;
+                break;
+    
+            case BitwiseMove.CASTLE_KINGSIDE:
+                performUndoMove(team, boardPieceType, fromSquare, toSquare);
+                if (team == 1) { // White
+                    this.piece_bitboards[team][4] ^= (1L << 2);
+                    this.piece_bitboards[team][4] ^= (1L << 0);
+                } else { // Black
+                    this.piece_bitboards[team][4] ^= (1L << 58);
+                    this.piece_bitboards[team][4] ^= (1L << 56);
+                }
+                break;
+    
+            case BitwiseMove.CASTLE_QUEENSIDE:
+                performUndoMove(team, boardPieceType, fromSquare, toSquare);
+                if (team == 1) { // White
+                    this.piece_bitboards[team][4] ^= (1L << 4);
+                    this.piece_bitboards[team][4] ^= (1L << 7);
+                } else { // Black
+                    this.piece_bitboards[team][4] ^= (1L << 60);
+                    this.piece_bitboards[team][4] ^= (1L << 63);
+                }
+                break;
+    
+            case BitwiseMove.PROMOTE_TO_BISHOP:
+                this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_BISHOP] ^= (1L << toSquare);
+                this.piece_bitboards[team][0] ^= (1L << fromSquare);         
+                break;
+
+            case BitwiseMove.PROMOTE_TO_QUEEN:
+                this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_QUEEN] ^= (1L << toSquare);
+                this.piece_bitboards[team][0] ^= (1L << fromSquare);         
+                break;
+
+            case BitwiseMove.PROMOTE_TO_KNIGHT:
+                this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_KNIGHT] ^= (1L << toSquare);
+                this.piece_bitboards[team][0] ^= (1L << fromSquare);         
+                break;
+
+            case BitwiseMove.PROMOTE_TO_ROOK:
+                this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_ROOK] ^= (1L << toSquare);
+                this.piece_bitboards[team][0] ^= (1L << fromSquare);         
+                break;
+    
+            default:
+                new RuntimeErrorException(null, "Flag does not match pattern in undo move");
+        }
     }
 
     public boolean canCastleQueenside(){
@@ -221,5 +377,68 @@ public class BitwiseBoard {
 
     public boolean canCastleKingside(){
         return (this.castlingRights & (2 << (this.isWhiteToMove ? 2 : 0))) != 0;
+    }
+
+    //-------------
+
+    private void performMove(int team, int boardPieceType, int fromSquare, int toSquare, int captureTeam, int captureBoardPieceType, int capturePieceType, int promotionType, int newEnPassantSquare) {
+        
+        System.out.println("int team " + team);
+        System.out.println("int boardPieceType " + boardPieceType) ;
+        System.out.println("int fromSquare " + fromSquare) ;
+        System.out.println("int toSquare " + toSquare) ;
+        System.out.println("int captureTeam " + captureTeam) ;
+        System.out.println("int captureBoardPieceType " + captureBoardPieceType) ;
+        System.out.println("int capturePieceType " + capturePieceType) ;
+        System.out.println("int promotionType " + promotionType) ;
+        System.out.println("int newEnPassantSquare " + newEnPassantSquare);
+
+        this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+        this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
+    
+        if (promotionType != -1) {
+            this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare); // Remove pawn
+            this.piece_bitboards[team][promotionType] ^= (1L << toSquare); // Add promoted piece
+        }
+    
+        if (boardPieceType == 0) { // king
+            int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
+            this.castlingRights &= ~activeCastlingBits;
+        }
+    
+        if (boardPieceType == 4) { // rook
+            int activeCastlingBits;
+    
+            if (this.isWhiteToMove) { // is white
+                activeCastlingBits = (fromSquare == 0) ? 0b1000 : 0b0100;
+            } else { // is black
+                activeCastlingBits = (fromSquare == 56) ? 0b0010 : 0b0001;
+            }
+    
+            this.castlingRights &= ~activeCastlingBits;
+        }
+    
+        if (captureBoardPieceType == 4) { // rook
+            int activeCastlingBits;
+    
+            if (!this.isWhiteToMove) { // black capturing white
+                activeCastlingBits = (toSquare == 0) ? 0b1000 : 0b0100;
+            } else { // white capturing black
+                activeCastlingBits = (toSquare == 56) ? 0b0010 : 0b0001;
+            }
+    
+            this.castlingRights &= ~activeCastlingBits;
+        }
+    
+        if (capturePieceType != -1) {
+            this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << toSquare);
+        }
+    
+        this.enpassantIndex = -1;
+    }
+
+    private void performUndoMove(int team, int boardPieceType, int fromSquare, int toSquare) {
+        this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare); 
+        this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare); 
     }
 }
