@@ -84,7 +84,11 @@ public class MoveGenerator extends Constants {
 
         int kingIndex = Long.numberOfTrailingZeros(bwB.piece_bitboards[team][K]);
 
-        generateSlidingMoves(MoveGenerator.kingMoves[kingIndex], kingIndex, BitwiseMove.NORMAL_MOVE, moveList);
+        if(kingIndex == 64){
+            return;
+        }
+
+        generateSlidingMoves(MoveGenerator.kingMoves[kingIndex] & ~teamMask[team], kingIndex, BitwiseMove.NORMAL_MOVE, moveList);
 
         if (bwB.canCastleKingside()) {
             moveList.append(new BitwiseMove(kingIndex, bwB.isWhiteToMove ? 6 : 62, BitwiseMove.CASTLE_KINGSIDE));
