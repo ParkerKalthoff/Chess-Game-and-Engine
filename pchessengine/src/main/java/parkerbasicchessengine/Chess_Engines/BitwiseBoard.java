@@ -104,13 +104,6 @@ public class BitwiseBoard {
 
         this.fullMoveCounter = Integer.parseInt(parts[5]);
 
-        printBitboard(this.piece_bitboards[0][0]);
-        printBitboard(this.piece_bitboards[0][1]);
-        printBitboard(this.piece_bitboards[0][2]);
-        printBitboard(this.piece_bitboards[0][3]);
-        printBitboard(this.piece_bitboards[0][4]);
-        printBitboard(this.piece_bitboards[0][5]);
-
     }
 
     private long hashPosition() {

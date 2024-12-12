@@ -35,15 +35,9 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         this.board = board;
 
-        System.out.println("board");
-
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
 
-        System.out.println("bwb");
-
         this.moveGenerator = new MoveGenerator(this.bwB);
-
-        System.out.println("move gen");
         
     }
 
