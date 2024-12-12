@@ -18,6 +18,7 @@ public class MoveGenerator extends Constants {
             0x800080500000000L, 0x1100110a00000000L, 0x2200221400000000L, 0x4400442800000000L, 0x8800885000000000L,
             0x100010a000000000L, 0x2000204000000000L, 0x4020000000000L, 0x8050000000000L, 0x110a0000000000L,
             0x22140000000000L, 0x44280000000000L, 0x88500000000000L, 0x10a00000000000L, 0x20400000000000L };
+            
     public static final long kingMoves[] = { 0x302L, 0x705L, 0xe0aL, 0x1c14L, 0x3828L, 0x7050L, 0xe0a0L, 0xc040L,
             0x30203L, 0x70507L, 0xe0a0eL, 0x1c141cL, 0x382838L, 0x705070L, 0xe0a0e0L, 0xc040c0L, 0x3020300L, 0x7050700L,
             0xe0a0e00L, 0x1c141c00L, 0x38283800L, 0x70507000L, 0xe0a0e000L, 0xc040c000L, 0x302030000L, 0x705070000L,
@@ -65,8 +66,8 @@ public class MoveGenerator extends Constants {
         // you are generating opposition vision and pins
 
         pawnMoveGen(moveList);
-        slidingPieceMoveGen(moveList);
-        knightMoveGen(moveList);
+        //slidingPieceMoveGen(moveList);
+        //knightMoveGen(moveList);
         kingMoveGen(moveList);
 
         BitwiseMove[] endMoveList = moveList.toArray();

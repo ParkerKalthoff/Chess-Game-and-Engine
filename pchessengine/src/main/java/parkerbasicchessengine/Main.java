@@ -3,6 +3,7 @@ package parkerbasicchessengine;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+
 import javax.swing.JFrame;
 
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
@@ -30,6 +31,8 @@ public class Main {
         frame.setVisible(true);
 
         board.repaint();
+
+        System.out.println("test");
 
         parkerfish_v1 parkerTest = new parkerfish_v1(board); 
         parkerTest.makeMove();       

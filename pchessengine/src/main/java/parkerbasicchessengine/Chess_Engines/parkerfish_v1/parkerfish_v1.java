@@ -3,6 +3,7 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
@@ -20,25 +21,35 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     public parkerfish_v1(Board board){
 
+        System.out.println(
+            """
+             (                                (                                  \r
+             )\\ )               )             )\\ )             )              )  \r
+            (()/(    )  (    ( /(    (   (   (()/(  (       ( /(   (   (   ( /(  \r
+             /(_))( /(  )(   )\\())  ))\\  )(   /(_)) )\\  (   )\\())  )\\  )\\  )\\()) \r
+            (_))  )(_))(()\\ ((_)\\  /((_)(()\\ (_))_|((_) )\\ ((_)\\  ((_)((_)((_)\\  \r
+            | _ \\((_)_  ((_)| |(_)(_))   ((_)| |_   (_)((_)| |(_) \\ \\ / /  / (_) \r
+            |  _// _` || '_|| / / / -_) | '_|| __|  | |(_-<| ' \\   \\ V /   | |   \r
+            |_|  \\__,_||_|  |_\\_\\ \\___| |_|  |_|    |_|/__/|_||_|   \\_/    |_|   \r""" 
+        );
+
         this.board = board;
+
+        System.out.println("board");
+
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
+
+        System.out.println("bwb");
+
         this.moveGenerator = new MoveGenerator(this.bwB);
 
-        System.out.println(
-        " (                                (                                  \r\n" + //
-        " )\\ )               )             )\\ )             )              )  \r\n" + //
-        "(()/(    )  (    ( /(    (   (   (()/(  (       ( /(   (   (   ( /(  \r\n" + //
-        " /(_))( /(  )(   )\\())  ))\\  )(   /(_)) )\\  (   )\\())  )\\  )\\  )\\()) \r\n" + //
-        "(_))  )(_))(()\\ ((_)\\  /((_)(()\\ (_))_|((_) )\\ ((_)\\  ((_)((_)((_)\\  \r\n" + //
-        "| _ \\((_)_  ((_)| |(_)(_))   ((_)| |_   (_)((_)| |(_) \\ \\ / /  / (_) \r\n" + //
-        "|  _// _` || '_|| / / / -_) | '_|| __|  | |(_-<| ' \\   \\ V /   | |   \r\n" + //
-        "|_|  \\__,_||_|  |_\\_\\ \\___| |_|  |_|    |_|/__/|_||_|   \\_/    |_|   \r\n" + //
-        "                                                                     "
-        );
+        System.out.println("move gen");
+        
     }
 
 
-
+    Scanner scanner = new Scanner(System.in);
+    
     // minimax algorithm
     // generates all positions and when depth is at zero does an evaluation on all positions
     // and returns the best move
@@ -111,6 +122,8 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     private int search(int depth, int alpha, int beta){
 
+        
+
         if(depth == 0){
             return evaluate();
         }
@@ -133,6 +146,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
             byte preMoveCastlingRights = bwB.castlingRights;
             int capturePieceType = bwB.movePiece(move);
+
+            
+            System.out.println(bwB.bitboardsToString()); 
+
+            scanner.nextLine();
 
             int eval = -search(depth - 1, -beta, -alpha);
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
