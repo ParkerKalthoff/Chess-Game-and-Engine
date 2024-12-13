@@ -7,10 +7,7 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
-
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
 
 public class Main {
 
