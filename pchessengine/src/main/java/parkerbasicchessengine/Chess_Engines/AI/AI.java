@@ -184,6 +184,7 @@ public class AI {
 
         }
 
+
     }
 
     ArrayList<Move> findValidMoves() {

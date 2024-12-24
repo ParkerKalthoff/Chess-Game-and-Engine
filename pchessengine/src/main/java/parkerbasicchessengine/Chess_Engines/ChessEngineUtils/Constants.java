@@ -124,4 +124,117 @@ public class Constants {
     public static final long RANK_7 = 0x00FF000000000000L;
     public static final long RANK_8 = 0xFF00000000000000L;
 
+    // methods from old project
+
+    public static final long bit_between[][] = generateAllSquaresBetween();
+
+    public static final long bit_after[][] = generateAllBitsAfter();
+    
+
+    // help functions
+
+    private static long[][] generateAllBitsAfter(){
+        long bitsAfter[][] = new long[64][64];
+        for(int i = 0; i < 64; i++){
+            for(int y = 0; y < 64; y++){
+                bitsAfter[i][y] = getBitsAfter(i, y);
+            }   
+        }
+        return bitsAfter;
+    }
+
+    private static long getBitsAfter(int startIndex, int endIndex) {
+        
+        int startIndexRow = startIndex / 8;
+        int startIndexCol = startIndex % 8;
+        int endIndexRow = endIndex / 8;
+        int endIndexCol = endIndex % 8;
+
+        if (startIndexRow == endIndexRow) {
+            // horizontal move ----
+            return scalarToBoardEdge(endIndex, startIndex > endIndex ? -1 : 1);
+        } else if (startIndexCol == endIndexCol) {
+            // Vertical move ||||
+            return scalarToBoardEdge(endIndex, startIndex > endIndex ? -8 : 8);
+        } else if (Math.abs(startIndexRow - endIndexRow) == Math.abs(startIndexCol - endIndexCol)) {
+            // Diagonal move /\/\/\\/
+            int direction;
+            if (startIndex < endIndex) {
+                direction = (startIndexRow < endIndexRow) ? 9 : 7;
+            } else {
+                direction = (startIndexRow < endIndexRow) ? -7 : -9;
+            }
+            return scalarToBoardEdge(endIndex, direction);
+        } else {
+            return 0L;
+        }
+    }
+
+    private static long scalarToBoardEdge(int startIndex, int scalar){
+
+        if(!(scalar == 1 || scalar == -1 || scalar == 8 || scalar == -8 || scalar == 9 || scalar == -9 || scalar == 7 || scalar == -7)){throw new java.lang.RuntimeException("Incorrect inputs");}
+
+        long bb = 1L << startIndex;
+        int currentSquare = startIndex;
+        int nextSquare;
+
+        while (true) {
+            nextSquare = currentSquare + scalar;
+            if (nextSquare >= 64 || nextSquare < 0) {break;}
+            if (Math.abs((nextSquare % 8) - (currentSquare % 8)) > 1) {break;}
+            currentSquare = nextSquare;
+            bb |= 1L << currentSquare;
+        }
+
+        return bb;
+    }
+
+    private static long[][] generateAllSquaresBetween(){
+        long[][] allSquaresBetween = new long[64][64];
+        for (int startIndex = 0; startIndex < 64; startIndex++) {
+            for(int endIndex = 0; endIndex < 64; endIndex++){
+                allSquaresBetween[startIndex][endIndex] = getSquaresBetween(startIndex, endIndex);
+            }
+        }
+        return allSquaresBetween;
+    }
+
+    private static long getSquaresBetween(int startIndex, int endIndex) {
+        
+        if (startIndex == endIndex) {
+            return 0L;
+        }
+        
+        long squaresBetween = 0L;
+        
+        int startRow = startIndex / 8;
+        int startCol = startIndex % 8;
+        int endRow = endIndex / 8;
+        int endCol = endIndex % 8;
+        
+        if (startRow == endRow) { // same row
+            int step = (startIndex < endIndex) ? 1 : -1;
+            for (int i = startIndex + step; i != endIndex; i += step) {
+                squaresBetween |= 1L << i;
+            }
+        } else if (startCol == endCol) { // same column
+            int step = (startIndex < endIndex) ? 8 : -8;
+            for (int i = startIndex + step; i != endIndex; i += step) {
+                squaresBetween |= 1L << i;
+            }
+        } else if (Math.abs(startRow - endRow) == Math.abs(startCol - endCol)) { // diagonal
+            int rowStep = (startRow < endRow) ? 1 : -1;
+            int colStep = (startCol < endCol) ? 1 : -1;
+            for (int i = startIndex + 8 * rowStep + colStep; i != endIndex; i += 8 * rowStep + colStep) {
+                squaresBetween |= 1L << i;
+            }
+        } else {
+            return 0L; 
+        }
+        
+        return squaresBetween;
+    }
+
+
+
 }
