@@ -42,7 +42,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
     }
 
 
-    Scanner scanner = new Scanner(System.in);
     
     // minimax algorithm
     // generates all positions and when depth is at zero does an evaluation on all positions
@@ -143,8 +142,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
             
             System.out.println(bwB.bitboardsToString()); 
-
-            scanner.nextLine();
 
             int eval = -search(depth - 1, -beta, -alpha);
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);

@@ -124,6 +124,26 @@ public class Constants {
     public static final long RANK_7 = 0x00FF000000000000L;
     public static final long RANK_8 = 0xFF00000000000000L;
 
+    // White castle
+    public static final int KING_SIDE_WHITE_CASTLE = 62;
+    public static final int QUEEN_SIDE_WHITE_CASTLE = 58;
+
+    public static final long MASK_KING_WHITE = (1L << 62) | (1L << 61);
+    public static final long MASK_QUEEN_WHITE = (1L << 58) | (1L << 57) | (1L << 59);
+
+    // Black castle
+    public static final int KING_SIDE_BLACK_CASTLE = 6;
+    public static final int QUEEN_SIDE_BLACK_CASTLE = 2;
+
+    public static final long MASK_KING_BLACK = (1L << 6) | (1L << 5);
+    public static final long MASK_QUEEN_BLACK = (1L << 2) | (1L << 3) | (1L << 1);
+
+    // Rook spots
+    public static final long BLACK_QUEEN_ROOK = 1L << 0;
+    public static final long BLACK_KING_ROOK = 1L << 7;
+    public static final long WHITE_KING_ROOK = 1L << 63;
+    public static final long WHITE_QUEEN_ROOK = 1L << 56;
+
     // methods from old project
 
     public static final long bit_between[][] = generateAllSquaresBetween();

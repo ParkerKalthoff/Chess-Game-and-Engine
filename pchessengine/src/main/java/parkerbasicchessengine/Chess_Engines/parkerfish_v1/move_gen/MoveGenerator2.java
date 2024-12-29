@@ -7,6 +7,7 @@ import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.LSBLoopGenerator;
 
+
 public class MoveGenerator2 extends Constants {
 
     private static final long knightMoves[] = { 0x20400L, 0x50800L, 0xa1100L, 0x142200L, 0x284400L, 0x508800L, 0xa01000L,
@@ -50,7 +51,7 @@ public class MoveGenerator2 extends Constants {
     private boolean multipleChecksOnActiveKing;
 
 
-    private MoveGenerator2(BitwiseBoard bwB) {
+    public MoveGenerator2(BitwiseBoard bwB) {
         this.bwB = bwB;
     }
 
@@ -80,7 +81,7 @@ public class MoveGenerator2 extends Constants {
 
         MoveList moveList = new MoveList();
 
-        
+        generateFriendlyMoves(moveList);
 
         return moveList.toArray();
     }
@@ -93,13 +94,13 @@ public class MoveGenerator2 extends Constants {
         return mask;
     }
 
-    private BitwiseMove generateActiveTeamMoves(MoveList moveList){
+    //private BitwiseMove generateActiveTeamMoves(MoveList moveList){
 
         // generate rooks
 
 
         
-    }
+    //}
 
     private void generateEnemyVision(){
 
@@ -184,7 +185,7 @@ public class MoveGenerator2 extends Constants {
 
     private long generateKnightBitboard(int index, boolean isActive){
 
-        long moveBitboard = kingMoves[index];
+        long moveBitboard = knightMoves[index];
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
         if(!isActive){
@@ -231,7 +232,7 @@ public class MoveGenerator2 extends Constants {
         return moveBitboard;
     }
 
-    private long generatePawnRightAttacksBitboards(boolean isActive) {
+    public long generatePawnRightAttacksBitboards(boolean isActive) {
         
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
@@ -254,7 +255,7 @@ public class MoveGenerator2 extends Constants {
         return moveBitboard;
     }
 
-    private long generatePawnForwardMovesBitboard(boolean isActive) {
+    public long generatePawnForwardMovesBitboard(boolean isActive) {
         
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
@@ -325,6 +326,8 @@ public class MoveGenerator2 extends Constants {
                 case N:
                     movementBitboard = generateKnightBitboard(pieceIndex, true);
                     break;
+                case K:
+                    movementBitboard = generateKingNormalMovesBitboard(pieceIndex, true);
                 default:
                     throw new RuntimeErrorException(null,"Illegal Piece:" + pieceType);
             }
@@ -356,6 +359,98 @@ public class MoveGenerator2 extends Constants {
         generateFriendlyPieceMoves(moveList, N);
     }
 
+    private void generateFriendlyKingMoves(MoveList moveList) {
+        generateFriendlyPieceMoves(moveList, K);
+
+        
+        int team = this.bwB.isWhiteToMove ? White : Black;
+
+        int kingIndex = Long.numberOfTrailingZeros(this.bwB.piece_bitboards[team][K]);
+
+
+        if (canCastleKingside(team)) {
+
+            int kingsideCastleSquare = bwB.isWhiteToMove ? KING_SIDE_WHITE_CASTLE : KING_SIDE_BLACK_CASTLE;
+
+            moveList.append(new BitwiseMove(kingIndex, kingsideCastleSquare, BitwiseMove.CASTLE_KINGSIDE));
+        }
+
+        if (canCastleQueenside(team)) {
+            
+            int queensideCastleSquare = bwB.isWhiteToMove ? QUEEN_SIDE_WHITE_CASTLE : QUEEN_SIDE_BLACK_CASTLE;
+
+            moveList.append(new BitwiseMove(kingIndex, queensideCastleSquare, BitwiseMove.CASTLE_QUEENSIDE));
+        }
+    }
+
+    private boolean canCastleKingside(int team){
+
+        byte castleKingsideBits;
+
+        if(team == White){
+            castleKingsideBits = 0b1000;
+        } else {
+            castleKingsideBits = 0b0010;
+        }
+
+        // check for castling rights
+        if((this.bwB.castlingRights & castleKingsideBits) == 0){
+            return false;
+        }
+
+        // check if rook exists on square
+        long kingsideRook = this.bwB.isWhiteToMove ? WHITE_KING_ROOK : BLACK_KING_ROOK;
+
+        if((kingsideRook & this.bwB.piece_bitboards[team][R]) == 0){
+            return false;
+        }   
+
+        // check if squares dont have any pieces on them or enemy vision 'blocking'
+        long kingsideSquares = this.bwB.isWhiteToMove ? MASK_KING_WHITE : MASK_KING_BLACK;
+
+        if(((allPieces | enemyVision) & kingsideSquares) != 0){
+            return false;
+        }
+
+        // return the inverse of the king being in check
+        // if is in check, no castling, no check, yes castle ;D
+        return !activeKingInCheck;
+    }
+
+    private boolean canCastleQueenside(int team){
+
+        byte castleQueensideBits;
+
+        if(team == White){
+            castleQueensideBits = 0b0100;
+        } else {
+            castleQueensideBits = 0b0001;
+        }
+
+        // check for castling rights
+        if((this.bwB.castlingRights & castleQueensideBits) == 0){
+            return false;
+        }
+
+        // check if rook exists on square
+        long queensideRook = this.bwB.isWhiteToMove ? WHITE_QUEEN_ROOK : BLACK_QUEEN_ROOK;
+
+        if((queensideRook & this.bwB.piece_bitboards[team][R]) == 0){
+            return false;
+        }   
+
+        // check if squares dont have any pieces on them or enemy vision 'blocking'
+        long queensideSquares = this.bwB.isWhiteToMove ? MASK_QUEEN_WHITE : MASK_QUEEN_BLACK;
+
+        if(((allPieces | enemyVision) & queensideSquares) != 0){
+            return false;
+        }
+
+        // return the inverse of the king being in check
+        // if is in check, no castling, no check, yes castle ;D
+        return !activeKingInCheck;
+    }
+
     private void generateFriendlyPawnMoves(MoveList moveList){
 
         int team = this.bwB.isWhiteToMove ? White : Black;
@@ -365,6 +460,16 @@ public class MoveGenerator2 extends Constants {
 
         long rightCaptures = generatePawnRightAttacksBitboards(true);
         long leftCaptures = generatePawnLeftAttacksBitboards(true);
+
+        long promotionRow = bwB.isWhiteToMove ? RANK_7 : RANK_2;
+
+        long singlePushesPromote = singlePushes & promotionRow;
+        long rightCapturesPromote = rightCaptures & promotionRow; 
+        long leftCapturesPromote = leftCaptures & promotionRow; 
+
+        rightCaptures &= ~promotionRow;
+        leftCaptures &= ~promotionRow;
+        singlePushes &= ~promotionRow;
 
         int enpassantIndex = this.bwB.enpassantIndex;
 
@@ -381,8 +486,27 @@ public class MoveGenerator2 extends Constants {
 
         }
 
+        MoveUtils.generateMovesFromBitboardMultiplePieces(leftCaptures, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? -7 : 7);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(rightCaptures, moveList, BitwiseMove.NORMAL_MOVE,  bwB.isWhiteToMove ? -9 : 9);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(singlePushes, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? -8 : 8);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(doublePushes, moveList, BitwiseMove.PAWN_MOVE_DOUBLE,  bwB.isWhiteToMove ? -16 : 16);
+        
+        // gen promotes :D lolo Fart epic swasg! !! ! ! ! 
+        // POPooPROPROORPORPORP OG GHGAWHAHAH
+
+        MoveUtils.generateMovesPromotions(leftCapturesPromote, moveList, bwB.isWhiteToMove ? -7 : 7);
+        MoveUtils.generateMovesPromotions(rightCapturesPromote, moveList, bwB.isWhiteToMove ? -9 : 9);
+        MoveUtils.generateMovesPromotions(singlePushesPromote, moveList, bwB.isWhiteToMove ? -8 : 8);
     }
 
+    private void generateFriendlyMoves(MoveList moveList){
+        generateFriendlyPawnMoves(moveList);
+        generateFriendlyBishopMoves(moveList);
+        generateFriendlyKnightMoves(moveList);
+        generateFriendlyRookMoves(moveList);
+        generateFriendlyQueenMoves(moveList);
+        generateFriendlyKingMoves(moveList);
+    }
 }
 
 class MoveUtils {
@@ -398,8 +522,21 @@ class MoveUtils {
         LSBLoopGenerator loop = new LSBLoopGenerator(movesBitboard);
         while (loop.hasNext) {
             int toIndex = Long.numberOfTrailingZeros(loop.getNext());
-            int fromIndex = toIndex - adjustBy; 
+            int fromIndex = toIndex + adjustBy; 
             moveList.append(new BitwiseMove(fromIndex, toIndex, moveFlag));
+        }
+    }
+
+    public static void generateMovesPromotions(long movesBitboard, MoveList moveList, int adjustBy) {
+        LSBLoopGenerator loop = new LSBLoopGenerator(movesBitboard);
+        while (loop.hasNext) {
+            int toIndex = Long.numberOfTrailingZeros(loop.getNext());
+            int fromIndex = toIndex + adjustBy;
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_BISHOP));
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_KNIGHT));
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_ROOK));
+            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_QUEEN));
+
         }
     }
 }
