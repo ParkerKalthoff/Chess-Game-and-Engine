@@ -10,12 +10,12 @@ import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
-import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator2;
 import parkerbasicchessengine.Move;
 
 public class parkerfish_v1 extends AbstractChessEngine {
 
-    private MoveGenerator moveGenerator;
+    private MoveGenerator2 moveGenerator;
     private Board board;
     public BitwiseBoard bwB; 
 
@@ -37,7 +37,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
 
-        this.moveGenerator = new MoveGenerator(this.bwB);
+        this.moveGenerator = new MoveGenerator2(this.bwB);
         
     }
 
@@ -70,7 +70,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
         BitwiseMove[] legalMoves = moveGenerator.generateMoves();
     
         if (legalMoves.length == 0) {
-            if (legalMoves.length == 0 /* <--- fake code - Player in check */) {
+            if (moveGenerator.activeKingInCheck) {
                 System.out.println("Checkmate!");
             } else {
                 System.out.println("Stalemate!");
@@ -125,7 +125,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         if(moves.length == 0){
 
-            if(false /* Player in Check*/){
+            if(moveGenerator.activeKingInCheck){
                 return negativeInfinity;
             }
             

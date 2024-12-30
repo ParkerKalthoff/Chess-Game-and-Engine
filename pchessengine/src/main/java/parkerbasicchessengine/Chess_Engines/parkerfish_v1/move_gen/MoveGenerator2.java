@@ -40,7 +40,7 @@ public class MoveGenerator2 extends Constants {
     private long enemyVision;
 
     // These variables are used to have check detection
-    private boolean activeKingInCheck;
+    public boolean activeKingInCheck;
     
     private int activeKingIndex;
 
@@ -55,7 +55,7 @@ public class MoveGenerator2 extends Constants {
         this.bwB = bwB;
     }
 
-    private BitwiseMove[] generateMoves() {
+    public BitwiseMove[] generateMoves() {
 
         int activeTeam = this.bwB.isWhiteToMove ? White : Black;
 
@@ -328,6 +328,7 @@ public class MoveGenerator2 extends Constants {
                     break;
                 case K:
                     movementBitboard = generateKingNormalMovesBitboard(pieceIndex, true);
+                    break;
                 default:
                     throw new RuntimeErrorException(null,"Illegal Piece:" + pieceType);
             }
