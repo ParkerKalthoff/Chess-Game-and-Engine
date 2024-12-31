@@ -139,10 +139,26 @@ public class Constants {
     public static final long MASK_QUEEN_BLACK = (1L << 2) | (1L << 3) | (1L << 1);
 
     // Rook spots
-    public static final long BLACK_QUEEN_ROOK = 1L << 0;
     public static final long BLACK_KING_ROOK = 1L << 7;
+    public static final long BLACK_QUEEN_ROOK = 1L << 0;
+    public static final long BLACK_KING_ROOK_CASTLED = 1L << 5;
+    public static final long BLACK_QUEEN_ROOK_CASTLED = 1L << 3;
+
+
     public static final long WHITE_KING_ROOK = 1L << 63;
     public static final long WHITE_QUEEN_ROOK = 1L << 56;
+    public static final long WHITE_KING_ROOK_CASTLED = 1L << 61;
+    public static final long WHITE_QUEEN_ROOK_CASTLED = 1L << 59;
+
+    public static final int WHITE_CASTLE_BITS = 0b1100;
+    public static final int BLACK_CASTLE_BITS =  0b0011;
+
+    // 0b KQkq
+
+    public static final int WHITE_KING_CASTLE_BIT = 0b1000;
+    public static final int WHITE_QUEEN_CASTLE_BIT = 0b0100;
+    public static final int BLACK_KING_CASTLE_BIT =  0b0010;
+    public static final int BLACK_QUEEN_CASTLE_BIT =  0b0001;
 
     // methods from old project
 

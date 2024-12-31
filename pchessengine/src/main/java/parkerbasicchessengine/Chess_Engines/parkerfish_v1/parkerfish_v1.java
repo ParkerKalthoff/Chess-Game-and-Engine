@@ -18,6 +18,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
     private MoveGenerator2 moveGenerator;
     private Board board;
     public BitwiseBoard bwB; 
+    private Scanner scanner;
 
     public parkerfish_v1(Board board){
 
@@ -36,9 +37,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
         this.board = board;
 
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
-
+        
         this.moveGenerator = new MoveGenerator2(this.bwB);
         
+
+        this.scanner = new Scanner(System.in);
     }
 
 
@@ -78,7 +81,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
             return;
         }
     
-        int depth = 3; 
+        int depth = 2; 
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         BitwiseMove bestMove = null;
@@ -90,10 +93,13 @@ public class parkerfish_v1 extends AbstractChessEngine {
             int capturePieceType = bwB.movePiece(move);
 
             System.out.println(bwB.bitboardsToString()); 
+            
             int eval = -search(depth - 1, -beta, -alpha);
 
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
-    
+            
+            scanner.nextLine();
+
             if (eval > bestEval) {
                 bestEval = eval;
                 bestMove = move;

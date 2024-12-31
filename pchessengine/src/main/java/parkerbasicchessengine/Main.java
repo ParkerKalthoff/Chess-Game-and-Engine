@@ -8,9 +8,9 @@ import javax.swing.JFrame;
 
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator2;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.SlidingMovementGeneration;
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
-
 
 public class Main {
     
@@ -40,9 +40,7 @@ public class Main {
 
         parkerfish_v1 parkerTest = new parkerfish_v1(board); 
         parkerTest.makeMove();       
-
         
-
     }
 
     // debugging purposes

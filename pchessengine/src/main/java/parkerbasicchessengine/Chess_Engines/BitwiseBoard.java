@@ -4,9 +4,12 @@ import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
 
-public class BitwiseBoard {
+
+public class BitwiseBoard{
 
     // bitwise board is meant to be a lightweight way of encapsulating chess data
     // the intention is to have a way to mutate board state for an engine
@@ -251,17 +254,17 @@ public class BitwiseBoard {
 
                 if (this.isWhiteToMove) {
 
-                    this.piece_bitboards[team][4] ^= (1L);
-                    this.piece_bitboards[team][4] ^= (1L << 2);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_KING_ROOK);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_KING_ROOK_CASTLED);
 
                 } else {
 
-                    this.piece_bitboards[team][4] ^= (1L << 56);
-                    this.piece_bitboards[team][4] ^= (1L << 58);
+                    this.piece_bitboards[team][R] ^= (1L << BLACK_KING_ROOK);
+                    this.piece_bitboards[team][R] ^= (1L << BLACK_KING_ROOK_CASTLED);
 
                 }
 
-                int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
+                int activeCastlingBits = this.isWhiteToMove ? WHITE_CASTLE_BITS : BLACK_CASTLE_BITS;
                 this.castlingRights &= ~activeCastlingBits;
                 this.enpassantIndex = -1;
 
@@ -274,17 +277,17 @@ public class BitwiseBoard {
 
                 if (this.isWhiteToMove) {
 
-                    this.piece_bitboards[team][4] ^= (1L << 7);
-                    this.piece_bitboards[team][4] ^= (1L << 4);
+                    this.piece_bitboards[team][4] ^= (1L << WHITE_QUEEN_ROOK);
+                    this.piece_bitboards[team][4] ^= (1L << WHITE_QUEEN_ROOK_CASTLED);
 
                 } else {
 
-                    this.piece_bitboards[team][4] ^= (1L << 63);
-                    this.piece_bitboards[team][4] ^= (1L << 60);
+                    this.piece_bitboards[team][4] ^= (1L << BLACK_QUEEN_ROOK);
+                    this.piece_bitboards[team][4] ^= (1L << BLACK_QUEEN_ROOK_CASTLED);
 
                 }
 
-                int activeCastlingBit = this.isWhiteToMove ? 0b1100 : 0b0011;
+                int activeCastlingBit = this.isWhiteToMove ? WHITE_CASTLE_BITS : BLACK_CASTLE_BITS;
                 this.castlingRights &= ~activeCastlingBit;
                 this.enpassantIndex = -1;
 
@@ -349,52 +352,52 @@ public class BitwiseBoard {
 
             case BitwiseMove.EN_PASSANT_CAPTURE:
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
-                int captureSquare = this.enpassantIndex;
+                int captureSquare = (toSquare + fromSquare) / 2;
                 int captureTeam = team ^ 1;
-                this.piece_bitboards[captureTeam][0] ^= (1L << captureSquare);
-                this.enpassantIndex = -1;
+                this.piece_bitboards[captureTeam][P] ^= (1L << captureSquare);
+                this.enpassantIndex = captureSquare;
                 break;
 
             case BitwiseMove.CASTLE_KINGSIDE:
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
                 if (team == 1) { // White
-                    this.piece_bitboards[team][4] ^= (1L << 2);
-                    this.piece_bitboards[team][4] ^= (1L);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_KING_ROOK_CASTLED);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_KING_ROOK);
                 } else { // Black
-                    this.piece_bitboards[team][4] ^= (1L << 58);
-                    this.piece_bitboards[team][4] ^= (1L << 56);
+                    this.piece_bitboards[team][R] ^= (1L << BLACK_KING_ROOK_CASTLED);
+                    this.piece_bitboards[team][R] ^= (1L << BLACK_KING_ROOK);
                 }
                 break;
 
             case BitwiseMove.CASTLE_QUEENSIDE:
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
                 if (team == 1) { // White
-                    this.piece_bitboards[team][4] ^= (1L << 4);
-                    this.piece_bitboards[team][4] ^= (1L << 7);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_QUEEN_ROOK_CASTLED);
+                    this.piece_bitboards[team][R] ^= (1L << WHITE_QUEEN_ROOK);
                 } else { // Black
-                    this.piece_bitboards[team][4] ^= (1L << 60);
-                    this.piece_bitboards[team][4] ^= (1L << 63);
+                    this.piece_bitboards[team][R] ^= (1L <<BLACK_QUEEN_ROOK_CASTLED);
+                    this.piece_bitboards[team][R] ^= (1L <<BLACK_QUEEN_ROOK);
                 }
                 break;
 
             case BitwiseMove.PROMOTE_TO_BISHOP:
                 this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_BISHOP] ^= (1L << toSquare);
-                this.piece_bitboards[team][0] ^= (1L << fromSquare);
+                this.piece_bitboards[team][P] ^= (1L << fromSquare);
                 break;
 
             case BitwiseMove.PROMOTE_TO_QUEEN:
                 this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_QUEEN] ^= (1L << toSquare);
-                this.piece_bitboards[team][0] ^= (1L << fromSquare);
+                this.piece_bitboards[team][P] ^= (1L << fromSquare);
                 break;
 
             case BitwiseMove.PROMOTE_TO_KNIGHT:
                 this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_KNIGHT] ^= (1L << toSquare);
-                this.piece_bitboards[team][0] ^= (1L << fromSquare);
+                this.piece_bitboards[team][P] ^= (1L << fromSquare);
                 break;
 
             case BitwiseMove.PROMOTE_TO_ROOK:
                 this.piece_bitboards[team][BitwiseMove.PROMOTE_TO_ROOK] ^= (1L << toSquare);
-                this.piece_bitboards[team][0] ^= (1L << fromSquare);
+                this.piece_bitboards[team][P] ^= (1L << fromSquare);
                 break;
 
             default:
