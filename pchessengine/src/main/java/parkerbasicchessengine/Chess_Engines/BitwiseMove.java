@@ -13,6 +13,17 @@ public class BitwiseMove {
     public static final byte CASTLE_KINGSIDE = 7;    // Kingside castle
     public static final byte CASTLE_QUEENSIDE = 8;   // Queenside castle
 
+    private static final String[] flagStrings = {
+        "NORMAL_MOVE",
+        "PROMOTE_TO_QUEEN",
+        "PROMOTE_TO_BISHOP",
+        "PROMOTE_TO_KNIGHT",
+        "PROMOTE_TO_ROOK",
+        "PAWN_MOVE_DOUBLE",
+        "EN_PASSANT_CAPTURE",
+        "CASTLE_KINGSIDE",
+        "CASTLE_QUEENSIDE"};
+
     public BitwiseMove(byte fromSquare, byte toSquare, short flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
     }
@@ -92,7 +103,10 @@ public class BitwiseMove {
 
         String toSquare = String.valueOf(toFileChar) + toRankNumber;
 
+        // flag
+
+        String flagString = " - ["+ flagStrings[flag] + "]";
         
-        return fromSquare+toSquare;
+        return fromSquare+toSquare+flagString;
     }
 }

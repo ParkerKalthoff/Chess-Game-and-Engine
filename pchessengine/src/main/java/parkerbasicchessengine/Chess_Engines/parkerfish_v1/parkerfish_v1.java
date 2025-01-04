@@ -86,14 +86,25 @@ public class parkerfish_v1 extends AbstractChessEngine {
         int beta = Integer.MAX_VALUE;
         BitwiseMove bestMove = null;
         int bestEval = Integer.MIN_VALUE;
-    
+            
+        char pieceToChar[] = {'-','K', 'Q', 'B', 'N', 'R', 'P', 'k', 'q', 'b', 'n', 'r', 'p'};
+
         for (BitwiseMove move : legalMoves) {
 
             byte preMoveCastlingRights = bwB.castlingRights;
-            int capturePieceType = bwB.movePiece(move);
 
+            char fromPiece = pieceToChar[1 + this.bwB.getPieceType(move.getFromSquare())];
+            char capturePiece = pieceToChar[1 + this.bwB.getPieceType(move.getToSquare())];
+
+            int capturePieceType = bwB.movePiece(move);
+            System.out.println("-----------------\n");
             System.out.println(bwB.bitboardsToString()); 
             
+            System.out.println("["+(!this.bwB.isWhiteToMove ? "W" : "B")+"] Trying :" + move.toString());
+            System.out.println("From Piece : "+fromPiece);
+            System.out.println("Capture Piece : "+capturePiece);
+            System.out.println();
+
             int eval = -search(depth - 1, -beta, -alpha);
 
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
@@ -141,13 +152,24 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         moves = orderMoves(moves);
 
+        char pieceToChar[] = {'-','K', 'Q', 'B', 'N', 'R', 'P', 'k', 'q', 'b', 'n', 'r', 'p'};
+
         for(BitwiseMove move : moves){
 
             byte preMoveCastlingRights = bwB.castlingRights;
+
+            char fromPiece = pieceToChar[1 + this.bwB.getPieceType(move.getFromSquare())];
+            char capturePiece = pieceToChar[1 + this.bwB.getPieceType(move.getToSquare())];
+
             int capturePieceType = bwB.movePiece(move);
 
-            
+            System.out.println("===============\n");
             System.out.println(bwB.bitboardsToString()); 
+            
+            System.out.println("["+(!this.bwB.isWhiteToMove ? "W" : "B")+"] Trying :" + move.toString());
+            System.out.println("From Piece: "+fromPiece);
+            System.out.println("Capture Piece: "+capturePiece);
+            System.out.println();
 
             int eval = -search(depth - 1, -beta, -alpha);
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);

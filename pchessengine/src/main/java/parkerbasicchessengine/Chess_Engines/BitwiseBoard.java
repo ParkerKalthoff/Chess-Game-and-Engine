@@ -205,8 +205,13 @@ public class BitwiseBoard{
 
         int capturePieceType = getPieceType(toSquare); // should be -1 if no capture
         int captureTeam = team ^ 1;
-        int captureBoardPieceType = capturePieceType % 6;
 
+        int captureBoardPieceType = capturePieceType;
+
+        if(capturePieceType != -1){
+            captureBoardPieceType = captureBoardPieceType % 6;
+        }
+        
         /*
         System.out.println("-------------------");
 
@@ -425,8 +430,9 @@ public class BitwiseBoard{
             {'k', 'q', 'b', 'n', 'r', 'p'} // Black pieces
         };
 
+
         // Create the chessboard string (8x8 grid)
-        for (int rank = 7; rank >= 0; rank--) {  // Loop through ranks (8 rows)
+        for (int rank = 0; rank < 8; rank++) {  // Loop through ranks (8 rows)
             for (int file = 0; file < 8; file++) { // Loop through files (8 columns)
                 boolean piecePlaced = false;
                 // Check for each piece (white and black)
@@ -493,19 +499,20 @@ public class BitwiseBoard{
             this.castlingRights &= ~activeCastlingBits;
         }
 
-        if (captureBoardPieceType == 4) { // rook
+        if (captureBoardPieceType == R) { // rook
             int activeCastlingBits;
 
             if (!this.isWhiteToMove) { // black capturing white
-                activeCastlingBits = (toSquare == 0) ? 0b1000 : 0b0100;
+                activeCastlingBits = (toSquare == 63) ? 0b1000 : 0b0100;
             } else { // white capturing black
-                activeCastlingBits = (toSquare == 56) ? 0b0010 : 0b0001;
+                activeCastlingBits = (toSquare == 7) ? 0b0010 : 0b0001;
             }
 
             this.castlingRights &= ~activeCastlingBits;
         }
 
         if (capturePieceType != -1) {
+            System.out.println("-- inmove : capture team"+captureTeam+", capture type : "+captureBoardPieceType+" --");
             this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << toSquare);
         }
 

@@ -145,11 +145,15 @@ public class MoveGenerator2 extends Constants {
         
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
-        long moveBitboard = SlidingMovementGeneration.generateRookMovementBitboard(index, team);
+        long blockerBitboard = allPieces & ~(1L << index);
+
+        long moveBitboard = SlidingMovementGeneration.generateRookMovementBitboard(index, blockerBitboard);
 
         if(!isActive){
             detectCheck(index, team, moveBitboard);
             this.enemyVision |= moveBitboard; 
+        } else {
+            moveBitboard &= ~this.teamMask[team];
         }
 
         return moveBitboard;
@@ -159,11 +163,15 @@ public class MoveGenerator2 extends Constants {
         
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
-        long moveBitboard = SlidingMovementGeneration.generateBishopMovementBitboard(index, team);
+        long blockerBitboard = allPieces & ~(1L << index);
+
+        long moveBitboard = SlidingMovementGeneration.generateBishopMovementBitboard(index, blockerBitboard);
 
         if(!isActive){
             detectCheck(index, team, moveBitboard);
             this.enemyVision |= moveBitboard; 
+        }else {
+            moveBitboard &= ~this.teamMask[team];
         }
 
         return moveBitboard;
@@ -173,11 +181,15 @@ public class MoveGenerator2 extends Constants {
         
         int team = this.bwB.isWhiteToMove == isActive ? White : Black;
 
-        long moveBitboard = SlidingMovementGeneration.generateQueenMovementBitboard(index, team);
+        long blockerBitboard = allPieces;
+        
+        long moveBitboard = SlidingMovementGeneration.generateQueenMovementBitboard(index, blockerBitboard);
 
         if(!isActive){
             detectCheck(index, team, moveBitboard);
             this.enemyVision |= moveBitboard; 
+        } else {
+            moveBitboard &= ~this.teamMask[team];
         }
 
         return moveBitboard;
@@ -191,6 +203,8 @@ public class MoveGenerator2 extends Constants {
         if(!isActive){
             detectCheck(index, team, moveBitboard);
             this.enemyVision |= moveBitboard;
+        } else {
+            moveBitboard &= ~this.teamMask[team];
         }
 
         return moveBitboard;
@@ -198,12 +212,15 @@ public class MoveGenerator2 extends Constants {
 
     private long generateKingNormalMovesBitboard(int index, boolean isActive) {
         
+        int team = this.bwB.isWhiteToMove == isActive ? White : Black;
+
         long moveBitboard = kingMoves[index];
 
-        if(isActive){
-            moveBitboard = moveBitboard & ~this.enemyVision;
-        } else {
+        if(!isActive){
             this.enemyVision |= moveBitboard;
+        } else {
+            moveBitboard &= ~this.enemyVision;
+            moveBitboard &= ~this.teamMask[team];
         }
 
         return moveBitboard;
@@ -507,6 +524,21 @@ public class MoveGenerator2 extends Constants {
         generateFriendlyRookMoves(moveList);
         generateFriendlyQueenMoves(moveList);
         generateFriendlyKingMoves(moveList);
+    }
+
+    public static void printBitboard(long bitboard) {
+        // for debug
+        System.out.println();
+
+        for (int rank = 0; rank < 8; rank++) {
+            for (int file = 0; file < 8; file++) {
+
+                int flippedAndMirroredIndex = rank * 8 + file;
+                long square = (bitboard >> flippedAndMirroredIndex) & 1;
+                System.out.print(square == 1 ? "1 " : "0 ");
+            }
+            System.out.println();
+        }
     }
 }
 
