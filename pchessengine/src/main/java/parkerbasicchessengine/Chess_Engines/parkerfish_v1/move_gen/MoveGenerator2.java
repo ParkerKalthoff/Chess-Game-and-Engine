@@ -257,9 +257,9 @@ public class MoveGenerator2 extends Constants {
         long moveBitboard;
 
         if(this.bwB.isWhiteToMove){
-            moveBitboard = (pawns << 9) & ~FILE_A;
+            moveBitboard = (pawns >>> 9) & ~FILE_A;
         } else {
-            moveBitboard = (pawns >>> 9) & ~FILE_H;
+            moveBitboard = (pawns << 9) & ~FILE_H;
         }
 
         if(isActive){
@@ -281,9 +281,9 @@ public class MoveGenerator2 extends Constants {
         long activePawns = this.bwB.piece_bitboards[team][P];
 
         if(team == White){
-            bitboard = (activePawns << 8) & ~this.allPieces;
-        } else {
             bitboard = (activePawns >>> 8) & ~this.allPieces;
+        } else {
+            bitboard = (activePawns << 8) & ~this.allPieces;
         }
         
         return bitboard;
@@ -298,9 +298,9 @@ public class MoveGenerator2 extends Constants {
         long singlePushes = generatePawnForwardMovesBitboard(isActive); 
 
         if(team == White){
-            bitboard = ((singlePushes & RANK_3) << 8) & ~this.allPieces;
+            bitboard = ((singlePushes & RANK_3) >>> 8) & ~this.allPieces;
         } else {
-            bitboard = ((singlePushes & RANK_6) >>> 8) & ~this.allPieces;
+            bitboard = ((singlePushes & RANK_6) << 8) & ~this.allPieces;
         }
         
         return bitboard;
@@ -471,7 +471,7 @@ public class MoveGenerator2 extends Constants {
 
     private void generateFriendlyPawnMoves(MoveList moveList){
 
-        int team = this.bwB.isWhiteToMove ? White : Black;
+        //int team = this.bwB.isWhiteToMove ? White : Black;
 
         long singlePushes = generatePawnForwardMovesBitboard(true);
         long doublePushes = generatePawnDoubleMovesBitboard(true);

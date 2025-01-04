@@ -6,7 +6,10 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JFrame;
 
+import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
+
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
 
 public class Main {
     
@@ -29,7 +32,23 @@ public class Main {
 
     public static void main(String[] args){
         
-        
+
+        // TODO
+
+        // Cleanup constants, especially change the directions,
+        // then impliment those instead of random numerical constants that make no sense
+        // validate each one
+
+        // Once all of the move gen is workign CORRECTLY, a basic eval function is due
+        // Material + position of pieces + king safety should be fine I believe?
+        // add an opening book too, then this program should be wrapped up
+
+        printBitboard(RANK_8);
+
+        if(true){
+            return;
+        }
+
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
 
@@ -59,8 +78,12 @@ public class Main {
     public static void printBitboard(long bitboard) {
 
         System.out.println();
-
+        System.out.println("    a b c d e f g h");
+        System.out.println("    _ _ _ _ _ _ _ _");
         for (int rank = 0; rank < 8; rank++) {
+
+            System.out.print(""+(8-rank)+" | ");
+
             for (int file = 0; file < 8; file++) {
 
                 int flippedAndMirroredIndex = rank * 8 + file;
