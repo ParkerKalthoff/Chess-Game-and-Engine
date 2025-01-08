@@ -421,21 +421,18 @@ public class BitwiseBoard{
     }
 
     public String bitboardsToString() {
-        // chat gtp'd a printer cause I CANT BE BOTHERED AHHH
+
         StringBuilder sb = new StringBuilder();
 
-        // Define a piece representation for each type
         char[][] pieceRepresentation = {
-            {'K', 'Q', 'B', 'N', 'R', 'P'}, // White pieces
-            {'k', 'q', 'b', 'n', 'r', 'p'} // Black pieces
+            {'K', 'Q', 'B', 'N', 'R', 'P'},
+            {'k', 'q', 'b', 'n', 'r', 'p'} 
         };
 
-
-        // Create the chessboard string (8x8 grid)
-        for (int rank = 0; rank < 8; rank++) {  // Loop through ranks (8 rows)
-            for (int file = 0; file < 8; file++) { // Loop through files (8 columns)
+        for (int rank = 0; rank < 8; rank++) {  
+            for (int file = 0; file < 8; file++) { 
                 boolean piecePlaced = false;
-                // Check for each piece (white and black)
+                
                 for (int color = 0; color < 2; color++) {
                     for (int pieceType = 0; pieceType < 6; pieceType++) {
                         long bitboard = piece_bitboards[color][pieceType];
@@ -450,7 +447,6 @@ public class BitwiseBoard{
                     }
                 }
 
-                // If no piece is placed, add a dot (empty square)
                 if (!piecePlaced) {
                     sb.append('.');
                 }
@@ -462,8 +458,8 @@ public class BitwiseBoard{
 
     //-------------
     private void performMove(int team, int boardPieceType, int fromSquare, int toSquare, int captureTeam, int captureBoardPieceType, int capturePieceType, int promotionType, int newEnPassantSquare) {
-
         /*
+        System.out.println();
         System.out.println("int team " + team); 
         System.out.println("int boardPieceType " + boardPieceType); 
         System.out.println("int fromSquare " + fromSquare); 
@@ -474,6 +470,7 @@ public class BitwiseBoard{
         System.out.println("int promotionType " + promotionType); 
         System.out.println("int newEnPassantSquare " + newEnPassantSquare);
          */
+
         this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
         this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
 
@@ -512,7 +509,7 @@ public class BitwiseBoard{
         }
 
         if (capturePieceType != -1) {
-            System.out.println("-- inmove : capture team"+captureTeam+", capture type : "+captureBoardPieceType+" --");
+            //System.out.println("-- inmove : capture team"+captureTeam+", capture type : "+captureBoardPieceType+" --");
             this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << toSquare);
         }
 

@@ -1,6 +1,8 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 
+import static parkerbasicchessengine.Main.printBitboard;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -12,13 +14,13 @@ import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator2;
 import parkerbasicchessengine.Move;
+import parkerbasicchessengine.soundManager;
 
 public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator2 moveGenerator;
     private Board board;
-    public BitwiseBoard bwB; 
-    private Scanner scanner;
+    public BitwiseBoard bwB;
 
     public parkerfish_v1(Board board){
 
@@ -39,9 +41,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
         
         this.moveGenerator = new MoveGenerator2(this.bwB);
-        
-
-        this.scanner = new Scanner(System.in);
     }
 
 
@@ -81,35 +80,23 @@ public class parkerfish_v1 extends AbstractChessEngine {
             return;
         }
     
-        int depth = 2; 
+        int depth = 2;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         BitwiseMove bestMove = null;
         int bestEval = Integer.MIN_VALUE;
             
-        char pieceToChar[] = {'-','K', 'Q', 'B', 'N', 'R', 'P', 'k', 'q', 'b', 'n', 'r', 'p'};
+        System.out.println("gen moves");
 
         for (BitwiseMove move : legalMoves) {
 
             byte preMoveCastlingRights = bwB.castlingRights;
 
-            char fromPiece = pieceToChar[1 + this.bwB.getPieceType(move.getFromSquare())];
-            char capturePiece = pieceToChar[1 + this.bwB.getPieceType(move.getToSquare())];
-
             int capturePieceType = bwB.movePiece(move);
-            System.out.println("-----------------\n");
-            System.out.println(bwB.bitboardsToString()); 
-            
-            System.out.println("["+(!this.bwB.isWhiteToMove ? "W" : "B")+"] Trying :" + move.toString());
-            System.out.println("From Piece : "+fromPiece);
-            System.out.println("Capture Piece : "+capturePiece);
-            System.out.println();
 
-            int eval = -search(depth - 1, -beta, -alpha);
+            int eval = search(depth - 1, alpha, beta);
 
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
-            
-            scanner.nextLine();
 
             if (eval > bestEval) {
                 bestEval = eval;
@@ -125,14 +112,14 @@ public class parkerfish_v1 extends AbstractChessEngine {
             int newCol = bestMove.getToSquare() % 8;
             int newRow = bestMove.getToSquare() / 8;
 
-            board.makeMove(new Move(board, board.getPiece(oldCol, oldRow), newCol, newRow));
+            //board.makeMove(new Move(board, board.getPiece(oldCol, oldRow), newCol, newRow));
             System.out.println("Best move: " + bestMove);
+        } else {
+            System.out.println("null move");
         }
     }
 
     private int search(int depth, int alpha, int beta){
-
-        
 
         if(depth == 0){
             return evaluate();
@@ -142,47 +129,34 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         if(moves.length == 0){
 
-            if(moveGenerator.activeKingInCheck){
+            if(moveGenerator.activeKingInCheck){ // king in check with 0 moves means game over
+                System.out.println("king in check");
                 return negativeInfinity;
+            } else {
+                return 0; // stalemate so tie
             }
-            
-            return 0;
-
         }
 
         moves = orderMoves(moves);
-
-        char pieceToChar[] = {'-','K', 'Q', 'B', 'N', 'R', 'P', 'k', 'q', 'b', 'n', 'r', 'p'};
 
         for(BitwiseMove move : moves){
 
             byte preMoveCastlingRights = bwB.castlingRights;
 
-            char fromPiece = pieceToChar[1 + this.bwB.getPieceType(move.getFromSquare())];
-            char capturePiece = pieceToChar[1 + this.bwB.getPieceType(move.getToSquare())];
-
             int capturePieceType = bwB.movePiece(move);
 
-            System.out.println("===============\n");
-            System.out.println(bwB.bitboardsToString()); 
-            
-            System.out.println("["+(!this.bwB.isWhiteToMove ? "W" : "B")+"] Trying :" + move.toString());
-            System.out.println("From Piece: "+fromPiece);
-            System.out.println("Capture Piece: "+capturePiece);
-            System.out.println();
 
             int eval = -search(depth - 1, -beta, -alpha);
             bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
 
             if(eval >= beta){
-                // determines if opponent will likely avoid position
+                // determines if opponent will likely avoid position (from bots perspective)
                 return beta;
             }
 
             alpha = Math.max(alpha, eval);
 
         }
-
         return alpha;
     }
 
@@ -191,8 +165,10 @@ public class parkerfish_v1 extends AbstractChessEngine {
         // alpha beta pruning is most effective when best moves are searched first and worst last
         // this function give an extremely rough eval to each position to then optimize the search function
 
-        long enemyPawns = bwB.piece_bitboards[!bwB.isWhiteToMove ? 0 : 1][5];
-        long enemyPawnVision = (enemyPawns << 7) & enemyPawns & ~ (Constants.FILE_H) | (enemyPawns << 9) & enemyPawns & ~ (Constants.FILE_A);
+        MoveGenerator2 moveGen = new MoveGenerator2(this.bwB);
+
+        long enemyPawnVision = moveGen.generatePawnRightAttacksBitboards(false);
+        enemyPawnVision |= moveGen.generatePawnLeftAttacksBitboards(false);
 
         Map<BitwiseMove, Integer> moveScores = new HashMap<>();
 
@@ -202,12 +178,14 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
             int movePieceType = bwB.getPieceType(move.getFromSquare());
 
+            //System.out.println(movePieceType);
+
             int toSquare = move.getToSquare();
 
             int capturePieceType = bwB.getPieceType(toSquare);
 
-            boolean canBeCapturedByEnemyPawns = ((enemyPawnVision & (1L << toSquare)) != 0);
-            
+            boolean canBeCapturedByEnemyPawns = (enemyPawnVision & (1L << toSquare)) != 0L;
+
             if(capturePieceType != -1){
                 // priortize good captures
                 moveScoreGuess = 10 * bwB.getPieceValue(capturePieceType) - bwB.getPieceValue(movePieceType);
@@ -218,8 +196,9 @@ public class parkerfish_v1 extends AbstractChessEngine {
             }
 
             if(canBeCapturedByEnemyPawns){
-                moveScoreGuess -= bwB.getPieceValue(move.getToSquare());
+                moveScoreGuess -= bwB.getPieceValue(movePieceType);
             }
+
             moveScores.put(move, moveScoreGuess);
         }
 

@@ -226,24 +226,24 @@ public class MoveGenerator2 extends Constants {
         return moveBitboard;
     }
 
-    private long generatePawnLeftAttacksBitboards(boolean isActive) {
+    public long generatePawnLeftAttacksBitboards(boolean isActive) {
 
-        int team = this.bwB.isWhiteToMove == isActive ? White : Black;
+        int team = isActive ? (this.bwB.isWhiteToMove ? White : Black) : (this.bwB.isWhiteToMove ? Black : White);
 
         long pawns = this.bwB.piece_bitboards[team][P];
         long moveBitboard;
 
-        if(this.bwB.isWhiteToMove){
-            moveBitboard = (pawns << 7) & ~FILE_H;
+        if(team == White){
+            moveBitboard = (pawns & ~FILE_A) >>> 9;
         } else {
-            moveBitboard = (pawns >>> 7) & ~FILE_A;
+            moveBitboard = (pawns & ~FILE_A) << 7;
         }
 
         if(isActive){
             moveBitboard &= this.teamMask[team ^ 1];
         } else {
             enemyVision |= moveBitboard;
-            detectCheck(team, team, moveBitboard);
+            detectCheck(-1, team, moveBitboard);
         }
 
         return moveBitboard;
@@ -251,22 +251,22 @@ public class MoveGenerator2 extends Constants {
 
     public long generatePawnRightAttacksBitboards(boolean isActive) {
         
-        int team = this.bwB.isWhiteToMove == isActive ? White : Black;
+        int team = isActive ? (this.bwB.isWhiteToMove ? White : Black) : (this.bwB.isWhiteToMove ? Black : White);
 
         long pawns = this.bwB.piece_bitboards[team][P];
         long moveBitboard;
 
-        if(this.bwB.isWhiteToMove){
-            moveBitboard = (pawns >>> 9) & ~FILE_A;
+        if(team == White){
+            moveBitboard = (pawns & ~FILE_H) >>> 7;
         } else {
-            moveBitboard = (pawns << 9) & ~FILE_H;
+            moveBitboard = (pawns & ~FILE_H) << 9;
         }
 
         if(isActive){
             moveBitboard &= this.teamMask[team ^ 1];
         } else {
             enemyVision |= moveBitboard;
-            detectCheck(team, team, moveBitboard);
+            detectCheck(-1, team, moveBitboard);
         }
 
         return moveBitboard;
@@ -314,7 +314,10 @@ public class MoveGenerator2 extends Constants {
                 this.checkBlockingMask = 0L; // no move can block check
             } else {
                 this.activeKingInCheck = true;
-                this.checkBlockingMask |= (1L << index | bit_between[index][this.activeKingIndex]);
+
+                if(index != -1){
+                    this.checkBlockingMask |= (1L << index | bit_between[index][this.activeKingIndex]);
+                }
             }
         }
     }
@@ -499,22 +502,22 @@ public class MoveGenerator2 extends Constants {
             rightCaptures &= ~enpasantRightCapture;
             leftCaptures &= ~enpasantLeftCapture;
 
-            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantLeftCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE, bwB.isWhiteToMove ? -7 : 7);
-            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantRightCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE,  bwB.isWhiteToMove ? -9 : 9);
+            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantLeftCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE, bwB.isWhiteToMove ? SW : NW);
+            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantRightCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE,  bwB.isWhiteToMove ? SE : NE);
 
         }
 
-        MoveUtils.generateMovesFromBitboardMultiplePieces(leftCaptures, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? -7 : 7);
-        MoveUtils.generateMovesFromBitboardMultiplePieces(rightCaptures, moveList, BitwiseMove.NORMAL_MOVE,  bwB.isWhiteToMove ? -9 : 9);
-        MoveUtils.generateMovesFromBitboardMultiplePieces(singlePushes, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? -8 : 8);
-        MoveUtils.generateMovesFromBitboardMultiplePieces(doublePushes, moveList, BitwiseMove.PAWN_MOVE_DOUBLE,  bwB.isWhiteToMove ? -16 : 16);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(leftCaptures, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? SW : NW);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(rightCaptures, moveList, BitwiseMove.NORMAL_MOVE,  bwB.isWhiteToMove ? SE : NE);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(singlePushes, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? SOUTH : NORTH);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(doublePushes, moveList, BitwiseMove.PAWN_MOVE_DOUBLE,  bwB.isWhiteToMove ? SOUTH + SOUTH : NORTH + NORTH);
         
         // gen promotes :D lolo Fart epic swasg! !! ! ! ! 
         // POPooPROPROORPORPORP OG GHGAWHAHAH
 
-        MoveUtils.generateMovesPromotions(leftCapturesPromote, moveList, bwB.isWhiteToMove ? -7 : 7);
-        MoveUtils.generateMovesPromotions(rightCapturesPromote, moveList, bwB.isWhiteToMove ? -9 : 9);
-        MoveUtils.generateMovesPromotions(singlePushesPromote, moveList, bwB.isWhiteToMove ? -8 : 8);
+        MoveUtils.generateMovesPromotions(leftCapturesPromote, moveList, bwB.isWhiteToMove ? SW : NW);
+        MoveUtils.generateMovesPromotions(rightCapturesPromote, moveList, bwB.isWhiteToMove ? SE : NE);
+        MoveUtils.generateMovesPromotions(singlePushesPromote, moveList, bwB.isWhiteToMove ? SOUTH : NORTH);
     }
 
     private void generateFriendlyMoves(MoveList moveList){

@@ -12,9 +12,9 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
 import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
 
 public class Main {
-    
+
     public final static boolean ai_verses_ai = false;
-    
+
     /*
      * 00 01 02 03 04 05 06 07
      * 08 09 10 11 12 13 14 15
@@ -25,29 +25,22 @@ public class Main {
      * 48 49 50 51 52 53 54 55
      * 56 57 58 59 60 61 62 63
      * 
-     * 1L << index 
+     * 1L << index
      * 
      * https://tearth.dev/bitboard-viewer/
      */
 
-    public static void main(String[] args){
-        
+    public static void main(String[] args) {
 
         // TODO
-
-        // Cleanup constants, especially change the directions,
-        // then impliment those instead of random numerical constants that make no sense
-        // validate each one
 
         // Once all of the move gen is workign CORRECTLY, a basic eval function is due
         // Material + position of pieces + king safety should be fine I believe?
         // add an opening book too, then this program should be wrapped up
 
-        printBitboard(RANK_8);
-
-        if(true){
-            return;
-        }
+        //if(true){
+        //    return;
+        //}
 
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
@@ -58,7 +51,7 @@ public class Main {
         frame.setLocationRelativeTo(null);
 
         boolean playerOneIsHuman = true;
-        boolean playerTwoIsHuman = true;
+        boolean playerTwoIsHuman = false;
 
         Board board = new Board();
         frame.add(board);
@@ -67,11 +60,8 @@ public class Main {
 
         board.repaint();
 
-        System.out.println("test");
-
-        parkerfish_v1 parkerTest = new parkerfish_v1(board); 
-        parkerTest.makeMove();       
-        
+        parkerfish_v1 parkerTest = new parkerfish_v1(board);
+        parkerTest.makeMove();
     }
 
     // debugging purposes
@@ -82,7 +72,7 @@ public class Main {
         System.out.println("    _ _ _ _ _ _ _ _");
         for (int rank = 0; rank < 8; rank++) {
 
-            System.out.print(""+(8-rank)+" | ");
+            System.out.print("" + (8 - rank) + " | ");
 
             for (int file = 0; file < 8; file++) {
 
@@ -93,5 +83,5 @@ public class Main {
             System.out.println();
         }
     }
-    
+
 }

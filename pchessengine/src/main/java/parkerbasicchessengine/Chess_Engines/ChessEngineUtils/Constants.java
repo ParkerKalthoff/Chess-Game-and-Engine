@@ -76,14 +76,14 @@ public class Constants {
     
     // Directions
 
-    public static final int NORTH = 0;
-    public static final int NE = 1;
-    public static final int EAST = 2;
-    public static final int SE = 3;
-    public static final int SOUTH = 4;
-    public static final int SW = 5;
-    public static final int WEST = 6;
-    public static final int NW = 7;
+    public static final int NORTH = -8;
+    public static final int NE = -7;
+    public static final int EAST = 1;
+    public static final int SE = 9;
+    public static final int SOUTH = 8;
+    public static final int SW = 7;
+    public static final int WEST = -1;
+    public static final int NW = -9;
 
     // pieces
 
@@ -115,14 +115,14 @@ public class Constants {
     public static final long FILE_H = 0x8080808080808080L;
 
     // Ranks <->
-    public static final long RANK_1 = 0x00000000000000FFL;
-    public static final long RANK_2 = 0x000000000000FF00L;
-    public static final long RANK_3 = 0x0000000000FF0000L;
-    public static final long RANK_4 = 0x00000000FF000000L;
-    public static final long RANK_5 = 0x000000FF00000000L;
-    public static final long RANK_6 = 0x0000FF0000000000L;
-    public static final long RANK_7 = 0x00FF000000000000L;
-    public static final long RANK_8 = 0xFF00000000000000L;
+    public static final long RANK_8 = 0x00000000000000FFL;
+    public static final long RANK_7 = 0x000000000000FF00L;
+    public static final long RANK_6 = 0x0000000000FF0000L;
+    public static final long RANK_5 = 0x00000000FF000000L;
+    public static final long RANK_4 = 0x000000FF00000000L;
+    public static final long RANK_3 = 0x0000FF0000000000L;
+    public static final long RANK_2 = 0x00FF000000000000L;
+    public static final long RANK_1 = 0xFF00000000000000L;
 
     // White castle
     public static final int KING_SIDE_WHITE_CASTLE = 62;
