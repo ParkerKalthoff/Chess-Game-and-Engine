@@ -59,7 +59,7 @@ public class MovementBitboards extends Constants{
 
     public static Map<Long, Short> bitboardToIndex = new HashMap<>();
 
-    final static int[] Flip = {
+    public final static int[] Flip = {
         56, 57, 58, 59, 60, 61, 62, 63,
         48, 49, 50, 51, 52, 53, 54, 55,
         40, 41, 42, 43, 44, 45, 46, 47,

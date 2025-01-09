@@ -19,8 +19,10 @@ import parkerbasicchessengine.soundManager;
 public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator2 moveGenerator;
+    private Evaluate evaluate;
     private Board board;
     public BitwiseBoard bwB;
+
 
     public parkerfish_v1(Board board){
 
@@ -41,6 +43,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
         this.bwB = new BitwiseBoard(board.convertPostionToFEN());
         
         this.moveGenerator = new MoveGenerator2(this.bwB);
+        this.evaluate = new Evaluate(this.bwB);
     }
 
 
@@ -80,13 +83,13 @@ public class parkerfish_v1 extends AbstractChessEngine {
             return;
         }
     
-        int depth = 2;
+        int depth = 8;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         BitwiseMove bestMove = null;
         int bestEval = Integer.MIN_VALUE;
             
-        System.out.println("gen moves");
+        //System.out.println("gen moves");
 
         for (BitwiseMove move : legalMoves) {
 
@@ -112,7 +115,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
             int newCol = bestMove.getToSquare() % 8;
             int newRow = bestMove.getToSquare() / 8;
 
-            //board.makeMove(new Move(board, board.getPiece(oldCol, oldRow), newCol, newRow));
+            board.makeMove(new Move(board, board.getPiece(oldCol, oldRow), newCol, newRow));
             System.out.println("Best move: " + bestMove);
         } else {
             System.out.println("null move");
@@ -211,29 +214,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
     }
 
     public int evaluate(){
-        
-        // using a placeholder of checking material difference
-
-        // plan to account for piece placement, connected pawns, is castled weighted by remaining material
-
-        int whiteScore = 0;
-        int blackScore = 0;
-        
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][0]) * 999999;
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][1]) * 900;
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][2]) * 300;
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][3]) * 300;
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][4]) * 500;
-        whiteScore += Long.bitCount(bwB.piece_bitboards[0][5]) * 100;
-
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][0]) * 999999;
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][1]) * 900;
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][2]) * 300;
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][3]) * 300;
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][4]) * 500;
-        blackScore += Long.bitCount(bwB.piece_bitboards[1][5]) * 100;
-
-        return whiteScore - blackScore;
+        return evaluate.getEval();
     }
 
 }

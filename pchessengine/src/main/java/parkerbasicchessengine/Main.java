@@ -3,6 +3,7 @@ package parkerbasicchessengine;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 
@@ -61,7 +62,14 @@ public class Main {
         board.repaint();
 
         parkerfish_v1 parkerTest = new parkerfish_v1(board);
-        parkerTest.makeMove();
+
+        Scanner scanner = new Scanner(System.in);
+
+        while(!board.isGameOver){
+            parkerTest.makeMove();
+            scanner.nextLine();
+        }
+        
     }
 
     // debugging purposes
