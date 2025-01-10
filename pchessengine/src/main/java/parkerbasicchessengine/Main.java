@@ -35,13 +35,25 @@ public class Main {
 
         // TODO
 
-        // Once all of the move gen is workign CORRECTLY, a basic eval function is due
-        // Material + position of pieces + king safety should be fine I believe?
-        // add an opening book too, then this program should be wrapped up
+        // fix random bugs and black suiciding its piece
 
         //if(true){
         //    return;
         //}
+
+
+        String openings[] = {
+        "r1bqkbnr/pppp1ppp/8/3Pp3/1P2P3/8/P1PP2PP/RNBQKBNR b KQkq - 0 4    ", // Ruy López (Spanish Opening)
+        "rnbqkb1r/pp1ppppp/5n2/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", // Sicilian Defense
+        "rnbqkbnr/pp1ppppp/8/2p5/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 3", // French Defense
+        "rnbqkbnr/pp2pppp/3p4/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 4", // Caro-Kann Defense
+        "rnbqkb1r/pppppppp/5n2/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2", // King's Indian Defense
+        "rnbqkb1r/ppp1pppp/8/3p4/2P5/5N2/PP1PPPPP/RNBQKB1R w KQkq - 1 3", // Queen's Gambit Declined
+        "rnbqkb1r/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 2", // English Opening
+        "rnbqk1nr/pppp1ppp/8/4p3/2B5/5N2/PPPP1PPP/RNBQK2R b KQkq - 2 3", // Italian Game
+        "rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 1 2", // Scandinavian Defense
+        "rnbqk2r/ppppppbp/5np1/8/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 3 4", // Nimzo-Indian Defense
+        };
 
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
@@ -55,6 +67,7 @@ public class Main {
         boolean playerTwoIsHuman = false;
 
         Board board = new Board();
+        board.loadPositionFromFEN(openings[3]);
         frame.add(board);
 
         frame.setVisible(true);
@@ -68,7 +81,6 @@ public class Main {
         while(!board.isGameOver){
             parkerTest.makeMove();
             board.repaint();
-            scanner.nextLine();
         }
         
     }

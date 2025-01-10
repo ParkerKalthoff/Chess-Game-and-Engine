@@ -208,7 +208,7 @@ public class BitwiseBoard{
 
         System.out.println(move);
         System.out.println(move.source);
-        
+
         int boardPieceType = pieceType - (6 * team);
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
 
@@ -438,7 +438,10 @@ public class BitwiseBoard{
             {'k', 'q', 'b', 'n', 'r', 'p'} 
         };
 
-        for (int rank = 0; rank < 8; rank++) {  
+        sb.append("    a b c d e f g h\n");
+        sb.append("    _ _ _ _ _ _ _ _\n");
+        for (int rank = 0; rank < 8; rank++) {
+            sb.append("" + (8 - rank) + " | ");  
             for (int file = 0; file < 8; file++) { 
                 boolean piecePlaced = false;
                 
@@ -446,7 +449,7 @@ public class BitwiseBoard{
                     for (int pieceType = 0; pieceType < 6; pieceType++) {
                         long bitboard = piece_bitboards[color][pieceType];
                         if ((bitboard & (1L << (rank * 8 + file))) != 0) {
-                            sb.append(pieceRepresentation[color][pieceType]);
+                            sb.append(pieceRepresentation[color][pieceType]+" ");
                             piecePlaced = true;
                             break;
                         }
@@ -457,7 +460,7 @@ public class BitwiseBoard{
                 }
 
                 if (!piecePlaced) {
-                    sb.append('.');
+                    sb.append(". ");
                 }
             }
             sb.append("\n");

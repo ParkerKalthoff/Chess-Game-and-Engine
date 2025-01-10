@@ -332,22 +332,28 @@ public class MoveGenerator2 extends Constants {
         while (iterator.hasNext) {
             int pieceIndex = Long.numberOfTrailingZeros(iterator.getNext());
             long movementBitboard;
+            String typeString = "";
     
             switch (pieceType) {
                 case R:
                     movementBitboard = generateRookBitboard(pieceIndex, true);
+                    typeString = "R";
                     break;
                 case B:
                     movementBitboard = generateBishopBitboard(pieceIndex, true);
+                    typeString = "B";
                     break;
                 case Q:
                     movementBitboard = generateQueenBitboard(pieceIndex, true);
+                    typeString = "Q";
                     break;
                 case N:
                     movementBitboard = generateKnightBitboard(pieceIndex, true);
+                    typeString = "N";
                     break;
                 case K:
                     movementBitboard = generateKingNormalMovesBitboard(pieceIndex, true);
+                    typeString = "K";
                     break;
                 default:
                     throw new RuntimeErrorException(null,"Illegal Piece:" + pieceType);
@@ -360,7 +366,7 @@ public class MoveGenerator2 extends Constants {
                 movementBitboard &= this.checkBlockingMask;
             }
     
-            MoveUtils.generateMovesFromBitboardSinglePiece(movementBitboard, moveList, BitwiseMove.NORMAL_MOVE, pieceIndex);
+            MoveUtils.generateMovesFromBitboardSinglePiece(movementBitboard, moveList, BitwiseMove.NORMAL_MOVE, pieceIndex, typeString);
         }
     }
     
@@ -546,7 +552,7 @@ public class MoveGenerator2 extends Constants {
 }
 
 class MoveUtils {
-    public static void generateMovesFromBitboardSinglePiece(long moveBitboard, MoveList moveList, int moveFlag, int index) {
+    public static void generateMovesFromBitboardSinglePiece(long moveBitboard, MoveList moveList, int moveFlag, int index, String piece) {
         LSBLoopGenerator loop = new LSBLoopGenerator(moveBitboard);
         while (loop.hasNext) {
             int toIndex = Long.numberOfTrailingZeros(loop.getNext()); 
@@ -554,7 +560,7 @@ class MoveUtils {
             
             BitwiseMove w = new BitwiseMove(index, toIndex, moveFlag);
             
-            w.source = "- "+toIndex+", "+index;
+            w.source = "- "+ piece;
 
             moveList.append(new BitwiseMove(index, toIndex, moveFlag));
         }

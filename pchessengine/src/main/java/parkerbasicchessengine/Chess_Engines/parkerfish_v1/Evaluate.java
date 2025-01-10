@@ -44,7 +44,7 @@ public class Evaluate {
         whiteScore += evaluatePawns(White);
         blackScore += evaluatePawns(Black);
 
-        return whiteScore - blackScore;
+        return whiteScore - blackScore; 
     }
 
     private int getMaterialScore(int team){
