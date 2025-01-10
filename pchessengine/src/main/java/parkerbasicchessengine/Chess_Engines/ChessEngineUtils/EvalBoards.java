@@ -1,7 +1,7 @@
 package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
 
 public class EvalBoards extends Constants {
-        
+
         public static final int[] col = {
             0, 1, 2, 3, 4, 5, 6, 7,
             0, 1, 2, 3, 4, 5, 6, 7,
@@ -62,7 +62,7 @@ public class EvalBoards extends Constants {
         public final static int[] pawn_score = {
               0,   0,   0,   0,   0,   0,   0,   0,
               0,   2,   4, -12, -12,   4,   2,   0,
-              0,   2,   4,   4,   4,   4,   2,   0,
+              0,   2,   4,   4,   4,   2,   2,   0,
               0,   2,   4,   8,   8,   4,   2,   0,
               0,   2,   4,   8,   8,   4,   2,   0,
               4,   8,  10,  16,  16,  10,   8,   4,

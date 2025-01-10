@@ -67,7 +67,7 @@ public class Main {
         boolean playerTwoIsHuman = false;
 
         Board board = new Board();
-        board.loadPositionFromFEN(openings[3]);
+        //board.loadPositionFromFEN(openings[3]);
         frame.add(board);
 
         frame.setVisible(true);

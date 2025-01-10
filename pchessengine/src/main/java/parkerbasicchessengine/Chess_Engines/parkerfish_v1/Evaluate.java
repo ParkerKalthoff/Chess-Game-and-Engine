@@ -11,8 +11,8 @@ public class Evaluate {
 
     private BitwiseBoard bwB;
 
-    final int EndgameUpperBound = 48;
-    final int EndgameLowerBound = 6;
+    final int EndgameUpperBound = 4800;
+    final int EndgameLowerBound = 600;
 
     public Evaluate(BitwiseBoard bwB){
         this.bwB = bwB;
@@ -44,7 +44,12 @@ public class Evaluate {
         whiteScore += evaluatePawns(White);
         blackScore += evaluatePawns(Black);
 
-        return whiteScore - blackScore; 
+        if(!bwB.isWhiteToMove){
+            return blackScore - whiteScore;
+        } else {
+            return whiteScore - blackScore;
+        }
+         
     }
 
     private int getMaterialScore(int team){
