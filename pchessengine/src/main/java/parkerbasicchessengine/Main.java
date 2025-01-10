@@ -67,6 +67,7 @@ public class Main {
 
         while(!board.isGameOver){
             parkerTest.makeMove();
+            board.repaint();
             scanner.nextLine();
         }
         

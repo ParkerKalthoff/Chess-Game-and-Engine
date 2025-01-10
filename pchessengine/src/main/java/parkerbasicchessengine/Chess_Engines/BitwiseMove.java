@@ -3,6 +3,8 @@ package parkerbasicchessengine.Chess_Engines;
 public class BitwiseMove {
     public short move;
 
+    public String source = "";
+
     public static final byte NORMAL_MOVE = 0;        // Regular move
     public static final byte PROMOTE_TO_QUEEN = 1;   // Pawn promotion to Queen
     public static final byte PROMOTE_TO_BISHOP = 2;  // Pawn promotion to Bishop

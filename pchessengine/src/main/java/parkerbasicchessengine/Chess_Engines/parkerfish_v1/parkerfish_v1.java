@@ -83,9 +83,9 @@ public class parkerfish_v1 extends AbstractChessEngine {
             return;
         }
     
-        int depth = 8;
-        int alpha = Integer.MIN_VALUE;
-        int beta = Integer.MAX_VALUE;
+        int depth = 3;
+        int alpha = -999999;
+        int beta = 999999;
         BitwiseMove bestMove = null;
         int bestEval = Integer.MIN_VALUE;
             

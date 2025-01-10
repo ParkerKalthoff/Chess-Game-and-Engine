@@ -502,13 +502,13 @@ public class MoveGenerator2 extends Constants {
             rightCaptures &= ~enpasantRightCapture;
             leftCaptures &= ~enpasantLeftCapture;
 
-            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantLeftCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE, bwB.isWhiteToMove ? SW : NW);
-            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantRightCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE,  bwB.isWhiteToMove ? SE : NE);
+            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantLeftCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE, bwB.isWhiteToMove ? SE : NE);
+            MoveUtils.generateMovesFromBitboardMultiplePieces(enpasantRightCapture, moveList, BitwiseMove.EN_PASSANT_CAPTURE,  bwB.isWhiteToMove ? SW : NW);
 
         }
 
-        MoveUtils.generateMovesFromBitboardMultiplePieces(leftCaptures, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? SW : NW);
-        MoveUtils.generateMovesFromBitboardMultiplePieces(rightCaptures, moveList, BitwiseMove.NORMAL_MOVE,  bwB.isWhiteToMove ? SE : NE);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(leftCaptures, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? SE : NE);
+        MoveUtils.generateMovesFromBitboardMultiplePieces(rightCaptures, moveList, BitwiseMove.NORMAL_MOVE,  bwB.isWhiteToMove ? SW : NW);
         MoveUtils.generateMovesFromBitboardMultiplePieces(singlePushes, moveList, BitwiseMove.NORMAL_MOVE, bwB.isWhiteToMove ? SOUTH : NORTH);
         MoveUtils.generateMovesFromBitboardMultiplePieces(doublePushes, moveList, BitwiseMove.PAWN_MOVE_DOUBLE,  bwB.isWhiteToMove ? SOUTH + SOUTH : NORTH + NORTH);
         
@@ -550,6 +550,12 @@ class MoveUtils {
         LSBLoopGenerator loop = new LSBLoopGenerator(moveBitboard);
         while (loop.hasNext) {
             int toIndex = Long.numberOfTrailingZeros(loop.getNext()); 
+
+            
+            BitwiseMove w = new BitwiseMove(index, toIndex, moveFlag);
+            
+            w.source = "- "+toIndex+", "+index;
+
             moveList.append(new BitwiseMove(index, toIndex, moveFlag));
         }
     }
@@ -559,7 +565,12 @@ class MoveUtils {
         while (loop.hasNext) {
             int toIndex = Long.numberOfTrailingZeros(loop.getNext());
             int fromIndex = toIndex + adjustBy; 
-            moveList.append(new BitwiseMove(fromIndex, toIndex, moveFlag));
+
+            BitwiseMove w = new BitwiseMove(fromIndex, toIndex, moveFlag);
+            
+            w.source = ""+adjustBy+", "+toIndex+", "+fromIndex;
+
+            moveList.append(w);
         }
     }
 

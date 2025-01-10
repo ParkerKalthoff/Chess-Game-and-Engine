@@ -200,6 +200,15 @@ public class BitwiseBoard{
 
         int team = pieceType <= 5 ? 0 : 1;
 
+        System.out.println("=================");
+
+        System.out.println(bitboardsToString());
+
+        System.out.println();
+
+        System.out.println(move);
+        System.out.println(move.source);
+        
         int boardPieceType = pieceType - (6 * team);
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
 
