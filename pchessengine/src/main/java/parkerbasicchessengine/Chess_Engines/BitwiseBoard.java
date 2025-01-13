@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
-import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
 import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
 
@@ -109,6 +108,82 @@ public class BitwiseBoard{
 
     }
 
+    public String toFenString(){
+
+        StringBuilder fenBuilder = new StringBuilder();
+    
+        for (int rank = 0; rank < 8; rank++) {
+            int emptySquares = 0;
+            for (int file = 0; file < 8; file++) {
+                int bitboardIndex = rank * 8 + file;
+                char pieceChar = ' ';
+    
+                for (int team = 0; team < 2; team++) {
+                    for (int pieceType = 0; pieceType < 6; pieceType++) {
+                        if ((this.piece_bitboards[team][pieceType] & (1L << bitboardIndex)) != 0) {
+                            pieceChar = switch (pieceType) {
+                                case 0 -> 'K';
+                                case 1 -> 'Q';
+                                case 2 -> 'B';
+                                case 3 -> 'N';
+                                case 4 -> 'R';
+                                case 5 -> 'P';
+                                default -> ' ';
+                            };
+    
+                            if (team == 1) pieceChar = Character.toLowerCase(pieceChar);
+                            break;
+                        }
+                    }
+                    if (pieceChar != ' ') break;
+                }
+    
+                if (pieceChar == ' ') {
+                    emptySquares++;
+                } else {
+                    if (emptySquares > 0) {
+                        fenBuilder.append(emptySquares);
+                        emptySquares = 0;
+                    }
+                    fenBuilder.append(pieceChar);
+                }
+            }
+            if (emptySquares > 0) fenBuilder.append(emptySquares);
+            if (rank < 7) fenBuilder.append('/');
+        }
+    
+        fenBuilder.append(' ');
+        fenBuilder.append(this.isWhiteToMove ? 'w' : 'b');
+    
+        fenBuilder.append(' ');
+        if (this.castlingRights == 0) {
+            fenBuilder.append('-');
+        } else {
+            if ((this.castlingRights & (1 << 3)) != 0) fenBuilder.append('K');
+            if ((this.castlingRights & (1 << 2)) != 0) fenBuilder.append('Q');
+            if ((this.castlingRights & (1 << 1)) != 0) fenBuilder.append('k');
+            if ((this.castlingRights & 1) != 0) fenBuilder.append('q');
+        }
+    
+        fenBuilder.append(' ');
+        if (this.enpassantIndex == -1) {
+            fenBuilder.append('-');
+        } else {
+            int rank = this.enpassantIndex / 8;
+            int file = this.enpassantIndex % 8;
+            fenBuilder.append((char) ('a' + file)).append(rank + 1);
+        }
+    
+        fenBuilder.append(' ');
+        fenBuilder.append(this.halfMoveClock / 2);
+    
+        fenBuilder.append(' ');
+        fenBuilder.append(this.fullMoveCounter);
+    
+        return fenBuilder.toString();
+    }
+    
+
     private long hashPosition() {
         return this.zorbistHasher.generateZorbistHash(this);
     }
@@ -200,14 +275,14 @@ public class BitwiseBoard{
 
         int team = pieceType <= 5 ? 0 : 1;
 
-        System.out.println("=================");
-
-        System.out.println(bitboardsToString());
-
-        System.out.println();
-
-        System.out.println(move);
-        System.out.println(move.source);
+        //System.out.println("=================");
+//
+        //System.out.println(bitboardsToString());
+//
+        //System.out.println();
+//
+        //System.out.println(move);
+        //System.out.println(move.source);
 
         int boardPieceType = pieceType - (6 * team);
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]

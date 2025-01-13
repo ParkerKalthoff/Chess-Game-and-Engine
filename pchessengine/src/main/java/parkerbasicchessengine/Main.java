@@ -64,7 +64,6 @@ public class Main {
         boolean playerTwoIsHuman = false;
 
         Board board = new Board();
-        //board.loadPositionFromFEN(openings[3]);
         frame.add(board);
 
         frame.setVisible(true);
@@ -74,6 +73,8 @@ public class Main {
         parkerfish_v1 parkerTest = new parkerfish_v1(board);
 
         Scanner scanner = new Scanner(System.in);
+
+        System.out.println(parkerTest.bwB.toFenString());
 
         while(!board.isGameOver){
             parkerTest.makeMove();

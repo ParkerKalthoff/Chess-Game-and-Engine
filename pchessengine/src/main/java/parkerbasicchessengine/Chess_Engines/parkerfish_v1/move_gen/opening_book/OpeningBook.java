@@ -11,34 +11,84 @@ import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 
 public class OpeningBook {
 
-    private HashMap<String, ArrayList<Pair<String, Integer>>> moveHashmap;
-    private Random random;
+    // crappy opening book concept I made
+    // a little janky but I was interesting in learning concepts
+
+    private HashMap<String, ArrayList<Triple<String, Integer, Integer>>> moveHashmap;
+    private Random random = new Random();
 
     public BitwiseMove getPopularMove(String fenString){
 
-        ArrayList<Pair<String, Integer>> moves = moveHashmap.get(fenString);
+        ArrayList<Triple<String, Integer, Integer>> moves = moveHashmap.get(fenString);
 
         if(moves == null){
+            // doesnt exist return null 
             return null;
         }
 
-        Pair<String, Integer> popularMove = null;
+        Triple<String, Integer, Integer> popularMove = null;
 
-        for(Pair<String, Integer> move : moves){
-
-            if(popularMove == null || move.getValue() > popularMove.getValue()){
+        for(Triple<String, Integer, Integer> move : moves){
+            if(popularMove == null || move.getFreq() > popularMove.getFreq()){
                 popularMove = move;
             }
+        }
 
+        BitwiseMove boardMove = convertStringToBitwiseMove(popularMove);
+
+        return boardMove;
+
+    }
+
+    public BitwiseMove getRandomMove(String fenString){
+
+        ArrayList<Triple<String, Integer, Integer>> moves = moveHashmap.get(fenString);
+
+        if(moves == null){
+            // doesnt exist, return null
+            return null;
+        }
+
+        int totalWeight = 0;
+
+        for(Triple<String, Integer, Integer> move : moves){
+            totalWeight += move.getFreq();
+        }
+
+        int randomValue = random.nextInt(totalWeight);
+
+        int cumulativeWeight = 0;
+
+        for (Triple<String, Integer, Integer> move : moves) {
+            cumulativeWeight += move.getFreq();
+            if (cumulativeWeight > randomValue) {
+                BitwiseMove randomMove = convertStringToBitwiseMove(move);
+                return randomMove;
+            }
         }
 
         return null;
+    }
 
+    private BitwiseMove convertStringToBitwiseMove(Triple<String, Integer, Integer> moveInfo){
+        
+        String move = moveInfo.getMove();
+        int type = moveInfo.getType();
+
+        String fromString = move.substring(0, 2);
+        String toString = move.substring(2, 4);
+
+        int fromIndex = coordToIndex(fromString);
+        int toIndex = coordToIndex(toString);
+
+        BitwiseMove boardMove = new BitwiseMove(fromIndex, toIndex, type);
+
+        return boardMove;
     }
 
     public OpeningBook(){
 
-        final String filename = "opening_book_raw.txt";
+        final String filename = "pchessengine\\src\\main\\java\\parkerbasicchessengine\\Chess_Engines\\parkerfish_v1\\move_gen\\opening_book\\processed_moves.txt";
 
         moveHashmap = new HashMap<>();
 
@@ -48,7 +98,7 @@ public class OpeningBook {
 
             String[] moveInfoArray = fileContent.split(";");
 
-            String[][] fenMoveFrequencyStringArray = new String[moveInfoArray.length][3];
+            String[][] fenMoveFrequencyStringArray = new String[moveInfoArray.length][4];
 
             for (int i = 0; i < moveInfoArray.length; i++) {
                 fenMoveFrequencyStringArray[i] = moveInfoArray[i].split(":");
@@ -58,9 +108,10 @@ public class OpeningBook {
 
                 String fenString = moveInfo[0];
                 String move = moveInfo[1];
-                int freq = Integer.parseInt(moveInfo[2]);
+                int freq = Integer.parseInt(moveInfo[2].strip());
+                int moveType = Integer.parseInt(moveInfo[3].strip());
 
-                Pair<String, Integer> moveFreqPair = new Pair<>(move, freq);
+                Triple<String, Integer, Integer> moveFreqPair = new Triple<String, Integer, Integer>(move, freq, moveType);
 
                 if(!moveHashmap.containsKey(fenString)){
                     moveHashmap.put(fenString, new ArrayList<>());
@@ -94,21 +145,27 @@ public class OpeningBook {
 
     /* Pair util class */
 
-    public class Pair<K, V> {
-        private final K key;
-        private final V value;
+    public class Triple<K, V, T> {
+        private final K move;
+        private final V freq;
+        private final T type;
     
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
+        public Triple(K move, V freq, T type) {
+            this.move = move;
+            this.freq = freq;
+            this.type = type;
         }
     
-        public K getKey() {
-            return key;
+        public K getMove() {
+            return this.move;
         }
     
-        public V getValue() {
-            return value;
+        public V getFreq() {
+            return this.freq;
+        }
+
+        public T getType() {
+            return this.type;
         }
     }
 
