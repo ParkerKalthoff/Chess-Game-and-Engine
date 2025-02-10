@@ -30,6 +30,11 @@ public class BitwiseBoard{
 
     public HashMap<Long, Integer> historicalPostions = new HashMap<>();
 
+    private static final char[][] PIECE_REPRESENTATION = {
+        {'K', 'Q', 'B', 'N', 'R', 'P'},
+        {'k', 'q', 'b', 'n', 'r', 'p'}
+    };
+
     public void printBitboard(long bitboard) {
         System.out.println();
         for (int rank = 7; rank >= 0; rank--) {  // Loop through ranks (8 rows)
@@ -213,12 +218,20 @@ public class BitwiseBoard{
         long bitboardSquare = 1L << square;
 
         for (int i = 0; i < 2; i++) {
+            // Team
             for (int y = 0; y < 6; y++) {
+                // Piece
+                // K Q B N R P
+                // 0 1 2 3 4 5
+
                 if ((piece_bitboards[i][y] & bitboardSquare) != 0) {
+                    
                     return y + (i * 6);
+
                 }
             }
         }
+
 
         return -1;
     }
@@ -275,19 +288,11 @@ public class BitwiseBoard{
 
         int team = pieceType <= 5 ? 0 : 1;
 
-        //System.out.println("=================");
-//
-        //System.out.println(bitboardsToString());
-//
-        //System.out.println();
-//
-        //System.out.println(move);
-        //System.out.println(move.source);
-
         int boardPieceType = pieceType - (6 * team);
         // used to fix an issue where I have piecetype represented as both [0 or 1][0 - 5] OR [0 - 11]
 
         int capturePieceType = getPieceType(toSquare); // should be -1 if no capture
+        System.out.println(capturePieceType);
         int captureTeam = team ^ 1;
 
         int captureBoardPieceType = capturePieceType;
@@ -295,20 +300,11 @@ public class BitwiseBoard{
         if(capturePieceType != -1){
             captureBoardPieceType = captureBoardPieceType % 6;
         }
-        
-        /*
-        System.out.println("-------------------");
 
-        System.out.println("fromSquare "+ fromSquare); 
-        System.out.println("toSquare "+ toSquare); 
-        System.out.println("flag "+ flag); 
-        System.out.println("pieceType "+ pieceType); 
-        System.out.println("team "+ team); 
-        System.out.println("boardPieceType "+ boardPieceType); 
-        System.out.println("capturePieceType "+ capturePieceType); 
-        System.out.println("captureTeam "+ captureTeam); 
-        System.out.println("captureBoardPieceType "+ captureBoardPieceType); 
-         */
+        if(capturePieceType != -1 || boardPieceType == P){
+            halfMoveClock = -1;
+        }
+        
         switch (flag) {
             case BitwiseMove.NORMAL_MOVE:
 
@@ -404,26 +400,37 @@ public class BitwiseBoard{
 
         this.addPositionToHistoricalPositions();
 
+        if(!this.isWhiteToMove){
+            this.fullMoveCounter += 1;
+        }
+
         this.isWhiteToMove = !this.isWhiteToMove;
         
+        halfMoveClock += 1;
+
+        if(halfMoveClock == 100){
+            isGameOver = true;
+        }
+
         return capturePieceType;
 
     }
 
-    public void unmovePiece(BitwiseMove move, int capturePieceType, byte previousCastlingRights) {
+    public void unmovePiece(BitwiseMove move, int capturePieceType, byte previousCastlingRights, int previousHalfMoveClock) {
 
         int fromSquare = move.getFromSquare();
         int toSquare = move.getToSquare();
         int flag = move.getFlag();
 
         int pieceType = getPieceType(toSquare);
-        int team = pieceType <= 5 ? 0 : 1;
+        int team = pieceType <= 5 ? White : Black;
         int boardPieceType = pieceType - (6 * team);
 
         this.castlingRights = previousCastlingRights;
+        this.halfMoveClock = previousHalfMoveClock;
 
         if (capturePieceType != -1) {
-            int captureTeam = capturePieceType > 5 ? 1 : 0;
+            int captureTeam = capturePieceType <= 5 ? White : Black;
             int captureBoardPieceType = capturePieceType % 6;
 
             this.piece_bitboards[captureTeam][captureBoardPieceType] ^= (1L << toSquare);
@@ -431,7 +438,12 @@ public class BitwiseBoard{
 
         switch (flag) {
             case BitwiseMove.NORMAL_MOVE:
+            try{
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
+            } catch(ArrayIndexOutOfBoundsException e){
+                System.out.println(move.source);
+                throw e;
+            }
                 break;
 
             case BitwiseMove.PAWN_MOVE_DOUBLE:
@@ -493,6 +505,10 @@ public class BitwiseBoard{
                 throw new RuntimeErrorException(null, "Flag does not match pattern in undo move");
         }
 
+        if(this.isWhiteToMove){
+            this.fullMoveCounter -= 1;
+        }
+
         this.isWhiteToMove = !this.isWhiteToMove; 
     }
 
@@ -505,13 +521,11 @@ public class BitwiseBoard{
     }
 
     public String bitboardsToString() {
+        return bitboardsToString(this.piece_bitboards);
+    }
 
+    public static String bitboardsToString(long[][] inputBitboards) {
         StringBuilder sb = new StringBuilder();
-
-        char[][] pieceRepresentation = {
-            {'K', 'Q', 'B', 'N', 'R', 'P'},
-            {'k', 'q', 'b', 'n', 'r', 'p'} 
-        };
 
         sb.append("    a b c d e f g h\n");
         sb.append("    _ _ _ _ _ _ _ _\n");
@@ -519,12 +533,12 @@ public class BitwiseBoard{
             sb.append("" + (8 - rank) + " | ");  
             for (int file = 0; file < 8; file++) { 
                 boolean piecePlaced = false;
-                
+
                 for (int color = 0; color < 2; color++) {
                     for (int pieceType = 0; pieceType < 6; pieceType++) {
-                        long bitboard = piece_bitboards[color][pieceType];
+                        long bitboard = inputBitboards[color][pieceType];
                         if ((bitboard & (1L << (rank * 8 + file))) != 0) {
-                            sb.append(pieceRepresentation[color][pieceType]+" ");
+                            sb.append(PIECE_REPRESENTATION[color][pieceType] + " ");
                             piecePlaced = true;
                             break;
                         }
@@ -545,33 +559,32 @@ public class BitwiseBoard{
 
     //-------------
     private void performMove(int team, int boardPieceType, int fromSquare, int toSquare, int captureTeam, int captureBoardPieceType, int capturePieceType, int promotionType, int newEnPassantSquare) {
-        /*
-        System.out.println();
-        System.out.println("int team " + team); 
-        System.out.println("int boardPieceType " + boardPieceType); 
-        System.out.println("int fromSquare " + fromSquare); 
-        System.out.println("int toSquare " + toSquare); 
-        System.out.println("int captureTeam " + captureTeam); 
-        System.out.println("int captureBoardPieceType " + captureBoardPieceType); 
-        System.out.println("int capturePieceType " + capturePieceType); 
-        System.out.println("int promotionType " + promotionType); 
-        System.out.println("int newEnPassantSquare " + newEnPassantSquare);
-         */
-
-        this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
-        this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
+        
+        try {
+            this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("<<< -- <<< -- <<< -- <<< -- <<<");
+            System.out.println(" Index error when making move");
+            System.out.println("Team : " + team + ", PieceType : "+boardPieceType);
+            System.out.println("Move : "+fromSquare+" to "+toSquare);
+            System.out.println(" Capture info : "+captureTeam+", "+captureBoardPieceType);
+            System.out.println("\n"+this.bitboardsToString());
+            System.out.println("<<< -- <<< -- <<< -- <<< -- <<<\n");
+            throw new ArrayIndexOutOfBoundsException(); 
+        }
+            this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
 
         if (promotionType != -1) {
             this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare); // Remove pawn
             this.piece_bitboards[team][promotionType] ^= (1L << toSquare); // Add promoted piece
         }
 
-        if (boardPieceType == 0) { // king
+        if (boardPieceType == K) { // king
             int activeCastlingBits = this.isWhiteToMove ? 0b1100 : 0b0011;
             this.castlingRights &= ~activeCastlingBits;
         }
 
-        if (boardPieceType == 4) { // rook
+        if (boardPieceType == R) { // rook
             int activeCastlingBits;
 
             if (this.isWhiteToMove) { // is white
@@ -604,7 +617,15 @@ public class BitwiseBoard{
     }
 
     private void performUndoMove(int team, int boardPieceType, int fromSquare, int toSquare) {
-        this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
-        this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+
+        try{
+            this.piece_bitboards[team][boardPieceType] ^= (1L << toSquare);
+            this.piece_bitboards[team][boardPieceType] ^= (1L << fromSquare);
+                
+        } catch(ArrayIndexOutOfBoundsException e){
+            System.out.println(""+fromSquare+" - "+toSquare);
+            throw e;
+        }
+
     }
 }

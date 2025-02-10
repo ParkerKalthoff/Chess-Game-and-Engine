@@ -3,7 +3,7 @@ package parkerbasicchessengine.Chess_Engines;
 public class BitwiseMove {
     public short move;
 
-    public String source = "";
+    public String source;
 
     public static final byte NORMAL_MOVE = 0;        // Regular move
     public static final byte PROMOTE_TO_QUEEN = 1;   // Pawn promotion to Queen
@@ -28,22 +28,27 @@ public class BitwiseMove {
 
     public BitwiseMove(byte fromSquare, byte toSquare, short flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
+        source = "None Assigned";
     }
 
     public BitwiseMove(int fromSquare, int toSquare, int flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
+        source = "None Assigned";
     }
 
     public BitwiseMove(int fromSquare, int toSquare, byte flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
+        source = "None Assigned";
     }
 
     public BitwiseMove(short fromSquare, short toSquare, short flag) {
         this.move = (short) ((flag << 12) | (toSquare << 6) | fromSquare);
+        source = "None Assigned";
     }
 
     public BitwiseMove(short move){
         this.move = move;
+        source = "None Assigned";
     }
 
     public boolean isPromoting() {
@@ -89,7 +94,7 @@ public class BitwiseMove {
         int fromRank = fromIndex / 8;
     
         char fromFileChar = (char) ('a' + fromFile);
-        int fromRankNumber = fromRank + 1;
+        int fromRankNumber = 8 - fromRank;
 
         String fromSquare = String.valueOf(fromFileChar) + fromRankNumber;
 
@@ -101,7 +106,7 @@ public class BitwiseMove {
         int toRank = toIndex / 8;
     
         char toFileChar = (char) ('a' + toFile);
-        int toRankNumber = toRank + 1;
+        int toRankNumber = 8 - toRank;
 
         String toSquare = String.valueOf(toFileChar) + toRankNumber;
 

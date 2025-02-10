@@ -94,14 +94,6 @@ public class MoveGenerator extends Constants {
         return mask;
     }
 
-    //private BitwiseMove generateActiveTeamMoves(MoveList moveList){
-
-        // generate rooks
-
-
-        
-    //}
-
     private void generateEnemyVision(){
 
         int team = this.bwB.isWhiteToMove ? Black : White;
@@ -399,14 +391,20 @@ public class MoveGenerator extends Constants {
 
             int kingsideCastleSquare = bwB.isWhiteToMove ? KING_SIDE_WHITE_CASTLE : KING_SIDE_BLACK_CASTLE;
 
-            moveList.append(new BitwiseMove(kingIndex, kingsideCastleSquare, BitwiseMove.CASTLE_KINGSIDE));
+            BitwiseMove w = new BitwiseMove(kingIndex, kingsideCastleSquare, BitwiseMove.CASTLE_KINGSIDE);
+            w.source = "castle kingside";
+
+            moveList.append(w);
         }
 
         if (canCastleQueenside(team)) {
             
             int queensideCastleSquare = bwB.isWhiteToMove ? QUEEN_SIDE_WHITE_CASTLE : QUEEN_SIDE_BLACK_CASTLE;
 
-            moveList.append(new BitwiseMove(kingIndex, queensideCastleSquare, BitwiseMove.CASTLE_QUEENSIDE));
+            BitwiseMove w = new BitwiseMove(kingIndex, queensideCastleSquare, BitwiseMove.CASTLE_QUEENSIDE);
+            w.source = "castle queenside";
+
+            moveList.append(w);
         }
     }
 
@@ -488,7 +486,7 @@ public class MoveGenerator extends Constants {
         long rightCaptures = generatePawnRightAttacksBitboards(true);
         long leftCaptures = generatePawnLeftAttacksBitboards(true);
 
-        long promotionRow = bwB.isWhiteToMove ? RANK_7 : RANK_2;
+        long promotionRow = bwB.isWhiteToMove ? RANK_8 : RANK_1;
 
         long singlePushesPromote = singlePushes & promotionRow;
         long rightCapturesPromote = rightCaptures & promotionRow; 
@@ -562,7 +560,7 @@ class MoveUtils {
             
             w.source = "- "+ piece;
 
-            moveList.append(new BitwiseMove(index, toIndex, moveFlag));
+            moveList.append(w);
         }
     }
 
@@ -574,7 +572,9 @@ class MoveUtils {
 
             BitwiseMove w = new BitwiseMove(fromIndex, toIndex, moveFlag);
             
-            w.source = ""+adjustBy+", "+toIndex+", "+fromIndex;
+            char turn = adjustBy > 0 ? 'w' : 'b';
+
+            w.source = "P : ["+turn+" :: "+fromIndex+" to "+toIndex+"]";
 
             moveList.append(w);
         }
@@ -585,10 +585,21 @@ class MoveUtils {
         while (loop.hasNext) {
             int toIndex = Long.numberOfTrailingZeros(loop.getNext());
             int fromIndex = toIndex + adjustBy;
-            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_BISHOP));
-            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_KNIGHT));
-            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_ROOK));
-            moveList.append(new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_QUEEN));
+
+            BitwiseMove BISHOP = new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_BISHOP); 
+            BitwiseMove KNIGHT = new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_KNIGHT); 
+            BitwiseMove ROOK =  new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_ROOK);
+            BitwiseMove QUEEN = new BitwiseMove(fromIndex, toIndex, BitwiseMove.PROMOTE_TO_QUEEN); 
+
+            BISHOP.source = "Pawn promote BISHOP";
+            KNIGHT.source = "Pawn promote KNIGHT";
+            ROOK.source = "Pawn promote ROOK";
+            QUEEN.source = "Pawn promote QUEEN";
+
+            moveList.append(BISHOP);
+            moveList.append(KNIGHT);
+            moveList.append(ROOK);
+            moveList.append(QUEEN);
 
         }
     }

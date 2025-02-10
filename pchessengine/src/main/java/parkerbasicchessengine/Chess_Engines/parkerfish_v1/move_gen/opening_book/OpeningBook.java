@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import parkerbasicchessengine.Chess_Engines.BitwiseMove;
@@ -19,9 +20,13 @@ public class OpeningBook {
 
     public BitwiseMove getPopularMove(String fenString){
 
+        System.out.println("Looking for FEN: " + fenString);
+        System.out.println("Moves found: " + moveHashmap.get(fenString));
+
         ArrayList<Triple<String, Integer, Integer>> moves = moveHashmap.get(fenString);
 
         if(moves == null){
+            System.out.println("OpeningBook.java : Position doesnt exist in opening book, returning null");
             // doesnt exist return null 
             return null;
         }
@@ -40,6 +45,12 @@ public class OpeningBook {
 
     }
 
+    /**
+    * Returns a 'random' move that is present in the opening book. This method weights it by popularity
+    * So deviations can and will happen, but will be uncommon
+    * @param fenString the current position of the board
+    * @return returns a random bitwise move in the opening book
+    */
     public BitwiseMove getRandomMove(String fenString){
 
         ArrayList<Triple<String, Integer, Integer>> moves = moveHashmap.get(fenString);
@@ -86,44 +97,42 @@ public class OpeningBook {
         return boardMove;
     }
 
-    public OpeningBook(){
-
+    public OpeningBook() {
         final String filename = "pchessengine\\src\\main\\java\\parkerbasicchessengine\\Chess_Engines\\parkerfish_v1\\move_gen\\opening_book\\processed_moves.txt";
-
+    
         moveHashmap = new HashMap<>();
-
+    
         try {
-            
             String fileContent = new String(Files.readAllBytes(Paths.get(filename)));
-
+    
             String[] moveInfoArray = fileContent.split(";");
-
-            String[][] fenMoveFrequencyStringArray = new String[moveInfoArray.length][4];
-
-            for (int i = 0; i < moveInfoArray.length; i++) {
-                fenMoveFrequencyStringArray[i] = moveInfoArray[i].split(":");
-            }
-
-            for(String[] moveInfo : fenMoveFrequencyStringArray){
-
-                String fenString = moveInfo[0];
-                String move = moveInfo[1];
-                int freq = Integer.parseInt(moveInfo[2].strip());
-                int moveType = Integer.parseInt(moveInfo[3].strip());
-
-                Triple<String, Integer, Integer> moveFreqPair = new Triple<String, Integer, Integer>(move, freq, moveType);
-
-                if(!moveHashmap.containsKey(fenString)){
-                    moveHashmap.put(fenString, new ArrayList<>());
+    
+            for (String entry : moveInfoArray) {
+                if (entry.strip().isEmpty()) continue;
+    
+                String[] parts = entry.split(":");
+                if (parts.length != 4) {
+                    System.out.println("Malformed entry: " + entry);
+                    continue;
                 }
-
-                moveHashmap.get(fenString).add(moveFreqPair);
+    
+                String fenString = parts[0].strip();
+                String move = parts[1].strip();
+                int freq = Integer.parseInt(parts[2].strip());
+                int moveType = Integer.parseInt(parts[3].strip());
+    
+                Triple<String, Integer, Integer> moveFreqPair = new Triple<>(move, freq, moveType);
+    
+                moveHashmap.computeIfAbsent(fenString, k -> new ArrayList<>()).add(moveFreqPair);
             }
-
+    
         } catch (IOException e) {
-            System.out.println(e);
+            System.out.println("Error reading opening book file: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing number in opening book file: " + e.getMessage());
         }
     }
+    
 
     public static int coordToIndex(String coord) {
         if (coord == null || coord.length() != 2) {
@@ -166,6 +175,10 @@ public class OpeningBook {
 
         public T getType() {
             return this.type;
+        }
+
+        public String toString(){
+            return "("+move+", "+freq+")";
         }
     }
 
