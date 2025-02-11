@@ -86,6 +86,10 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     public void makeMove() {
 
+        if(bwB.isGameOver){
+            System.out.println("Game over, no moves possible, (prevent this message from appearing)");
+        }
+
         BitwiseMove[] legalMoves = moveGenerator.generateMoves();
 
         if (legalMoves.length == 0) {
@@ -143,6 +147,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
                 int capturePieceType = -1;
 
+                int ogMovePieceType = bwB.getPieceType(move.getFromSquare());
                 try{
                     capturePieceType = bwB.movePiece(move);
                 } catch(ArrayIndexOutOfBoundsException e){
@@ -158,7 +163,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
                 int eval = search(depth - 1, alpha, beta);
 
-                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock);
+                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock, ogMovePieceType);
 
                 if (eval > bestEval) {
                     bestEval = eval;
@@ -180,6 +185,14 @@ public class parkerfish_v1 extends AbstractChessEngine {
             System.out.println("Best move: " + bestMove);
         } else {
             System.out.println("null move");
+        }
+
+        
+        long white_king_bitboard = this.bwB.piece_bitboards[White][K];
+        long black_king_bitboard = this.bwB.piece_bitboards[Black][K];
+
+        if (white_king_bitboard == 0L || black_king_bitboard == 0L) {
+            this.bwB.isGameOver = true;
         }
     }
 
@@ -223,11 +236,13 @@ public class parkerfish_v1 extends AbstractChessEngine {
             oldBitboards[0] = bwB.piece_bitboards[0].clone();
             oldBitboards[1] = bwB.piece_bitboards[1].clone();
 
+            int ogMovePieceType = bwB.getPieceType(move.getFromSquare());
             int capturePieceType = bwB.movePiece(move);
 
             System.out.println(bwB.bitboardsToString());
             new Scanner(System.in).nextLine();
 
+            // temp
             long inoperationBitboard[][] = new long[2][6];            
             inoperationBitboard[0] = bwB.piece_bitboards[0].clone();
             inoperationBitboard[1] = bwB.piece_bitboards[1].clone();
@@ -260,7 +275,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
                 System.out.println("   - Beta : "+ beta);
             }
             
-            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock);
+            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock, ogMovePieceType);
 
             if(!Arrays.deepEquals(oldBitboards, bwB.piece_bitboards)){
 

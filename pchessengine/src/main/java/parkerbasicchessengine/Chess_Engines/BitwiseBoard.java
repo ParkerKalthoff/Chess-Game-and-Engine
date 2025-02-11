@@ -416,13 +416,15 @@ public class BitwiseBoard{
 
     }
 
-    public void unmovePiece(BitwiseMove move, int capturePieceType, byte previousCastlingRights, int previousHalfMoveClock) {
+    public void unmovePiece(BitwiseMove move, int capturePieceType, byte previousCastlingRights, int previousHalfMoveClock, int ogMovePieceType) {
 
         int fromSquare = move.getFromSquare();
         int toSquare = move.getToSquare();
         int flag = move.getFlag();
 
-        int pieceType = getPieceType(toSquare);
+        int pieceType = ogMovePieceType;
+        System.out.println("Trying to find piece presently on square "+toSquare);
+        System.out.println("Piece found is type "+pieceType);
         int team = pieceType <= 5 ? White : Black;
         int boardPieceType = pieceType - (6 * team);
 
@@ -441,7 +443,7 @@ public class BitwiseBoard{
             try{
                 performUndoMove(team, boardPieceType, fromSquare, toSquare);
             } catch(ArrayIndexOutOfBoundsException e){
-                System.out.println(move.source);
+                System.out.println(this.bitboardsToString());
                 throw e;
             }
                 break;
