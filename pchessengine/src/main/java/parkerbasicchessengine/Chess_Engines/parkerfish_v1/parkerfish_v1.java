@@ -1,11 +1,8 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import javax.management.RuntimeErrorException;
 
 import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
@@ -15,8 +12,6 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.opening_book.OpeningBook;
 import parkerbasicchessengine.Move;
 
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
-
 public class parkerfish_v1 extends AbstractChessEngine {
 
     private MoveGenerator moveGenerator;
@@ -25,9 +20,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
     public BitwiseBoard bwB;
 
     private OpeningBook oB;
-    private boolean inOpening = true;
-
-    private Scanner scanner;
+    private boolean inOpening = false;
 
     public parkerfish_v1(Board board) {
 
@@ -49,8 +42,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
         this.moveGenerator = new MoveGenerator(this.bwB);
         this.evaluate = new Evaluate(this.bwB);
         this.oB = new OpeningBook();
-
-        this.scanner = new Scanner(System.in);
     }
 
     // minimax algorithm
@@ -59,10 +50,10 @@ public class parkerfish_v1 extends AbstractChessEngine {
     // and returns the best move
     // alpha beta pruning speeds up this process
     //
-    //                  white start
-    //                /      \
-    //         black move black move
-    //                / \ / \
+    // white start
+    // / \
+    // black move black move
+    // / \ / \
     // White Moves -> 3 -1 4 5
     //
     // In this example, after white makes its initial move, black has a choice
@@ -86,10 +77,6 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     public void makeMove() {
 
-        if(bwB.isGameOver){
-            System.out.println("Game over, no moves possible, (prevent this message from appearing)");
-        }
-
         BitwiseMove[] legalMoves = moveGenerator.generateMoves();
 
         if (legalMoves.length == 0) {
@@ -101,27 +88,27 @@ public class parkerfish_v1 extends AbstractChessEngine {
             return;
         }
 
-        int depth = 3;
+        int depth = 6;
         int alpha = -9999999;
         int beta = 9999999;
         BitwiseMove bestMove = null;
         int bestEval = Integer.MIN_VALUE;
 
-        
-        String boardFenString = this.bwB.toFenString();
-        System.out.println(boardFenString);
-
         if (inOpening) {
 
-            if (bwB.fullMoveCounter > 7) {
+            if (7 < bwB.fullMoveCounter) {
 
                 this.inOpening = false;
 
             } else {
 
+                String boardFenString = this.bwB.toFenString();
+
                 bestMove = this.oB.getRandomMove(boardFenString);
 
-                System.out.println(bwB.bitboardsToString());
+                //System.out.println(bestMove.getFromSquare());
+                //System.out.println(bestMove.getToSquare());
+                //System.out.println(bestMove.getFlag());
 
                 if (bestMove == null) {
                     this.inOpening = false;
@@ -131,10 +118,9 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         }
 
+        // System.out.println("gen moves");
+
         if (bestMove == null) {
-
-            scanner.nextLine();
-
             // Best move being null means either the game is out of the opening or theres
             // not
             // a position in file (even if the move is right in the opening)
@@ -143,27 +129,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
                 byte preMoveCastlingRights = bwB.castlingRights;
 
-                int previousHalfMoveClock = this.bwB.halfMoveClock;
-
-                int capturePieceType = -1;
-
-                int ogMovePieceType = bwB.getPieceType(move.getFromSquare());
-                try{
-                    capturePieceType = bwB.movePiece(move);
-                } catch(ArrayIndexOutOfBoundsException e){
-                    System.out.println(bwB.toFenString());
-                    System.out.println("Moves : ");
-                    for(BitwiseMove m : legalMoves){
-                        System.out.println(" - "+m);
-                    throw e;
-                    }
-
-                    System.out.println("\n Move caused error :" + move);
-                }
+                int capturePieceType = bwB.movePiece(move);
 
                 int eval = search(depth - 1, alpha, beta);
 
-                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock, ogMovePieceType);
+                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
 
                 if (eval > bestEval) {
                     bestEval = eval;
@@ -186,23 +156,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
         } else {
             System.out.println("null move");
         }
-
-        
-        long white_king_bitboard = this.bwB.piece_bitboards[White][K];
-        long black_king_bitboard = this.bwB.piece_bitboards[Black][K];
-
-        if (white_king_bitboard == 0L || black_king_bitboard == 0L) {
-            this.bwB.isGameOver = true;
-        }
     }
 
     private int search(int depth, int alpha, int beta) {
 
-        long white_king_bitboard = this.bwB.piece_bitboards[White][K];
-        long black_king_bitboard = this.bwB.piece_bitboards[Black][K];
-
-        if (depth == 0 || white_king_bitboard == 0L || black_king_bitboard == 0L) {
-            // base case, eval at depth 0, also adding safeguard if king is captured
+        if (depth == 0) {
             return evaluate();
         }
 
@@ -220,32 +178,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
         moves = orderMoves(moves);
 
-        System.out.println("Moves to be processed :");
-        for (BitwiseMove move : moves) {
-            System.out.println("\t - "+move);
-        }
-
         for (BitwiseMove move : moves) {
 
             byte preMoveCastlingRights = bwB.castlingRights;
-            int previousHalfMoveClock = bwB.halfMoveClock;
 
-            long oldBitboards[][] = new long[2][6];
-
-
-            oldBitboards[0] = bwB.piece_bitboards[0].clone();
-            oldBitboards[1] = bwB.piece_bitboards[1].clone();
-
-            int ogMovePieceType = bwB.getPieceType(move.getFromSquare());
             int capturePieceType = bwB.movePiece(move);
-
-            System.out.println(bwB.bitboardsToString());
-            new Scanner(System.in).nextLine();
-
-            // temp
-            long inoperationBitboard[][] = new long[2][6];            
-            inoperationBitboard[0] = bwB.piece_bitboards[0].clone();
-            inoperationBitboard[1] = bwB.piece_bitboards[1].clone();
 
             try{
                 int eval = -search(depth - 1, -beta, -alpha);
@@ -257,46 +194,23 @@ public class parkerfish_v1 extends AbstractChessEngine {
     
                 alpha = Math.max(alpha, eval);
 
-            } catch (Exception e){ 
+            } catch (java.lang.ArrayIndexOutOfBoundsException e){ 
+                // generally this error goes when a piece in unexpectedly gone
                 System.out.println("=======================");
-                System.out.println(e);
                 System.out.println("  -- Error on move --  ");
                 System.out.println(" - Depth : "+depth);
                 System.out.println();
                 System.out.println(" - move considered : " + move.getFromSquare() + " to " + move.getToSquare() + " : " + move.getFlag());
                 System.out.println(move);
-                System.out.println("Intended Piece : "+move.source);
                 System.out.println();
-                System.out.println("Half move clock : "+ previousHalfMoveClock);
                 System.out.println(bwB.bitboardsToString());
                 System.out.println();
                 System.out.println(" - Evaluation : " + this.evaluate());
                 System.out.println("   - Alpha : "+ alpha);
                 System.out.println("   - Beta : "+ beta);
             }
-            
-            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, previousHalfMoveClock, ogMovePieceType);
 
-            if(!Arrays.deepEquals(oldBitboards, bwB.piece_bitboards)){
-
-                System.out.println("----------");
-                System.out.println("pre \n");
-                System.out.println(BitwiseBoard.bitboardsToString(oldBitboards));
-
-                System.out.println(move);
-
-                System.out.println("infix \n");
-                System.out.println(BitwiseBoard.bitboardsToString(inoperationBitboard));
-
-                System.out.println(move);
-
-                System.out.println("post \n");
-                System.out.println(bwB.bitboardsToString());
-
-                System.out.println("----------");
-
-                //throw new RuntimeErrorException(null, "Runtime Error : Pre Move and Post Undo Move Bitboards misalign");
-            }
+            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
 
         }
         return alpha;

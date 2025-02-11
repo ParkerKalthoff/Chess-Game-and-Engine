@@ -2,9 +2,22 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.BitboardToArrayIndicies;
-
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.*;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.B;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.Black;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.K;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.N;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.P;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.Q;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.R;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.White;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.Flip;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.bishop_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.king_endgame_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.king_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.knight_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.pawn_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.queen_score;
+import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.rook_score;
 
 
 public class Evaluate {
@@ -56,7 +69,7 @@ public class Evaluate {
         
         int score = 0;
 
-        score += Long.bitCount(bwB.piece_bitboards[team][K]) * 999999;
+        score += Long.bitCount(bwB.piece_bitboards[team][K]) * 99999;
         score += Long.bitCount(bwB.piece_bitboards[team][Q]) * 900;
         score += Long.bitCount(bwB.piece_bitboards[team][N]) * 300;
         score += Long.bitCount(bwB.piece_bitboards[team][B]) * 300;
