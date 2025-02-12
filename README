@@ -1,0 +1,7 @@
+This is my Chess Engine Repo
+
+In it I've built a OOP chess program with a gui, sound, full move validation
+
+I've also currently built one chess engine that utilizes bitboard, and advanced algorithms.
+
+Currently I'm making my second iteration of a bitboard chess engine, since my first one decided to learn by trying to architect it myself, leading to me learning a lot on how chess engines work, but creating a lot of tech debt and issues surrounding testing.
