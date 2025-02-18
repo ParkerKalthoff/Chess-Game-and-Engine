@@ -13,6 +13,8 @@ public class Move {
     private static final int PROMOTION_PIECE_SHIFT = 21;
     private static final int PAWN_DOUBLE_MOVE_SHIFT = 24;
     private static final int EN_PASSANT_SHIFT = 25;
+    private static final int CASTLING_SHIFT = 26;
+    
 
     // Bit masks
     private static final int FROM_SQUARE_MASK = 0x3F; // 6 bits
@@ -25,10 +27,9 @@ public class Move {
     private static final int PROMOTION_PIECE_MASK = 0x7; // 3 bits
     private static final int PAWN_DOUBLE_MOVE_MASK = 0x1; // 1 bit
     private static final int EN_PASSANT_MASK = 0x1;   // 1 bit
+    private static final int CASTLE_MASK = 0x1;   // 1 bit
 
-    public Move(int fromSquare, int toSquare, int team, int pieceType, 
-                boolean captureFlag, int capturePieceType, boolean promotionFlag, 
-                int promotionPiece, boolean pawnDoubleMove, boolean enPassant) {
+    public Move(int fromSquare, int toSquare, int team, int pieceType, boolean captureFlag, int capturePieceType, boolean promotionFlag, int promotionPiece, boolean pawnDoubleMove, boolean enPassant, boolean castling) {
         moveData = 0;
         moveData |= (fromSquare & FROM_SQUARE_MASK);
         moveData |= (toSquare & TO_SQUARE_MASK) << TO_SQUARE_SHIFT;
@@ -40,6 +41,7 @@ public class Move {
         moveData |= (promotionPiece & PROMOTION_PIECE_MASK) << PROMOTION_PIECE_SHIFT;
         moveData |= ((pawnDoubleMove ? 1 : 0) & PAWN_DOUBLE_MOVE_MASK) << PAWN_DOUBLE_MOVE_SHIFT;
         moveData |= ((enPassant ? 1 : 0) & EN_PASSANT_MASK) << EN_PASSANT_SHIFT;
+        moveData |= ((castling ? 1 : 0) & CASTLE_MASK) << CASTLING_SHIFT;
     }
 
     // Getters for each field
@@ -63,6 +65,10 @@ public class Move {
         return ((moveData >> CAPTURE_FLAG_SHIFT) & CAPTURE_FLAG_MASK) == 1;
     }
 
+    public int getCapturePieceTeam() {
+        return ((moveData >> TEAM_SHIFT) & TEAM_MASK) ^ 1;
+    }
+
     public int getCapturePieceType() {
         return (moveData >> CAPTURE_PIECE_TYPE_SHIFT) & CAPTURE_PIECE_TYPE_MASK;
     }
@@ -81,6 +87,10 @@ public class Move {
 
     public boolean isEnPassant() {
         return ((moveData >> EN_PASSANT_SHIFT) & EN_PASSANT_MASK) == 1;
+    }
+
+    public boolean isCastling() {
+        return ((moveData >> CASTLING_SHIFT) & CASTLE_MASK) == 1;
     }
 
     @Override

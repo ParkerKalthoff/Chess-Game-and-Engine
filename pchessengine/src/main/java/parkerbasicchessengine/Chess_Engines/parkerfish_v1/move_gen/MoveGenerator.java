@@ -2,10 +2,10 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
 import javax.management.RuntimeErrorException;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
-import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.LSBLoopGenerator;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 
 
 public class MoveGenerator extends Constants {

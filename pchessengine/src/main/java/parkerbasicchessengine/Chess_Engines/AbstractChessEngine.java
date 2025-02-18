@@ -1,7 +1,5 @@
 package parkerbasicchessengine.Chess_Engines;
 
-import java.util.Random;
-
 import parkerbasicchessengine.Board;
 
 public abstract class AbstractChessEngine {

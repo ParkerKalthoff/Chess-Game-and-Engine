@@ -1,6 +1,6 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseMove;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 
 public class MoveList {
     // made to avoid using lists

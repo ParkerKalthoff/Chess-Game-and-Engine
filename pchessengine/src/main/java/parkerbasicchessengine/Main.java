@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
-import parkerbasicchessengine.Chess_Engines.BitwiseMove;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
 
 public class Main {

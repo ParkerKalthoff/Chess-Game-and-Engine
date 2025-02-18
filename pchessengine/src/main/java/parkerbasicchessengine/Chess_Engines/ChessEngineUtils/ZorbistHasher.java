@@ -2,7 +2,7 @@ package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
 
 import java.util.Random;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
 
 public class ZorbistHasher {
 

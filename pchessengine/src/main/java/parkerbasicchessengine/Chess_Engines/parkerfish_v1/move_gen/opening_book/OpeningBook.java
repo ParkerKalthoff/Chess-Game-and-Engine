@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseMove;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 
 public class OpeningBook {
 

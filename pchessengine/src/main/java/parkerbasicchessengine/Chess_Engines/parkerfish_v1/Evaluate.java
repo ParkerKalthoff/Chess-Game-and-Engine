@@ -1,6 +1,5 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.BitboardToArrayIndicies;
 import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.B;
 import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.Black;

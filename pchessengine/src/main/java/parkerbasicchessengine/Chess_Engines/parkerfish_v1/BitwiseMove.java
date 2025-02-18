@@ -1,4 +1,4 @@
-package parkerbasicchessengine.Chess_Engines;
+package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 public class BitwiseMove {
     public short move;

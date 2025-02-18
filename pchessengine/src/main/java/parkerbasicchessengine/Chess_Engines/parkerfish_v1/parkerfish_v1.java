@@ -6,8 +6,6 @@ import java.util.Scanner;
 
 import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
-import parkerbasicchessengine.Chess_Engines.BitwiseBoard;
-import parkerbasicchessengine.Chess_Engines.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.MoveGenerator;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.move_gen.opening_book.OpeningBook;
 import parkerbasicchessengine.Move;
