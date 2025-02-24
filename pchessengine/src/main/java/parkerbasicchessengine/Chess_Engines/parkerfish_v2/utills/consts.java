@@ -87,6 +87,7 @@ public class consts {
 
     // pieces
 
+    public static final int NULL_PIECE = -1;
     public static final int K = 0;
     public static final int Q = 1;
     public static final int B = 2;
@@ -123,5 +124,58 @@ public class consts {
     public static final long RANK_3 = 0x0000FF0000000000L;
     public static final long RANK_2 = 0x00FF000000000000L;
     public static final long RANK_1 = 0xFF00000000000000L;
+
+
+    // Castling stuff
+
+
+    // White castling
+    public static final int WHITE_KING_START = E1;
+    public static final int WHITE_KINGSIDE_ROOK_START = H1;
+    public static final int WHITE_QUEENSIDE_ROOK_START = A1;
+
+    // White king end squares
+    public static final int WHITE_KINGSIDE_KING_END = G1;
+    public static final int WHITE_QUEENSIDE_KING_END = C1;
+
+    // White castling rook destinations
+    public static final int WHITE_KINGSIDE_ROOK_END = F1;
+    public static final int WHITE_QUEENSIDE_ROOK_END = D1;
+
+
+    // Squares that must be empty and not attacked
+    public static final long WHITE_KINGSIDE_SAFE_SQUARES = (1L << E1) | (1L << F1) | (1L << G1);
+    public static final long WHITE_QUEENSIDE_SAFE_SQUARES = (1L << E1) | (1L << D1) | (1L << C1);
+
+    // Squares between king and rook (must be empty but not necessarily safe)
+    public static final long WHITE_KINGSIDE_CASTLE_PATH = (1L << F1) | (1L << G1);
+    public static final long WHITE_QUEENSIDE_CASTLE_PATH = (1L << B1) | (1L << C1) | (1L << D1);
+
+
+
+    // Black castling
+    public static final int BLACK_KING_START = E8;
+    public static final int BLACK_KINGSIDE_ROOK_START = H8;
+    public static final int BLACK_QUEENSIDE_ROOK_START = A8;
+    
+    // Black king end squares
+    public static final int BLACK_KINGSIDE_KING_END = G8;
+    public static final int BLACK_QUEENSIDE_KING_END = C8;
+
+    // Black castling rook destinations
+    public static final int BLACK_KINGSIDE_ROOK_END = F8;
+    public static final int BLACK_QUEENSIDE_ROOK_END = D8;
+
+
+    // Squares that must be empty and not attacked
+    public static final long BLACK_KINGSIDE_SAFE_SQUARES = (1L << E8) | (1L << F8) | (1L << G8);
+    public static final long BLACK_QUEENSIDE_SAFE_SQUARES = (1L << E8) | (1L << D8) | (1L << C8);
+
+    // Squares between king and rook (must be empty but not necessarily safe)
+    public static final long BLACK_KINGSIDE_CASTLE_PATH = (1L << F8) | (1L << G8);
+    public static final long BLACK_QUEENSIDE_CASTLE_PATH = (1L << B8) | (1L << C8) | (1L << D8);
+
+
+
 
 }

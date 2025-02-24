@@ -11,8 +11,8 @@ public class Board {
     private int halfMoveClock;
     private boolean isGameOver;
     private boolean isWhitesTurn;
-    private byte castlingRights;
-    private int enPassantIndex;
+    private byte castlingRights; // 0bKQkq
+    public int enPassantIndex;
 
     public long bitboards[][];
     private Stack<BoardState> boardStateStack;
@@ -49,27 +49,32 @@ public class Board {
 
     // may be worth switching this to an attribute instead of calculating at runtime
     
-    public long whitePieces() {
-        return  this.bitboards[White][K] | this.bitboards[White][Q] | this.bitboards[White][R] | this.bitboards[White][B] |  this.bitboards[White][N] | this.bitboards[White][P];
-    }
-    
-    public long blackPieces() {
-        return  this.bitboards[Black][K] | this.bitboards[Black][Q] | this.bitboards[Black][R] | this.bitboards[Black][B] |  this.bitboards[Black][N] | this.bitboards[Black][P];
+    public boolean hasKingsideCastlingRights(int team){
+
+        if(team == White) {
+            return (this.castlingRights & 0b1000) != 0;
+        } else {
+            return (this.castlingRights & 0b0010) != 0;
+        }
+
     }
 
-    public long allPieces() {
-        return whitePieces() | blackPieces();
+    public boolean hasQueensideCastlingRights(int team){
+
+        if(team == White) {
+            return (this.castlingRights & 0b0100) != 0;
+        } else {
+            return (this.castlingRights & 0b0001) != 0;
+        }
+
+    }
+
+    public long getAllPieces() {
+        return getTeamsPieces(White) | getTeamsPieces(Black);
     }
 
     public long getTeamsPieces(int team) {
-        // abstracting method so I dont have a trillion if else statements
-
-        if(team == White) {
-            return whitePieces();
-        } else {
-            return blackPieces();
-        }
-
+        return this.bitboards[team][K] | this.bitboards[team][Q] | this.bitboards[team][R] | this.bitboards[team][B] |  this.bitboards[team][N] | this.bitboards[team][P];
     }
 
     public int getActiveTeam() {

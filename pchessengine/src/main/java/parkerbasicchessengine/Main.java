@@ -44,7 +44,6 @@ public class Main {
         boolean playerTwoIsHuman = false;
 
         Board board = new Board();
-        board.loadPositionFromFEN("8/k/8/8/8/K43/8/8 b - - 0 1");
         // incorrect promotion is causing out of bounds error
         frame.add(board);
 

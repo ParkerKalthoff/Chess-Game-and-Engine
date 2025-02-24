@@ -2,6 +2,8 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_boa
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
+import javax.management.RuntimeErrorException;
+
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_board_move_gen.HelperFunctions.*;
@@ -73,9 +75,9 @@ public class BitboardGenerators {
         long activePawns = this.board.bitboards[team][P]; // Get the active pawns for the given team.
 
         if(team == White) {
-            bitboard = (activePawns >>> 8) & ~this.board.allPieces(); // Shift White pawns up and exclude occupied squares.
+            bitboard = (activePawns >>> 8) & ~this.board.getAllPieces(); // Shift White pawns up and exclude occupied squares.
         } else {
-            bitboard = (activePawns << 8) & ~this.board.allPieces(); // Shift Black pawns down and exclude occupied squares.
+            bitboard = (activePawns << 8) & ~this.board.getAllPieces(); // Shift Black pawns down and exclude occupied squares.
         }
 
         return bitboard;
@@ -96,9 +98,9 @@ public class BitboardGenerators {
         long singlePushes = pawnForwardMove(team); // Get valid single pushes first.
 
         if(team == White) {
-            bitboard = ((singlePushes & RANK_3) >>> 8) & ~this.board.allPieces(); // White double move from rank 2.
+            bitboard = ((singlePushes & RANK_3) >>> 8) & ~this.board.getAllPieces(); // White double move from rank 2.
         } else {
-            bitboard = ((singlePushes & RANK_6) << 8) & ~this.board.allPieces(); // Black double move from rank 7.
+            bitboard = ((singlePushes & RANK_6) << 8) & ~this.board.getAllPieces(); // Black double move from rank 7.
         }
 
         return bitboard;
@@ -139,6 +141,22 @@ public class BitboardGenerators {
         return pawnLeftAttackVision(team) & board.getTeamsPieces(enemyTeam); // Mask attacks to enemy pieces only.
     }
 
+    
+    /**
+     * Calculates the legal left attack captures for enpassant square
+     *
+     * @param team The team (White or Black).
+     * @return A bitboard representing valid left attacks on enpassant square.
+     */
+    public long pawnLeftCaptureEnPassant(int team) {
+
+        if(board.enPassantIndex == -1) {
+            return 0L;
+        }
+
+        return pawnLeftAttackVision(team) & (1L << board.enPassantIndex); // Mask attacks to enemy pieces only.
+    }
+
     /**
      * Computes the right attack vision for pawns (attacked squares without considering enemy pieces).
      *
@@ -166,7 +184,6 @@ public class BitboardGenerators {
      * @param team The team (White or Black).
      * @return A bitboard representing valid right attacks on enemy pieces.
      */
-
     public long pawnRightAttackMoves(int team) {
 
         int enemyTeam = getEnemyTeam(team); // Get the opposing team.
@@ -174,8 +191,23 @@ public class BitboardGenerators {
         return pawnRightAttackVision(team) & board.getTeamsPieces(enemyTeam); // Mask attacks to enemy pieces only.
     }
 
+    /**
+     * Calculates the legal right attack captures for enpassant square
+     *
+     * @param team The team (White or Black).
+     * @return A bitboard representing valid right attacks on enpassant square.
+     */
+    public long pawnRightCaptureEnPassant(int team) {
 
-        // <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>>
+        if(board.enPassantIndex == -1) {
+            return 0L;
+        }
+
+        return pawnLeftAttackVision(team) & (1L << board.enPassantIndex); // Mask attacks to enemy pieces only.
+    }
+
+
+    // <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>>
     //   Rook Rook Rook Rook Rook Rook Rook Rook Rook Rook Rook Rook 
     // <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>> <<< >>>
 
@@ -187,7 +219,7 @@ public class BitboardGenerators {
      */
     public long rookVision(int index) {
 
-        long allPieces = this.board.allPieces(); // Get the occupied squares on the board.
+        long allPieces = this.board.getAllPieces(); // Get the occupied squares on the board.
 
         long rookAttackVision = MagicBitboards.generateRookMovementBitboard(index, allPieces);
 
@@ -222,7 +254,7 @@ public class BitboardGenerators {
      */
     public long bishopVision(int index) {
 
-        long allPieces = this.board.allPieces(); // Get the occupied squares on the board.
+        long allPieces = this.board.getAllPieces(); // Get the occupied squares on the board.
 
         long bishopAttackVision = MagicBitboards.generateBishopMovementBitboard(index, allPieces);
 
@@ -257,7 +289,7 @@ public class BitboardGenerators {
      */
     public long queenVision(int index) {
 
-        long allPieces = this.board.allPieces(); // Get the occupied squares on the board.
+        long allPieces = this.board.getAllPieces(); // Get the occupied squares on the board.
 
         long queenAttackVision = MagicBitboards.generateQueenMovementBitboard(index, allPieces); // Combine rook and bishop moves.
 
@@ -344,4 +376,32 @@ public class BitboardGenerators {
 
     }
 
+    /**
+     * Helps abstract getting bitboard for Move gen methods
+     * @param index
+     * @param team
+     * @param piece
+     * @return a movement bitboard
+     */
+    public long pieceMoves(int index, int team, int piece) {
+        switch (piece) {
+            case K:
+                return kingMoves(index, team);
+            
+            case Q:
+                return queenMoves(index, team);
+            
+            case R:
+                return rookMoves(index, team);
+            
+            case B:
+                return bishopMoves(index, team);
+            
+            case N:
+                return knightMoves(index, team);
+            
+            default:
+                throw new RuntimeErrorException(null, "Illegal piece: " + piece);
+        }
+    }    
 }
