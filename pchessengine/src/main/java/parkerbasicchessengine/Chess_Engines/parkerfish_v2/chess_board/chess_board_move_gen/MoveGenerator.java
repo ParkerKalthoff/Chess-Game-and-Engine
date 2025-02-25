@@ -2,6 +2,7 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_boa
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.management.RuntimeErrorException;
 
@@ -45,6 +46,8 @@ public class MoveGenerator {
     private void resetState() {
 
         this.pins = new long[64];
+        Arrays.fill(this.pins, 0xFFFFFFFFFFFFFFFFL);
+
         this.checkCount = 0;
         this.checkMask = 0xFFFFFFFFFFFFFFFFL;
         this.enemyVision = 0L;
@@ -142,7 +145,9 @@ public class MoveGenerator {
 
             long moveBitboard = bitboardGenerators.pieceMoves(pieceIndex, team, piece);
 
-            bitboardToMoves(pieceIndex, moveBitboard, team, piece);
+            long pinValidatedMoveBitboard = moveBitboard & pins[pieceIndex];
+
+            bitboardToMoves(pieceIndex, pinValidatedMoveBitboard, team, piece);
 
         }
 
@@ -226,6 +231,11 @@ public class MoveGenerator {
         for(int toSquare : toSquares) {
 
             int fromSquare = toSquare + adjustBy;
+
+            if((pins[fromSquare] & (1L << toSquare)) == 0){
+                // Piece is pinned and is trying to move illegally
+                continue;
+            }
             
             int capturePiece = this.board.getPieceAt(toSquare);
             boolean captureFlag = capturePiece != NULL_PIECE; 
@@ -304,6 +314,7 @@ public class MoveGenerator {
         int friendlyKingIndex = Long.numberOfTrailingZeros(friendlyKing);
 
         assert friendlyKingIndex < 64 : "Friendly King does not exist on king bitboard.";
+        // keep for duration of testing
 
         long[] enemyTeamPieces = this.board.bitboards[enemyTeam];
 
@@ -353,6 +364,10 @@ public class MoveGenerator {
         
         int rooks[] = HelperFunctions.bitboardToArray(enemyTeamPieces[R]);
 
+        
+        long friendlyKingRookVision = bitboardGenerators.rookVision(friendlyKingIndex);
+
+
         for(int rookIndex : rooks) {
 
             long rookVision = bitboardGenerators.rookVision(rookIndex);
@@ -369,9 +384,31 @@ public class MoveGenerator {
 
             }
 
+            // Getting the F Kings 'Bishop Vision' (Doesnt filter out friendly pieces) and 
+            // Getting the E Bishop 'Bishop Vision' (And filtering out enemy pieces) and
+            // Getting the Bits between since we only care about pins and not overlapping vision anywhere 
+
+            // manually calculating since we already have the vision
+            long rookMoves = rookVision & ~this.board.getTeamsPieces(enemyTeam);
+
+            long friendlyKingToEnemyRookSightline = friendlyKingRookVision & rookMoves & HelperFunctions.bitsBetween[friendlyKingIndex][rookIndex];
+
+            // Potential pinner
+            if(friendlyKingToEnemyRookSightline != 0L){
+
+                int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyRookSightline);
+
+                assert pinnedPieceIndex != 0 : "Pinning Error";
+
+                pins[pinnedPieceIndex] = HelperFunctions.bitsBetween[friendlyKingIndex][rookIndex] | (1L << rookIndex);
+
+            }
+
         }
 
         int bishops[] = HelperFunctions.bitboardToArray(enemyTeamPieces[B]);
+
+        long friendlyKingBishopVision = bitboardGenerators.bishopVision(friendlyKingIndex);
 
         for(int bishopIndex : bishops) {
 
@@ -389,9 +426,31 @@ public class MoveGenerator {
 
             }
 
+            // Getting the F Kings 'Bishop Vision' (Doesnt filter out friendly pieces) and 
+            // Getting the E Bishop 'Bishop Vision' (And filtering out enemy pieces) and
+            // Getting the Bits between since we only care about pins and not overlapping vision anywhere 
+
+            // manually calculating since we already have the vision
+            long bishopMoves = bishopVision & ~this.board.getTeamsPieces(enemyTeam);
+
+            long friendlyKingToEnemyBishopSightline = friendlyKingBishopVision & bishopMoves & HelperFunctions.bitsBetween[friendlyKingIndex][bishopIndex];
+
+            // Potential pinner
+            if(friendlyKingToEnemyBishopSightline != 0L){
+
+                int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyBishopSightline);
+
+                assert pinnedPieceIndex != 0 : "Pinning Error";
+
+                pins[pinnedPieceIndex] = HelperFunctions.bitsBetween[friendlyKingIndex][bishopIndex] | (1L << bishopIndex);
+
+            }
+
         }
 
         int queens[] = HelperFunctions.bitboardToArray(enemyTeamPieces[Q]);
+
+        long friendlyKingQueenVision = bitboardGenerators.queenVision(friendlyKingIndex);
 
         for(int queenIndex : queens) {
 
@@ -399,13 +458,34 @@ public class MoveGenerator {
 
             this.enemyVision |= queenVision;
 
+            // check for check
             if((queenVision & friendlyKing) != 0L) {
-    
+                
                 this.checkCount++;
 
                 long queenSightline = HelperFunctions.bitsBetween[queenIndex][friendlyKingIndex];
 
                 this.checkMask &= queenSightline | (1L << queenIndex);
+
+            }
+
+            // Getting the F Kings 'Queen Vision' (Doesnt filter out friendly pieces) and 
+            // Getting the E Queens 'Queen Vision' (And filtering out enemy pieces) and
+            // Getting the Bits between since we only care about pins and not overlapping vision anywhere 
+
+            // manually calculating since we already have the vision
+            long queenMoves = queenVision & ~this.board.getTeamsPieces(enemyTeam);
+
+            long friendlyKingToEnemyQueenSightline = friendlyKingQueenVision & queenMoves & HelperFunctions.bitsBetween[friendlyKingIndex][queenIndex];
+
+            // Potential pinner
+            if(friendlyKingToEnemyQueenSightline != 0L){
+
+                int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyQueenSightline);
+
+                assert pinnedPieceIndex != 0 : "Pinning Error";
+
+                pins[pinnedPieceIndex] = HelperFunctions.bitsBetween[friendlyKingIndex][queenIndex] | (1L << queenIndex);
 
             }
 
@@ -434,6 +514,7 @@ public class MoveGenerator {
         assert enemyKingIndex < 64 : "Enemy King does not exist on king bitboard.";
 
         this.enemyVision |= bitboardGenerators.kingVision(enemyKingIndex);
+
     }
 
 
