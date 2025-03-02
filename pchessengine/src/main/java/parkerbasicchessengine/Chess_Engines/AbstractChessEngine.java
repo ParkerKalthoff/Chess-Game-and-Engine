@@ -11,8 +11,4 @@ public abstract class AbstractChessEngine {
     public String engineName = "Parkers Engine";
 
     
-    public final int positiveInfinity = 9999999;
-    public final int negativeInfinity = -positiveInfinity;
-
-    
 }

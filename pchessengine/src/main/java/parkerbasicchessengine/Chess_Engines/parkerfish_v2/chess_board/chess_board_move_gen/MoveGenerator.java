@@ -28,7 +28,7 @@ public class MoveGenerator {
     private long pins[]; // TODO
 
     // If multiple checks on king, this should be used to skip move gen
-    private int checkCount;
+    public int checkCount;
     
     // a Mask to be able to quickly mask out moves that dont prevent check for non king pieces
     // Starts as a full bitboard, and then will be 'and'ed when pins come up

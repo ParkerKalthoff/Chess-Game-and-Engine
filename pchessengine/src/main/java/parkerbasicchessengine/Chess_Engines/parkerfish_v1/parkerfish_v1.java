@@ -2,7 +2,8 @@ package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+
+import javax.management.RuntimeErrorException;
 
 import parkerbasicchessengine.Board;
 import parkerbasicchessengine.Chess_Engines.AbstractChessEngine;
@@ -19,6 +20,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
     private OpeningBook oB;
     private boolean inOpening = false;
+
+
+    public final int positiveInfinity = 9999999;
+    public final int negativeInfinity = -positiveInfinity;
+
 
     public parkerfish_v1(Board board) {
 
@@ -73,6 +79,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
     // boost, and lower the score
     // for moves that put pieces in front of enemy pawns.
 
+    @SuppressWarnings("unused")
     public void makeMove() {
 
         BitwiseMove[] legalMoves = moveGenerator.generateMoves();
@@ -131,7 +138,11 @@ public class parkerfish_v1 extends AbstractChessEngine {
 
                 int eval = search(depth - 1, alpha, beta);
 
-                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
+                if(true){
+                    throw new RuntimeErrorException(null,"Unmove is broken dont run this module");
+                }
+
+                bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, eval, eval);
 
                 if (eval > bestEval) {
                     bestEval = eval;
@@ -156,6 +167,7 @@ public class parkerfish_v1 extends AbstractChessEngine {
         }
     }
 
+    @SuppressWarnings("unused")
     private int search(int depth, int alpha, int beta) {
 
         if (depth == 0) {
@@ -208,7 +220,12 @@ public class parkerfish_v1 extends AbstractChessEngine {
                 System.out.println("   - Beta : "+ beta);
             }
 
-            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights);
+            
+            if(true){
+                throw new RuntimeErrorException(null,"Unmove is broken dont run this module");
+            }
+
+            bwB.unmovePiece(move, capturePieceType, preMoveCastlingRights, capturePieceType, capturePieceType);
 
         }
         return alpha;

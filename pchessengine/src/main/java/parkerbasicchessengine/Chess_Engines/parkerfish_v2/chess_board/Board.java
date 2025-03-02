@@ -1,7 +1,10 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.management.RuntimeErrorException;
+
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_board_move_gen.MoveGenerator;
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
@@ -9,13 +12,15 @@ public class Board {
 
     private int fullMoveCounter;
     private int halfMoveClock;
-    private boolean isGameOver;
-    private boolean isWhitesTurn;
+    public boolean isGameOver;
+    public boolean isWhitesTurn;
     private byte castlingRights; // 0bKQkq
     public int enPassantIndex;
 
     public long bitboards[][];
     private Stack<BoardState> boardStateStack;
+
+    private MoveGenerator moveGenerator;
 
     public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights, int enPassantIndex, long[][] bitboards) {
         this.fullMoveCounter = fullMoveCounter;
@@ -26,6 +31,8 @@ public class Board {
         this.enPassantIndex = enPassantIndex;
         this.bitboards = bitboards;
         this.boardStateStack = new Stack<BoardState>();
+
+        this.moveGenerator = new MoveGenerator(this);
     }
 
     private static class BoardState {
@@ -67,6 +74,14 @@ public class Board {
             return (this.castlingRights & 0b0001) != 0;
         }
 
+    }
+
+    public ArrayList<Move> getValidMoves() {
+        return moveGenerator.generateMoves();
+    }
+
+    public boolean isKingInCheck(){
+        return moveGenerator.checkCount != 0;
     }
 
     public long getAllPieces() {
