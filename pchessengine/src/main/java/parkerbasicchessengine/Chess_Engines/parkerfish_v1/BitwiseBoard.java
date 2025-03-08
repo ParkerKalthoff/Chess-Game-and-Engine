@@ -1,11 +1,12 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.*;
+
 import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
-import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.ZorbistHasher;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.*;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.ZorbistHasher;
 
 
 public class BitwiseBoard{

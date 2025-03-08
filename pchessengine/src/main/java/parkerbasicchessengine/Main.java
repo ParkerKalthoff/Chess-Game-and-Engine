@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.parkerfish_v2;
 
 public class Main {
 
@@ -32,6 +33,19 @@ public class Main {
 
     public static void main(String[] args) {
 
+        parkerfish_v2 engine = new parkerfish_v2();
+        Scanner scanner = new Scanner(System.in);
+
+        while(true) {
+
+            engine.makeMove();
+
+            scanner.nextLine();
+
+        }            
+
+
+        /*
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
 
@@ -61,27 +75,6 @@ public class Main {
             parkerTest.makeMove();
             board.repaint();
         }
-        
+         */
     }
-
-    // debugging purposes
-    public static void printBitboard(long bitboard) {
-
-        System.out.println();
-        System.out.println("    a b c d e f g h");
-        System.out.println("    _ _ _ _ _ _ _ _");
-        for (int rank = 0; rank < 8; rank++) {
-
-            System.out.print("" + (8 - rank) + " | ");
-
-            for (int file = 0; file < 8; file++) {
-
-                int flippedAndMirroredIndex = rank * 8 + file;
-                long square = (bitboard >> flippedAndMirroredIndex) & 1;
-                System.out.print(square == 1 ? "1 " : "0 ");
-            }
-            System.out.println();
-        }
-    }
-
 }

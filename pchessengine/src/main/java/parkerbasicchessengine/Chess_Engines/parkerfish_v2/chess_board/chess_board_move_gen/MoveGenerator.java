@@ -4,11 +4,8 @@ import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.management.RuntimeErrorException;
-
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
-import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_board_move_gen.BitboardGenerators;
 
 
 
@@ -25,7 +22,7 @@ public class MoveGenerator {
     // So if a bishop was pinned to a king by another bishop, they should still be able to move along that axis
     // If a rook was pinned instead, movement should be restricted
     // This should be cleared after the board switches the position, or atleast after all moves are generated
-    private long pins[]; // TODO
+    private long pins[]; 
 
     // If multiple checks on king, this should be used to skip move gen
     public int checkCount;
@@ -66,7 +63,7 @@ public class MoveGenerator {
 
         updateOpponentCoverage(enemyTeam);
 
-        
+        generateFriendlyTeamMoves(team);
 
         return moveList;
 

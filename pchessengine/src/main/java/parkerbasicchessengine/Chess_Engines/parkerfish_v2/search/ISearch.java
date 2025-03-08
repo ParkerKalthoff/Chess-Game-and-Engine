@@ -4,4 +4,5 @@ public interface ISearch {
 
     public void makeMove();
 
+    public void printBoard();
 }

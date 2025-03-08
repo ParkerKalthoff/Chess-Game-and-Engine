@@ -1,22 +1,23 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v1;
 
-import parkerbasicchessengine.Chess_Engines.ChessEngineUtils.BitboardToArrayIndicies;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.B;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.Black;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.K;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.N;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.P;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.Q;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.R;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.Constants.White;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.Flip;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.bishop_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.king_endgame_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.king_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.knight_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.pawn_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.queen_score;
-import static parkerbasicchessengine.Chess_Engines.ChessEngineUtils.EvalBoards.rook_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.B;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.Black;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.K;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.N;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.P;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.Q;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.R;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.Constants.White;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.Flip;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.bishop_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.king_endgame_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.king_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.knight_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.pawn_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.queen_score;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.EvalBoards.rook_score;
+
+import parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils.BitboardToArrayIndicies;
 
 
 public class Evaluate {

@@ -5,7 +5,7 @@ public class HelperFunctions {
     // A general utils class for methods that are needed but violate the principal of being out of scope for a certain class, 
     // or generally just removing overly lengthy methods that produce an obvious output, but make a class too confusing because of method length
 
-    public static long bitsBetween[][];
+    public static long bitsBetween[][] = new long[64][64];
 
     public static final long knightMoves[] = { 0x20400L, 0x50800L, 0xa1100L, 0x142200L, 0x284400L, 0x508800L, 0xa01000L,
         0x402000L, 0x2040004L, 0x5080008L, 0xa110011L, 0x14220022L, 0x28440044L, 0x50880088L, 0xa0100010L,

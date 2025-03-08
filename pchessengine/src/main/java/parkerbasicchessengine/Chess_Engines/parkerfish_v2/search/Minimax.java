@@ -24,9 +24,17 @@ public class Minimax implements ISearch {
         this.evalModule = new Evaluator_v1(board);
     }
 
+    public void printBoard() {
+        System.out.println(this.board.toString());
+    }
+
     public void makeMove() {
 
         ArrayList<Move> validMoves = board.getValidMoves();
+
+        printBoard();
+
+        System.out.println(validMoves.size());
 
         if (validMoves.size() < 1) {
 
@@ -43,6 +51,8 @@ public class Minimax implements ISearch {
 
             board.makeMove(move);
 
+            printBoard();
+
             int searchEval = minimax(DEPTH, NEGATIVE_INFINITY, POSITIVE_INFINITY);
 
             if (searchEval < low) {
@@ -53,6 +63,8 @@ public class Minimax implements ISearch {
             }
 
             board.unmakeMove(move);
+
+            printBoard();
         }
 
         board.makeMove(bestMove);
@@ -63,6 +75,8 @@ public class Minimax implements ISearch {
         if (depth == 0 || board.isGameOver) {
             return evalModule.evaluate();
         }
+
+        System.out.println(this.board.toString());
 
         ArrayList<Move> moves = board.getValidMoves();
 

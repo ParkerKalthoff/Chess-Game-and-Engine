@@ -1,4 +1,4 @@
-package parkerbasicchessengine.Chess_Engines.ChessEngineUtils;
+package parkerbasicchessengine.Chess_Engines.parkerfish_v1.ChessEngineUtils;
 
 import java.util.HashMap;
 import java.util.Map;

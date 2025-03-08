@@ -4,7 +4,7 @@ import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*
 
 public class BoardFactory {
 
-    public Board createBoard(String fenString) {
+    public static Board createBoard(String fenString) {
 
         int fullMoveCounter;
         int halfMoveClock;
