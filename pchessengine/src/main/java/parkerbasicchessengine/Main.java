@@ -1,5 +1,7 @@
 package parkerbasicchessengine;
 
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -34,16 +36,22 @@ public class Main {
     public static void main(String[] args) {
 
         parkerfish_v2 engine = new parkerfish_v2();
+
         Scanner scanner = new Scanner(System.in);
 
-        while(true) {
+        engine.printBoard();
 
+        while (!engine.board.isGameOver) {
+            
             engine.makeMove();
 
+            engine.printBoard();
+
             scanner.nextLine();
-
-        }            
-
+            
+        }
+        
+        System.out.println("Over!");
 
         /*
         JFrame frame = new JFrame();

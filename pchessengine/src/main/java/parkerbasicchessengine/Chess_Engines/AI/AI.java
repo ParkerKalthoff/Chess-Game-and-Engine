@@ -67,13 +67,18 @@ public class AI {
         Move chosenMove = validMoves.get(rng.nextInt(validMoves.size()));
 
         int low = Integer.MAX_VALUE;
+
         for (Move move : validMoves) {
+
             board.makeMove(move);
+
             int search = search(depth, negativeInfinity, positiveInfinity);
+
             if (search < low) {
                 chosenMove = move;
                 low = search;
             }
+            
             board.unMakeMove(move);
         }
 

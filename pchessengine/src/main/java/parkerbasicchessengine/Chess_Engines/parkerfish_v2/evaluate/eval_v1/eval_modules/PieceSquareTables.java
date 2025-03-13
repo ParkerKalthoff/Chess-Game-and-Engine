@@ -24,27 +24,24 @@ public class PieceSquareTables implements IEvaluationModule{
         int enemyTeam = board.isWhitesTurn ? Black : White;
 
         int eval = 0;
+        float endGameWeight = endGameWeight();
 
-        eval += evaluatePawns(friendlyTeam);
+        eval += evaluatePawns(friendlyTeam, endGameWeight);
         eval += evaluateBishops(friendlyTeam);
         eval += evaluateKnights(friendlyTeam);
         eval += evaluateQueen(friendlyTeam);
         eval += evaluateRook(friendlyTeam);
-        eval += evaluateKing(friendlyTeam);
+        eval += evaluateKing(friendlyTeam, endGameWeight);
 
-        eval -= evaluatePawns(enemyTeam);
+        eval -= evaluatePawns(enemyTeam, endGameWeight);
         eval -= evaluateBishops(enemyTeam);
         eval -= evaluateKnights(enemyTeam);
         eval -= evaluateQueen(enemyTeam);
         eval -= evaluateRook(enemyTeam);
-        eval -= evaluateKing(enemyTeam);
+        eval -= evaluateKing(enemyTeam, endGameWeight);
 
         return eval;
 
-    }
-
-    private int evaluatePawns(int team){
-        return evaluatePiece(team, P, pawn_score);
     }
 
     private int evaluateBishops(int team){
@@ -69,7 +66,7 @@ public class PieceSquareTables implements IEvaluationModule{
 
         int indexes[] = HelperFunctions.bitboardToArray(pieces);
 
-        if(team == White){
+        if(team == Black){
             for(int index : indexes){
                 index = Flip[index];
             }
@@ -84,6 +81,13 @@ public class PieceSquareTables implements IEvaluationModule{
         return score;
     }
 
+    /**
+     * 
+     * A function that indicates how pieces should behave based on material conditions on the board,
+     *  with values closer to 0.0 indicating game is still in opening / midgame, and closer to 1.0 when game is in endgame / late midgame
+     * 
+     * @return a value between 0.0 - 1.0, with 0.0 being the not endgame and 1.0 being in an endgame
+     */
     private float endGameWeight(){
 
         int combinedPieceScore = 0;
@@ -100,34 +104,64 @@ public class PieceSquareTables implements IEvaluationModule{
         combinedPieceScore += Long.bitCount(board.bitboards[Black][R]) * 500;
         combinedPieceScore += Long.bitCount(board.bitboards[Black][P]) * 100;
 
+        // Fixed issue where Im dividing ints and then casting it into float, basically not doing anything
+        float rawEndgameWeight = (float)(EndgameUpperBound - combinedPieceScore) / (EndgameUpperBound - EndgameLowerBound);
+        float endgameWeight = Math.max(0.0f, Math.min(1.0f, rawEndgameWeight));
 
-        float rawEndgameWeight = (EndgameUpperBound - combinedPieceScore) / (EndgameUpperBound - EndgameLowerBound);
-        float endgameWeight = Math.max(0, Math.min(1, rawEndgameWeight));
+        // Testing, should be low for begining of game, just keeping this here for future use :)
+        // System.out.println("[ Eval : Piece Square Tables] Endgame weight set at " + endgameWeight + ", with combined piece score of " + combinedPieceScore);
 
         return endgameWeight;
+
     }
 
-    private int evaluateKing(int team){
+    private int evaluateKing(int team, float endgameWeight){
 
         int kingIndex = Long.numberOfTrailingZeros(board.bitboards[team][K]);
 
-        if(kingIndex == 64) { // no king
+        if(kingIndex == 64) {
             return 0;
         }
 
-        if(team == White){
+        if(team == Black){
             kingIndex = Flip[kingIndex];
         }
 
-        float endgameWeight = endGameWeight();
         int score = 0;
 
         long kingQueenSight = MagicBitboards.generateQueenMovementBitboard(kingIndex, board.getAllPieces());
         int kingExposedSquares = Long.bitCount(kingQueenSight) * 2;
 
+        // If you arent in an endgame, you want to punish king being exposed
         score -= (1 - endgameWeight) * kingExposedSquares * 2;
 
+        // If you are in an endgame you want king to be encouraged to take space
         score += endgameWeight * king_endgame_score[kingIndex];
+
+        return score;
+    
+    }
+
+    private int evaluatePawns(int team, float endgameWeight) {
+
+        long pieces = board.bitboards[team][P];
+
+        int indexes[] = HelperFunctions.bitboardToArray(pieces);
+
+        if(team == Black){
+            for(int index : indexes){
+                index = Flip[index];
+            }
+        }
+
+        int score = 0;
+
+        for(int index : indexes){
+            //  If you arent in an endgame, use pawn start
+            score += (1 - endgameWeight) * pawn_start[index];
+            // In endgame use pawn end
+            score += (endgameWeight) * pawn_end[index];
+        }
 
         return score;
     }

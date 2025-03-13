@@ -5,20 +5,16 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.eval_v1.eval_
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.eval_v1.eval_modules.MaterialEval;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.eval_v1.eval_modules.PieceSquareTables;
 
-public class Evaluator_v1 implements IEvaluate{
+public class Evaluator_v1 implements IEvaluate {
 
     private IEvaluationModule evalModules[] = {
         new MaterialEval(),
         new PieceSquareTables()
     };
 
-    private Board board;
-
     public Evaluator_v1(Board board) {
 
-        this.board = board;
-
-        for(IEvaluationModule evalModule : evalModules){
+        for(IEvaluationModule evalModule : evalModules) {
             evalModule.setBoard(board);
         }
 
@@ -33,11 +29,7 @@ public class Evaluator_v1 implements IEvaluate{
             eval += evalModules[i].eval();
         }
 
-        if(board.isWhitesTurn) {
-            return eval;
-        } else {
-            return - eval;
-        }
+        return eval;
 
     }
 

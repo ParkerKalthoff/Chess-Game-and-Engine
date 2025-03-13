@@ -6,7 +6,6 @@ public interface IEvaluationModule {
 
     public int eval();
 
-    
     public void setBoard(Board board);
 
 }

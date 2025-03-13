@@ -13,7 +13,7 @@ public class parkerfish_v2 {
     // using that to speak my board class
 
     private ISearch searchAlgorithm;
-    private Board board;
+    public Board board;
 
     public parkerfish_v2(String fenString) {
         // load position
@@ -26,7 +26,6 @@ public class parkerfish_v2 {
         // new game
         this.board = BoardFactory.createBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         this.searchAlgorithm = new Minimax(board);
-    
     } 
 
     public void makeMove() {

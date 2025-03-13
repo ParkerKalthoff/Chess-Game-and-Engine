@@ -142,7 +142,7 @@ public class Board {
             fullMoveCounter++;
         }
 
-        isWhitesTurn = !isWhitesTurn;
+        this.isWhitesTurn = !this.isWhitesTurn;
 
         togglePiece(move.getFromSquare(), move.getTeam(), move.getPieceType());
 
@@ -170,7 +170,7 @@ public class Board {
 
         if (move.isCastling()) {
             int rookFrom, rookTo;
-            if (move.getFromSquare() > move.getToSquare()) {
+            if (move.getFromSquare() < move.getToSquare()) {
                 rookFrom = move.getTeam() == White ? H1 : H8;
                 rookTo = move.getTeam() == White ? F1 : F8;
             } else {
@@ -201,7 +201,7 @@ public class Board {
 
         if (move.isCastling()) {
             int rookFrom, rookTo;
-            if (move.getFromSquare() > move.getToSquare()) {
+            if (move.getFromSquare() < move.getToSquare()) {
                 rookFrom = move.getTeam() == White ? H1 : H8;
                 rookTo = move.getTeam() == White ? F1 : F8;
             } else {
