@@ -76,8 +76,7 @@ public class MagicBitboards {
             -3452007189126279153L, -9005446704759007222L, -3909097950277352448L, -8558196911494394228L,
             -306528494514644250L, -72062011481006597L };
 
-    public static final int[] RookShifts = 
-          { 52, 52, 52, 52, 52, 52, 52, 52,
+    public static final int[] RookShifts = { 52, 52, 52, 52, 52, 52, 52, 52,
             53, 53, 53, 54, 53, 53, 54, 53,
             53, 54, 54, 54, 53, 53, 54, 53,
             53, 54, 53, 53, 54, 54, 54, 53,
@@ -86,8 +85,7 @@ public class MagicBitboards {
             53, 54, 54, 54, 53, 53, 54, 53,
             52, 53, 53, 53, 53, 53, 53, 52 };
 
-    public static final int[] BishopShifts = 
-          { 58, 60, 59, 59, 59, 59, 60, 58,
+    public static final int[] BishopShifts = { 58, 60, 59, 59, 59, 59, 60, 58,
             60, 59, 59, 59, 59, 59, 59, 60,
             59, 59, 57, 57, 57, 57, 59, 59,
             59, 59, 57, 55, 55, 57, 59, 59,
@@ -103,8 +101,8 @@ public class MagicBitboards {
         generateMoves();
     }
 
-
-    // These methods generate bitboards for their respective piece, it assumes capture for all blocking pieces
+    // These methods generate bitboards for their respective piece, it assumes
+    // capture for all blocking pieces
     // make sure to nand out friendly pieces!
 
     public static long generateBishopMovementBitboard(int bishopIndex, long blockerBitboard) {
@@ -124,13 +122,12 @@ public class MagicBitboards {
         return possibleMoves;
     }
 
-    public static long generateQueenMovementBitboard(int queenIndex, long blockerBitboard){
-        return generateBishopMovementBitboard(queenIndex, blockerBitboard) | generateRookMovementBitboard(queenIndex, blockerBitboard);
+    public static long generateQueenMovementBitboard(int queenIndex, long blockerBitboard) {
+        return generateBishopMovementBitboard(queenIndex, blockerBitboard)
+                | generateRookMovementBitboard(queenIndex, blockerBitboard);
     }
 
     private static long calculateRookMove(int rookIndex, long relevantBlockers) {
-        // calculates the actual rook move based on the blocker mask and saves it to an
-        // array
         long rookMove = 0L;
 
         for (int square = rookIndex + 8; square < 64; square += 8) {
@@ -165,29 +162,41 @@ public class MagicBitboards {
 
         // Northeast
         int square = bishopIndex + 9;
-        while (square < 64 && square % 8 != 0 && (relevantBlockers & (1L << square)) == 0) {
+        while (square < 64 && square % 8 != 0) {
             bishopMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) {
+                break;
+            }
             square += 9;
         }
 
         // Northwest
         square = bishopIndex + 7;
-        while (square < 64 && square % 8 != 7 && (relevantBlockers & (1L << square)) == 0) {
+        while (square < 64 && square % 8 != 7) {
             bishopMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) {
+                break;
+            }
             square += 7;
         }
 
         // Southeast
         square = bishopIndex - 7;
-        while (square >= 0 && square % 8 != 0 && (relevantBlockers & (1L << square)) == 0) {
+        while (square >= 0 && square % 8 != 0) {
             bishopMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) {
+                break;
+            }
             square -= 7;
         }
 
         // Southwest
         square = bishopIndex - 9;
-        while (square >= 0 && square % 8 != 7 && (relevantBlockers & (1L << square)) == 0) {
+        while (square >= 0 && square % 8 != 7) {
             bishopMove |= (1L << square);
+            if ((relevantBlockers & (1L << square)) != 0) {
+                break;
+            }
             square -= 9;
         }
 

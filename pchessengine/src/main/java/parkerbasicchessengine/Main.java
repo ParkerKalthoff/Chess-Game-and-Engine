@@ -35,6 +35,8 @@ public class Main {
 
     public static void main(String[] args) {
 
+        // Castling and Pawn pushing dupes?
+
         parkerfish_v2 engine = new parkerfish_v2();
 
         Scanner scanner = new Scanner(System.in);

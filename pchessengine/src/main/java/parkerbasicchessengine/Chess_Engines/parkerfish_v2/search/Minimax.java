@@ -5,6 +5,7 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.IEvaluate;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.eval_v1.Evaluator_v1;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Utils.MoveOrdering;
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
@@ -15,7 +16,7 @@ public class Minimax implements ISearch {
     private Board board;
     private IEvaluate evalModule;
 
-    private final int DEPTH = 3;
+    private final int DEPTH = 4; // Piles
 
     public int nodesGenerated;
     public int positionsEvaluated;
@@ -47,7 +48,7 @@ public class Minimax implements ISearch {
 
         }
 
-        int high = Integer.MIN_VALUE; // Change to MIN_VALUE for maximization
+        int bestEval = board.isWhitesTurn ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         Move bestMove = null;
 
@@ -56,20 +57,21 @@ public class Minimax implements ISearch {
         for (Move move : validMoves) {
 
             board.makeMove(move);
-
-            int searchEval = minimax(DEPTH - 1, Integer.MIN_VALUE, Integer.MAX_VALUE); //depth -1 here.
-
+            
+            int searchEval = minimax(DEPTH - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            
             System.out.println("\t" + move + "\n\t\tEval of : " + searchEval);
-
-            if (searchEval > high) { // Change to > for maximization
-
-                bestMove = move;
-
-                high = searchEval;
-            }
-
+            
             board.unmakeMove(move);
 
+            // Fixed Black maximizing on first step
+            if (board.isWhitesTurn ? searchEval > bestEval : searchEval < bestEval) {
+            
+                bestEval = searchEval;
+            
+                bestMove = move;
+            
+            }
         }
 
         System.out.println("[Minimax] " + validMoves.size() + " Potential Moves in this position with the evaluation for this position at " + this.evalModule.evaluate() + " for " + (board.isWhitesTurn ? "White" : "Black") + " team");
@@ -87,17 +89,9 @@ public class Minimax implements ISearch {
 
         if (depth == 0 || board.isGameOver) {
 
-            if (board.isGameOver) {
-                System.out.println("[DEBUG] IsGameOver : true");
-            }
-
             positionsEvaluated += 1;
 
             int eval = evalModule.evaluate();
-
-            if (eval == Integer.MIN_VALUE) {
-                System.out.println("[DEBUG] EvalModule returned " + Integer.MIN_VALUE);
-            }
 
             return eval;
 
@@ -105,19 +99,22 @@ public class Minimax implements ISearch {
 
         ArrayList<Move> moves = board.getValidMoves();
 
+        //moves = MoveOrdering.orderMoves(moves);
+
         nodesGenerated += moves.size();
 
         if (moves.isEmpty()) {
 
-            System.out.println("[DEBUG] No valid moves found at depth " + depth);
-
             long kingBitboard = board.bitboards[board.getActiveTeam()][K];
+
+            int recencyBias = board.isWhitesTurn ? - (DEPTH - depth - 1) : (DEPTH - depth - 1);
 
             if (kingBitboard == 0L) {
                 // king captured (should pause before, but safeguard)
                 positionsEvaluated += 1;
 
-                return evalModule.evaluate();
+
+                return evalModule.evaluate() + recencyBias;
             }
 
             if (board.isKingInCheck()) {
@@ -126,9 +123,9 @@ public class Minimax implements ISearch {
                 positionsEvaluated += 1;
 
                 if (board.isWhitesTurn) {
-                    return Integer.MIN_VALUE + depth; // Black is checkmating
+                    return Integer.MIN_VALUE - recencyBias; // Black is checkmating
                 } else {
-                    return Integer.MAX_VALUE - depth; // White is checkmating
+                    return Integer.MAX_VALUE - recencyBias; // White is checkmating
                 }
             }
 
@@ -138,47 +135,52 @@ public class Minimax implements ISearch {
         }
 
         if (board.isWhitesTurn) { // White / Maximizing Player
+
             int maxEval = Integer.MIN_VALUE;
 
             for (Move move : moves) {
+
                 board.makeMove(move);
 
                 int evaluation = minimax(depth - 1, alpha, beta);
-                
+
                 board.unmakeMove(move);
-                
+
                 maxEval = Math.max(maxEval, evaluation);
-                
+
                 alpha = Math.max(alpha, evaluation);
-                
+
                 if (beta <= alpha) {
                     break;
                 }
 
             }
             return maxEval;
+
         } else { // Black / Minimizing player
-            
+
             int minEval = Integer.MAX_VALUE;
-            
+
             for (Move move : moves) {
-                
+
                 board.makeMove(move);
-                
+
                 int evaluation = minimax(depth - 1, alpha, beta);
-                
+
                 board.unmakeMove(move);
-                
+
                 minEval = Math.min(minEval, evaluation);
-                
+
                 beta = Math.min(beta, evaluation);
-                
+
                 if (beta <= alpha) {
                     break;
-                
+
                 }
             }
             return minEval;
         }
     }
+
+    
 }

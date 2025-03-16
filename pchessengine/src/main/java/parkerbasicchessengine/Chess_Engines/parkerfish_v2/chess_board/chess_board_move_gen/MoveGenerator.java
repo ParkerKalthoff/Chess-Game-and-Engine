@@ -29,7 +29,8 @@ public class MoveGenerator {
     
     // a Mask to be able to quickly mask out moves that dont prevent check for non king pieces
     // Starts as a full bitboard, and then will be 'and'ed when pins come up
-    private long checkMask;
+    // TODO : switch back to private after testing
+    public long checkMask;
 
     private long enemyVision;
 
@@ -79,6 +80,7 @@ public class MoveGenerator {
         }
 
         generateCastlingKingMoves(team);
+
         generateMajorMinorPieceMoves(team, Q);
         generateMajorMinorPieceMoves(team, R);        
         generateMajorMinorPieceMoves(team, N);
@@ -229,7 +231,7 @@ public class MoveGenerator {
 
             int fromSquare = toSquare + adjustBy;
 
-            if((pins[fromSquare] & (1L << toSquare)) == 0){
+            if((pins[fromSquare] & (1L << toSquare)) == 0) {
                 // Piece is pinned and is trying to move illegally
                 continue;
             }
@@ -276,8 +278,12 @@ public class MoveGenerator {
      */
     private void bitboardToMoves(int index, long bitboard, int team, int piece) {
 
-        long validatedBitboard = bitboard & checkMask;
-
+        long validatedBitboard = bitboard;
+        
+        if(piece != K) {
+            validatedBitboard &= checkMask;
+        }
+            
         int toSquares[] = HelperFunctions.bitboardToArray(validatedBitboard);
 
         for(int toSquare : toSquares) {
@@ -310,8 +316,8 @@ public class MoveGenerator {
         long friendlyKing = this.board.bitboards[friendlyTeam][K];
         int friendlyKingIndex = Long.numberOfTrailingZeros(friendlyKing);
 
-        assert friendlyKingIndex < 64 : "Friendly King does not exist on king bitboard.";
-        // keep for duration of testing
+        assert friendlyKingIndex < 64 : "Friendly King does not exist on king bitboard";
+        // TODO : keep for duration of testing
 
         long[] enemyTeamPieces = this.board.bitboards[enemyTeam];
 
@@ -391,7 +397,7 @@ public class MoveGenerator {
             long friendlyKingToEnemyRookSightline = friendlyKingRookVision & rookMoves & HelperFunctions.bitsBetween[friendlyKingIndex][rookIndex];
 
             // Potential pinner
-            if(friendlyKingToEnemyRookSightline != 0L){
+            if(friendlyKingToEnemyRookSightline != 0L) {
 
                 int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyRookSightline);
 
@@ -433,7 +439,7 @@ public class MoveGenerator {
             long friendlyKingToEnemyBishopSightline = friendlyKingBishopVision & bishopMoves & HelperFunctions.bitsBetween[friendlyKingIndex][bishopIndex];
 
             // Potential pinner
-            if(friendlyKingToEnemyBishopSightline != 0L){
+            if(friendlyKingToEnemyBishopSightline != 0L) {
 
                 int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyBishopSightline);
 
@@ -476,7 +482,7 @@ public class MoveGenerator {
             long friendlyKingToEnemyQueenSightline = friendlyKingQueenVision & queenMoves & HelperFunctions.bitsBetween[friendlyKingIndex][queenIndex];
 
             // Potential pinner
-            if(friendlyKingToEnemyQueenSightline != 0L){
+            if(friendlyKingToEnemyQueenSightline != 0L) {
 
                 int pinnedPieceIndex = Long.numberOfTrailingZeros(friendlyKingToEnemyQueenSightline);
 
@@ -514,8 +520,15 @@ public class MoveGenerator {
 
     }
 
-
-
-
+    public static void printBitboard(long bitboard) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                int index = row * 8 + col;
+                boolean isSet = (bitboard & (1L << index)) != 0;
+                System.out.print(isSet ? "1 " : "0 ");
+            }
+            System.out.println();
+        }
+    }
 
 }

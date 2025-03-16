@@ -20,25 +20,24 @@ public class PieceSquareTables implements IEvaluationModule{
 
     public int eval() {
 
-        int friendlyTeam = board.isWhitesTurn ? White : Black;
-        int enemyTeam = board.isWhitesTurn ? Black : White;
-
-        int eval = 0;
+        
         float endGameWeight = endGameWeight();
 
-        eval += evaluatePawns(friendlyTeam, endGameWeight);
-        eval += evaluateBishops(friendlyTeam);
-        eval += evaluateKnights(friendlyTeam);
-        eval += evaluateQueen(friendlyTeam);
-        eval += evaluateRook(friendlyTeam);
-        eval += evaluateKing(friendlyTeam, endGameWeight);
+        int eval = 0;
 
-        eval -= evaluatePawns(enemyTeam, endGameWeight);
-        eval -= evaluateBishops(enemyTeam);
-        eval -= evaluateKnights(enemyTeam);
-        eval -= evaluateQueen(enemyTeam);
-        eval -= evaluateRook(enemyTeam);
-        eval -= evaluateKing(enemyTeam, endGameWeight);
+        eval += evaluatePawns(White, endGameWeight);
+        eval += evaluateBishops(White);
+        eval += evaluateKnights(White);
+        eval += evaluateQueen(White);
+        eval += evaluateRook(White);
+        eval += evaluateKing(White, endGameWeight);
+
+        eval -= evaluatePawns(Black, endGameWeight);
+        eval -= evaluateBishops(Black);
+        eval -= evaluateKnights(Black);
+        eval -= evaluateQueen(Black);
+        eval -= evaluateRook(Black);
+        eval -= evaluateKing(Black, endGameWeight);
 
         return eval;
 
@@ -108,8 +107,6 @@ public class PieceSquareTables implements IEvaluationModule{
         float rawEndgameWeight = (float)(EndgameUpperBound - combinedPieceScore) / (EndgameUpperBound - EndgameLowerBound);
         float endgameWeight = Math.max(0.0f, Math.min(1.0f, rawEndgameWeight));
 
-        // Testing, should be low for begining of game, just keeping this here for future use :)
-        // System.out.println("[ Eval : Piece Square Tables] Endgame weight set at " + endgameWeight + ", with combined piece score of " + combinedPieceScore);
 
         return endgameWeight;
 

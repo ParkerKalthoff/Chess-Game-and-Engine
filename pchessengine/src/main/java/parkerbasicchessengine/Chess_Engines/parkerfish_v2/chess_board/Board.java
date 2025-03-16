@@ -21,10 +21,10 @@ public class Board {
     public long bitboards[][];
     private Stack<BoardState> boardStateStack;
 
-    private MoveGenerator moveGenerator;
+    // TODO set back to private
+    public MoveGenerator moveGenerator;
 
-    public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights,
-            int enPassantIndex, long[][] bitboards) {
+    public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights, int enPassantIndex, long[][] bitboards) {
         this.fullMoveCounter = fullMoveCounter;
         this.halfMoveClock = halfMoveClock;
         this.isGameOver = isGameOver;
@@ -91,8 +91,13 @@ public class Board {
     }
 
     public long getTeamsPieces(int team) {
-        return this.bitboards[team][K] | this.bitboards[team][Q] | this.bitboards[team][R] | this.bitboards[team][B]
-                | this.bitboards[team][N] | this.bitboards[team][P];
+        return 
+            this.bitboards[team][K] | 
+            this.bitboards[team][Q] | 
+            this.bitboards[team][B] | 
+            this.bitboards[team][N] | 
+            this.bitboards[team][R] | 
+            this.bitboards[team][P];
     }
 
     public int getActiveTeam() {
