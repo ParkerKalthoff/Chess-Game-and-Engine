@@ -16,7 +16,7 @@ public class Minimax implements ISearch {
     private Board board;
     private IEvaluate evalModule;
 
-    private final int DEPTH = 4; // Piles
+    private final int DEPTH = 3; // Piles
 
     public int nodesGenerated;
     public int positionsEvaluated;
@@ -30,7 +30,11 @@ public class Minimax implements ISearch {
         System.out.println(this.board.toString());
     }
 
-    public void makeMove() {
+    public void makeMove(Move move) {
+        board.makeMove(move);
+    }
+
+    public Move makeMove() {
 
         this.nodesGenerated = 0;
         this.positionsEvaluated = 0;
@@ -44,7 +48,7 @@ public class Minimax implements ISearch {
         if (validMoves.size() < 1) {
 
             System.out.println((board.isWhitesTurn ? "Black" : "White") + " wins!");
-            return;
+            return null;
 
         }
 
@@ -74,15 +78,24 @@ public class Minimax implements ISearch {
             }
         }
 
+        /*
         System.out.println("[Minimax] " + validMoves.size() + " Potential Moves in this position with the evaluation for this position at " + this.evalModule.evaluate() + " for " + (board.isWhitesTurn ? "White" : "Black") + " team");
 
         System.out.println("[Minimax] Finished Search of depth " + DEPTH + " in " + (System.currentTimeMillis() - startTime) + " miliseconds");
 
         System.out.println("[Minimax] " + nodesGenerated + " nodes generated, with " + positionsEvaluated + " positions evaluated");
+        */
 
         System.out.println("[Minimax] Best Move : " + bestMove);
 
+        
+        System.out.println("[Minimax] Fen String : " + this.board.fenString());
+
         board.makeMove(bestMove);
+
+        System.out.println(board);
+
+        return bestMove;
     }
 
     private int minimax(int depth, int alpha, int beta) {
@@ -112,7 +125,6 @@ public class Minimax implements ISearch {
             if (kingBitboard == 0L) {
                 // king captured (should pause before, but safeguard)
                 positionsEvaluated += 1;
-
 
                 return evalModule.evaluate() + recencyBias;
             }

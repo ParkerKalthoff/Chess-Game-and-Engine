@@ -24,7 +24,8 @@ public class Board {
     // TODO set back to private
     public MoveGenerator moveGenerator;
 
-    public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights, int enPassantIndex, long[][] bitboards) {
+    public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights,
+            int enPassantIndex, long[][] bitboards) {
         this.fullMoveCounter = fullMoveCounter;
         this.halfMoveClock = halfMoveClock;
         this.isGameOver = isGameOver;
@@ -91,13 +92,12 @@ public class Board {
     }
 
     public long getTeamsPieces(int team) {
-        return 
-            this.bitboards[team][K] | 
-            this.bitboards[team][Q] | 
-            this.bitboards[team][B] | 
-            this.bitboards[team][N] | 
-            this.bitboards[team][R] | 
-            this.bitboards[team][P];
+        return this.bitboards[team][K] |
+                this.bitboards[team][Q] |
+                this.bitboards[team][B] |
+                this.bitboards[team][N] |
+                this.bitboards[team][R] |
+                this.bitboards[team][P];
     }
 
     public int getActiveTeam() {
@@ -296,33 +296,110 @@ public class Board {
         StringBuilder sb = new StringBuilder();
 
         for (int rank = 0; rank <= 7; rank++) {
-            
+
             for (int file = 0; file < 8; file++) {
 
                 int square = rank * 8 + file;
                 String pieceStr = ".";
-                
+
                 for (int team = 0; team < 2; team++) {
 
                     for (int piece = 0; piece < 6; piece++) {
 
-                    if ((bitboards[team][piece] & (1L << square)) != 0) {
-                        pieceStr = getPieceString(piece, team == White);
-                        break; 
+                        if ((bitboards[team][piece] & (1L << square)) != 0) {
+                            pieceStr = getPieceString(piece, team == White);
+                            break;
+                        }
                     }
                 }
-            }
-                
+
                 sb.append(pieceStr).append(" ");
-            
+
             }
-            
-            sb.append("\n"); 
-        
+
+            sb.append("\n");
+
         }
-        
+
         return sb.toString();
 
+    }
+
+    public String fenString() {
+        StringBuilder fen = new StringBuilder();
+    
+        for (int rank = 0; rank < 8; rank++) { // Corrected loop: rank from 0 to 7
+            int emptySquares = 0;
+    
+            for (int file = 0; file < 8; file++) {
+                int square = rank * 8 + file;
+                String pieceStr = ".";
+    
+                for (int team = 0; team < 2; team++) {
+                    for (int piece = 0; piece < 6; piece++) {
+                        if ((bitboards[team][piece] & (1L << square)) != 0) {
+                            pieceStr = getPieceString(piece, team == White);
+                            break;
+                        }
+                    }
+                    if (!pieceStr.equals(".")) {
+                        break;
+                    }
+                }
+    
+                if (pieceStr.equals(".")) {
+                    emptySquares++;
+                } else {
+                    if (emptySquares > 0) {
+                        fen.append(emptySquares);
+                        emptySquares = 0;
+                    }
+                    fen.append(pieceStr);
+                }
+            }
+    
+            if (emptySquares > 0) {
+                fen.append(emptySquares);
+            }
+            if (rank < 7) { // Corrected rank check
+                fen.append("/");
+            }
+        }
+    
+        fen.append(isWhitesTurn ? " w " : " b ");
+    
+        String castling = "";
+    
+        if (hasKingsideCastlingRights(White))
+            castling += "K";
+    
+        if (hasQueensideCastlingRights(White))
+            castling += "Q";
+    
+        if (hasKingsideCastlingRights(Black))
+            castling += "k";
+    
+        if (hasQueensideCastlingRights(Black))
+            castling += "q";
+    
+        fen.append(castling.isEmpty() ? "- " : " " + castling + " ");
+    
+        fen.append(enPassantIndex == -1 ? "- " : " " + indexToAlgebraic(enPassantIndex) + " ");
+    
+        fen.append(halfMoveClock).append(" ");
+    
+        fen.append(fullMoveCounter);
+    
+        return fen.toString();
+    }
+    
+    private String indexToAlgebraic(int index) {
+        if (index < 0 || index > 63) {
+            return "-";
+        }
+        int file = index % 8;
+        int rank = index / 8;
+        return "" + (char) ('a' + file) + (rank + 1);
     }
 
 }
