@@ -111,7 +111,7 @@ public class MoveGenerator {
         long leftAttacksNotPromoting = bitboardGenerators.pawnGetNonPromotionMoves(leftAttacks, team);
         long leftAttacksEnPassant = bitboardGenerators.pawnLeftCaptureEnPassant(team);
 
-        int leftAttackAdjustBy = isWhite ? SW : NW;
+        int leftAttackAdjustBy = isWhite ? SE : NE;
 
         pawnPromotionBitboardToMoves(leftAttackAdjustBy, leftAttacksPromoting, team);
         pawnBitboardToMoves(leftAttackAdjustBy, leftAttacksNotPromoting, team, false, false);
@@ -128,7 +128,7 @@ public class MoveGenerator {
 
         long doubleMove = bitboardGenerators.pawnDoubleMove(team);
 
-        int doubleMoveAdjustBy = isWhite ? SOUTH + SOUTH: NORTH + NORTH;
+        int doubleMoveAdjustBy = isWhite ? SOUTH + SOUTH : NORTH + NORTH;
 
         pawnBitboardToMoves(doubleMoveAdjustBy, doubleMove, team, true, false);
 

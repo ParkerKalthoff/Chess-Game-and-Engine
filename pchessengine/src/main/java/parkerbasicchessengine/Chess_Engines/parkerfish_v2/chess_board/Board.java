@@ -308,7 +308,7 @@ public class Board {
         if (boardStateStack.isEmpty()) {
             throw new RuntimeErrorException(null, "No moves to unmake");
         }
-
+    
         BoardState previousState = boardStateStack.pop();
         this.fullMoveCounter = previousState.fullMoveCounter;
         this.halfMoveClock = previousState.halfMoveClock;
@@ -316,7 +316,7 @@ public class Board {
         this.isWhitesTurn = previousState.isWhitesTurn;
         this.castlingRights = previousState.castlingRights;
         this.enPassantIndex = previousState.enPassantIndex;
-
+    
         if (move.isCastling()) {
             int rookFrom, rookTo;
             if (move.getFromSquare() < move.getToSquare()) {
@@ -329,7 +329,7 @@ public class Board {
             togglePiece(rookTo, move.getTeam(), R);
             togglePiece(rookFrom, move.getTeam(), R);
         }
-
+    
         if (move.isPromotion()) {
             togglePiece(move.getToSquare(), move.getTeam(), move.getPromotionPiece());
             togglePiece(move.getFromSquare(), move.getTeam(), P);
@@ -337,16 +337,14 @@ public class Board {
             togglePiece(move.getToSquare(), move.getTeam(), move.getPieceType());
             togglePiece(move.getFromSquare(), move.getTeam(), move.getPieceType());
         }
-
+    
         if (move.isCapture()) {
             togglePiece(move.getToSquare(), move.getCapturePieceTeam(), move.getCapturePieceType());
+            if (move.isEnPassant()) {
+                int capturedPawnSquare = isWhitesTurn ? move.getToSquare() + 8 : move.getToSquare() - 8;
+                togglePiece(capturedPawnSquare, move.getCapturePieceTeam(), P);
+            }
         }
-
-        if (move.isEnPassant()) {
-            int capturedPawnSquare = isWhitesTurn ? move.getToSquare() + 8 : move.getToSquare() - 8;
-            togglePiece(capturedPawnSquare, move.getCapturePieceTeam(), P);
-        }
-        
     }
 
     // Deep copy method for potential use in multithreading

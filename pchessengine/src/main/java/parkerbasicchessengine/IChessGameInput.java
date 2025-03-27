@@ -9,4 +9,6 @@ public interface IChessGameInput {
     String getFenString();
 
     void printBoard();
+
+    void loadPosition(String fenString);
 }

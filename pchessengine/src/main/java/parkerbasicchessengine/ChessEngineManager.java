@@ -14,14 +14,21 @@ public class ChessEngineManager {
 
     public void setWhitePlayer(IChessGameInput whitePlayer) {
         this.whitePlayer = whitePlayer;
+        whitePlayer.loadPosition(board.convertPostionToFEN());
     }
     
     public void setBlackPlayer(IChessGameInput blackPlayer) {
         this.blackPlayer = blackPlayer;
+        blackPlayer.loadPosition(board.convertPostionToFEN());
     }
 
     public void syncEngine(String move) {
         
+        /* Special Case where you're having an engine play itself, no need to sync */
+        if(whitePlayer == blackPlayer) {
+            return;
+        }
+
         if (board.isWhiteToMove && whitePlayer != null) {
             // Sync white's move after it is made
             System.out.println("Syncing White Engine...");

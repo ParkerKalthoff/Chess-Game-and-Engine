@@ -13,7 +13,7 @@ public class Minimax implements ISearch {
 
     // Implementation for Minimax with A-B pruning for maximum epicness
 
-    private Board board;
+    public Board board;
     private IEvaluate evalModule;
 
     private final int DEPTH = 4; // Piles
@@ -22,6 +22,13 @@ public class Minimax implements ISearch {
     public int positionsEvaluated;
 
     public Minimax(Board board) {
+        this.board = board;
+        this.evalModule = new Evaluator_v1(board);
+    }
+
+    public Minimax() {}
+
+    public void setBoard(Board board) {
         this.board = board;
         this.evalModule = new Evaluator_v1(board);
     }

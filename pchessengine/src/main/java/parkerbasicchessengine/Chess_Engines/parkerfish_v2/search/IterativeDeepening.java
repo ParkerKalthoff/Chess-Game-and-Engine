@@ -1,5 +1,6 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2.search;
 
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
 
 public class IterativeDeepening implements ISearch{
@@ -20,6 +21,12 @@ public class IterativeDeepening implements ISearch{
     public void printBoard() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'printBoard'");
+    }
+
+    @Override
+    public void setBoard(Board board) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setBoard'");
     }
 
    

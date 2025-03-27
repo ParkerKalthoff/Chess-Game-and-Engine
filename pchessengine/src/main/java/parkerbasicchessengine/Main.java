@@ -13,6 +13,7 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.parkerfish_v2;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Minimax;
 
 public class Main {
 
@@ -41,9 +42,6 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
 
         // Need to build gui for testing engine matchups!!!, maybe some automation platform
-
-        // Using this to test specific positions to ensure interboard-operability
-        boolean manualInputMode = true;
         
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
@@ -55,33 +53,34 @@ public class Main {
 
         Board board = new Board();
 
+        board.loadPositionFromFEN("rnbqkbnr/pppppp2/8/8/8/8/2PPPPPP/RNBQKBNR w KQkq - 0 1");
+
         frame.add(board);
 
         frame.setVisible(true);
 
         board.repaint();
 
-        IChessGameInput testEngine = new parkerfish_v2();
+        IChessGameInput testEngine = new parkerfish_v2(new Minimax());
         
         board.engineManager.setBlackPlayer(testEngine);
         board.engineManager.setWhitePlayer(testEngine);
         
-
         while (!board.isGameOver) {
-            if (board.engineManager.whitePlayer == null || manualInputMode) {
+            if (board.engineManager.whitePlayer == null) {
                 board.awaitingPlayerMove = true;
                 while (board.awaitingPlayerMove) {
                     Thread.sleep(100);
                 }
             } else {
-                board.engineManager.whitePlayer.engineMakeMove();
+                board.engineManager.engineMakeMove();
             }
         
             System.out.println(" - White made move");
 
             board.repaint();
 
-            if (board.engineManager.whitePlayer == null || manualInputMode) {
+            if (board.engineManager.blackPlayer == null) {
                 board.awaitingPlayerMove = true;
                 while (board.awaitingPlayerMove) {
                     Thread.sleep(100);
