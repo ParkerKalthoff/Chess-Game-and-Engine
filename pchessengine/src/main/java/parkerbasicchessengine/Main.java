@@ -19,43 +19,32 @@ public class Main {
     public final static boolean ai_verses_ai = false;
 
     /*
-     * 00 01 02 03 04 05 06 07
-     * 08 09 10 11 12 13 14 15
-     * 16 17 18 19 20 21 22 23
-     * 24 25 26 27 28 29 30 31
-     * 32 33 34 35 36 37 38 39
-     * 40 41 42 43 44 45 46 47
-     * 48 49 50 51 52 53 54 55
-     * 56 57 58 59 60 61 62 63
+     * Converting actual chess coordinates / custom board coordinates to engine coordinates 
+     * 
+     * actual/board | a|0 b|1 c|2 d|3 e|4 f|5 g|6 h|7  <-col->
+     * -------------+-------------------------------------
+     *      8|0     |  00  01  02  03  04  05  06  07
+     *      7|1     |  08  09  10  11  12  13  14  15
+     *      6|2     |  16  17  18  19  20  21  22  23
+     *      5|3     |  24  25  26  27  28  29  30  31
+     *      4|4     |  32  33  34  35  36  37  38  39
+     *      3|5     |  40  41  42  43  44  45  46  47
+     *      2|6     |  48  49  50  51  52  53  54  55
+     *      1|7     |  56  57  58  59  60  61  62  63
+     *    <-row->
      * 
      * 1L << index
      * 
      * https://tearth.dev/bitboard-viewer/
      */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
-        // Castling and Pawn pushing dupes?
+        // Need to build gui for testing engine matchups!!!, maybe some automation platform
 
-        parkerfish_v2 engine = new parkerfish_v2();
-
-        Scanner scanner = new Scanner(System.in);
-
-        engine.printBoard();
-
-        while (!engine.board.isGameOver) {
-            
-            engine.makeMove();
-
-            engine.printBoard();
-
-            scanner.nextLine();
-            
-        }
+        // Using this to test specific positions to ensure interboard-operability
+        boolean manualInputMode = true;
         
-        System.out.println("Over!");
-
-        /*
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
 
@@ -64,27 +53,46 @@ public class Main {
 
         frame.setLocationRelativeTo(null);
 
-        boolean playerOneIsHuman = true;
-        boolean playerTwoIsHuman = false;
-
         Board board = new Board();
-        // incorrect promotion is causing out of bounds error
+
         frame.add(board);
 
         frame.setVisible(true);
 
         board.repaint();
 
-        parkerfish_v1 parkerTest = new parkerfish_v1(board);
+        IChessGameInput testEngine = new parkerfish_v2();
+        
+        board.engineManager.setBlackPlayer(testEngine);
+        board.engineManager.setWhitePlayer(testEngine);
+        
 
-        Scanner scanner = new Scanner(System.in);
+        while (!board.isGameOver) {
+            if (board.engineManager.whitePlayer == null || manualInputMode) {
+                board.awaitingPlayerMove = true;
+                while (board.awaitingPlayerMove) {
+                    Thread.sleep(100);
+                }
+            } else {
+                board.engineManager.whitePlayer.engineMakeMove();
+            }
+        
+            System.out.println(" - White made move");
 
-        System.out.println(parkerTest.bwB.toFenString());
+            board.repaint();
 
-        while(!board.isGameOver){
-            parkerTest.makeMove();
+            if (board.engineManager.whitePlayer == null || manualInputMode) {
+                board.awaitingPlayerMove = true;
+                while (board.awaitingPlayerMove) {
+                    Thread.sleep(100);
+                }
+            } else {
+                board.engineManager.engineMakeMove();
+            }
+
+            System.out.println(" - Black made move");
+            
             board.repaint();
         }
-         */
     }
 }

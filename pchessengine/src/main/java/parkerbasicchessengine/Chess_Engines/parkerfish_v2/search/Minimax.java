@@ -16,7 +16,7 @@ public class Minimax implements ISearch {
     private Board board;
     private IEvaluate evalModule;
 
-    private final int DEPTH = 3; // Piles
+    private final int DEPTH = 4; // Piles
 
     public int nodesGenerated;
     public int positionsEvaluated;
@@ -30,8 +30,8 @@ public class Minimax implements ISearch {
         System.out.println(this.board.toString());
     }
 
-    public void makeMove(Move move) {
-        board.makeMove(move);
+    public void makeMove(String move) {
+        board.makeMoveUsingCoordinate(move);
     }
 
     public Move makeMove() {
@@ -39,7 +39,7 @@ public class Minimax implements ISearch {
         this.nodesGenerated = 0;
         this.positionsEvaluated = 0;
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
 
         ArrayList<Move> validMoves = board.getValidMoves();
 
@@ -56,7 +56,7 @@ public class Minimax implements ISearch {
 
         Move bestMove = null;
 
-        System.out.println("Checking These Moves : ");
+        //System.out.println("Checking These Moves : ");
 
         for (Move move : validMoves) {
 
@@ -64,7 +64,7 @@ public class Minimax implements ISearch {
             
             int searchEval = minimax(DEPTH - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
             
-            System.out.println("\t" + move + "\n\t\tEval of : " + searchEval);
+            //System.out.println("\t" + move + "\n\t\tEval of : " + searchEval);
             
             board.unmakeMove(move);
 
@@ -86,10 +86,9 @@ public class Minimax implements ISearch {
         System.out.println("[Minimax] " + nodesGenerated + " nodes generated, with " + positionsEvaluated + " positions evaluated");
         */
 
-        System.out.println("[Minimax] Best Move : " + bestMove);
+        //System.out.println("[Minimax] Best Move : " + bestMove);
 
-        
-        System.out.println("[Minimax] Fen String : " + this.board.fenString());
+        //System.out.println("[Minimax] Fen String : " + this.board.fenString());
 
         board.makeMove(bestMove);
 
@@ -112,7 +111,7 @@ public class Minimax implements ISearch {
 
         ArrayList<Move> moves = board.getValidMoves();
 
-        //moves = MoveOrdering.orderMoves(moves);
+        moves = MoveOrdering.orderMoves(moves);
 
         nodesGenerated += moves.size();
 

@@ -1,11 +1,14 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 import javax.management.RuntimeErrorException;
 
+import parkerbasicchessengine.soundManager;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.chess_board_move_gen.MoveGenerator;
+import parkerbasicchessengine.Utils.PieceCoordinateConversion;
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
@@ -121,11 +124,78 @@ public class Board {
                 return pieceType;
             }
         }
-        return -1;
+        return NULL_PIECE;
     }
 
     private void togglePiece(int square, int team, int piece) {
-        this.bitboards[team][piece] ^= 1L << square;
+        try {
+            this.bitboards[team][piece] ^= 1L << square;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("out of index, square : "+square+", team : "+team+", piece : "+piece);
+            throw e;
+        }
+    }
+
+    private int convertPieceStringToType(String piece) {
+
+        if(piece.equals("K")){
+            return K;
+        } else if (piece.equals("Q")) {
+            return Q;
+        } else if (piece.equals("P")) {
+            return P;
+        } else if (piece.equals("R")) {
+            return R;
+        } else if (piece.equals("B")) {
+            return B;
+        } else if (piece.equals("N")) {
+            return N;
+        } else {
+            return NULL_PIECE;
+        }
+
+    }
+
+    public void makeMoveUsingCoordinate(String moveCoord) {
+
+        String fromSquareString = moveCoord.substring(0,2);
+        String toSquareString = moveCoord.substring(2,4);
+        String promotionPieceString = moveCoord.length() == 5 ? moveCoord.substring(4,5) : null;
+        
+        int fromSquare = PieceCoordinateConversion.DecodeCoord.parkerfish_v2(fromSquareString);
+        int toSquare = PieceCoordinateConversion.DecodeCoord.parkerfish_v2(toSquareString);
+        int team = this.isWhitesTurn ? White : Black;
+        int pieceType = this.getPieceAt(fromSquare);
+        int capturePieceType = this.getPieceAt(toSquare);
+        boolean captureFlag = capturePieceType != -1 || (toSquare == enPassantIndex && pieceType == P);
+        boolean promotionFlag = promotionPieceString != null;
+        int promotionPiece = promotionFlag ? convertPieceStringToType(promotionPieceString) : NULL_PIECE; 
+        boolean pawnDoubleMove = pieceType == P && Math.abs(fromSquare - toSquare) == 16;
+        boolean enPassant = pieceType == P && captureFlag && toSquare == this.enPassantIndex;
+        boolean castling = pieceType == K && Math.abs(fromSquare - toSquare) > 1;
+
+        if(pieceType == NULL_PIECE) {
+            System.out.println("int fromSquare =\r\n" + fromSquare
+                                + "int toSquare =\r\n" + toSquare
+                                + "int team =\r\n" + team
+                                + "int pieceType =\r\n" + pieceType
+                                + "int capturePieceType =\r\n" + capturePieceType
+                                + "boolean captureFlag =\r\n" + captureFlag
+                                + "boolean promotionFlag =\r\n" + promotionFlag
+                                + "int promotionPiece =\r\n" + promotionPiece
+                                + "boolean pawnDoubleMove =\r\n" + pawnDoubleMove
+                                + "boolean enPassant =\r\n" + enPassant
+                                + "boolean castling =" +castling);
+            throw new RuntimeErrorException(null, "Missing Piece after conversion");
+        }
+
+        if(promotionFlag && promotionPiece == NULL_PIECE) {
+            throw new RuntimeErrorException(null, "Promotion Flag is true without given piece");
+        }
+
+        Move move = new Move(fromSquare, toSquare, team, pieceType, captureFlag, capturePieceType, promotionFlag, promotionPiece, pawnDoubleMove, enPassant, castling);
+        
+        this.makeMove(move);
     }
 
     public void makeMove(Move move) {
@@ -147,8 +217,6 @@ public class Board {
             fullMoveCounter++;
         }
 
-        this.isWhitesTurn = !this.isWhitesTurn;
-
         togglePiece(move.getFromSquare(), move.getTeam(), move.getPieceType());
 
         if (move.isPromotion()) {
@@ -158,13 +226,56 @@ public class Board {
         }
 
         if (move.isCapture()) {
+
             if (move.isEnPassant()) {
-                int capturedPawnSquare = isWhitesTurn ? move.getToSquare() + 8 : move.getToSquare() - 8;
+
+                int capturedPawnSquare = this.isWhitesTurn ? move.getToSquare() + SOUTH : move.getToSquare() + NORTH;
                 togglePiece(capturedPawnSquare, move.getCapturePieceTeam(), P);
+
             } else {
+
                 togglePiece(move.getToSquare(), move.getCapturePieceTeam(), move.getCapturePieceType());
+
+                if(move.getCapturePieceType() == R) {
+
+                    if (this.isWhitesTurn) {
+                        if (move.getToSquare() == A8) {
+                            castlingRights &= 0b1110; // clear q
+                        }
+                        else if (move.getToSquare() == H8) { 
+                            castlingRights &= 0b1101; // clear k
+                        }
+                    } else {
+                        if (move.getToSquare() == A1) {
+                            castlingRights &= 0b1011; // clear Q
+                        }
+                        else if (move.getToSquare() == H1) {
+                            castlingRights &= 0b0111; // clear K
+                        }
+                    }                    
+                }
             }
-            halfMoveClock = 0;
+        }
+
+        if (move.getPieceType() == R) {
+            if (move.getFromSquare() == A8) {
+                castlingRights &= 0b1110;
+            } else if (move.getFromSquare() == H8) {
+                castlingRights &= 0b1101;
+            } else if (move.getFromSquare() == A1) {
+                castlingRights &= 0b1011;
+            } else if (move.getFromSquare() == H1) {
+                castlingRights &= 0b0111;
+            }
+        }
+
+        if(move.getPieceType() == K) {
+
+            if(isWhitesTurn) {
+                castlingRights &= 0b0011;
+            } else {
+                castlingRights &= 0b1100;
+            }
         }
 
         if (move.isPawnDoubleMove()) {
@@ -189,6 +300,8 @@ public class Board {
         if (halfMoveClock >= 100 || bitboards[White][K] == 0L || bitboards[Black][K] == 0L) {
             isGameOver = true;
         }
+        
+        this.isWhitesTurn = !this.isWhitesTurn;
     }
 
     public void unmakeMove(Move move) {
@@ -233,6 +346,7 @@ public class Board {
             int capturedPawnSquare = isWhitesTurn ? move.getToSquare() + 8 : move.getToSquare() - 8;
             togglePiece(capturedPawnSquare, move.getCapturePieceTeam(), P);
         }
+        
     }
 
     // Deep copy method for potential use in multithreading
@@ -328,7 +442,7 @@ public class Board {
     public String fenString() {
         StringBuilder fen = new StringBuilder();
     
-        for (int rank = 0; rank < 8; rank++) { // Corrected loop: rank from 0 to 7
+        for (int rank = 0; rank < 8; rank++) {
             int emptySquares = 0;
     
             for (int file = 0; file < 8; file++) {
@@ -361,12 +475,12 @@ public class Board {
             if (emptySquares > 0) {
                 fen.append(emptySquares);
             }
-            if (rank < 7) { // Corrected rank check
+            if (rank < 7) {
                 fen.append("/");
             }
         }
     
-        fen.append(isWhitesTurn ? " w " : " b ");
+        fen.append(isWhitesTurn ? " w" : " b");
     
         String castling = "";
     
@@ -382,9 +496,9 @@ public class Board {
         if (hasQueensideCastlingRights(Black))
             castling += "q";
     
-        fen.append(castling.isEmpty() ? "- " : " " + castling + " ");
+        fen.append(castling.isEmpty() ? " - " : " " + castling + " ");
     
-        fen.append(enPassantIndex == -1 ? "- " : " " + indexToAlgebraic(enPassantIndex) + " ");
+        fen.append(enPassantIndex == -1 ? "- " : PieceCoordinateConversion.EncodeCoord.parkerfish_v2(enPassantIndex)+ " ");
     
         fen.append(halfMoveClock).append(" ");
     

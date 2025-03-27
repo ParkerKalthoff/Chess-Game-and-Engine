@@ -1,16 +1,25 @@
 package parkerbasicchessengine;
 
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.B;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.K;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.N;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.NULL_PIECE;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.P;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.Q;
+import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.R;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
 
-import parkerbasicchessengine.Chess_Engines.AI.AI;
+import parkerbasicchessengine.Utils.MoveConversion;
+import parkerbasicchessengine.Utils.PieceCoordinateConversion;
+import parkerbasicchessengine.Utils.PieceCoordinateConversion.DecodeCoord;
 import parkerbasicchessengine.pieces.*;
 
 public class Board extends JPanel {
@@ -19,8 +28,6 @@ public class Board extends JPanel {
 
     private soundManager soundManager = new soundManager();
 
-    HashMap<String, Integer> pieceHistory = new HashMap<>();
-
     public int tileSize = 85;
     public int enPassantTile = -1;
 
@@ -28,8 +35,6 @@ public class Board extends JPanel {
     public int cols = 8;
 
     public String moveType;
-
-    public AI ai = new AI(this);
 
     final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -44,7 +49,11 @@ public class Board extends JPanel {
     public boolean isWhiteToMove = true;
     public boolean isGameOver = false;
 
+    public boolean awaitingPlayerMove = true;
+
     public String gameState = "";
+
+    public ChessEngineManager engineManager = new ChessEngineManager(this);
 
     Input input = new Input(this);
 
@@ -81,6 +90,11 @@ public class Board extends JPanel {
     }
 
     public void makeMove(Move move) {
+        // calling this function without passing in a sync flag implies user input
+        makeMove(move, true);
+    }
+
+    public void makeMove(Move move, boolean syncEngineManager) {
 
         moveType = "Move";
 
@@ -168,6 +182,15 @@ public class Board extends JPanel {
                     throw new IllegalArgumentException("moveType has illegal value of : " + moveType);
             }
         }
+
+        if(syncEngineManager) {
+            String moveStringRepresentation = MoveConversion.board(move);
+            engineManager.syncEngine(moveStringRepresentation);
+        }
+
+        halfMoveClock++;
+
+        this.awaitingPlayerMove = false;
     }
 
     public void unMakeMove(Move move) {
@@ -473,11 +496,11 @@ public class Board extends JPanel {
         // enpassant
         fenString.append(" ");
         fenString.append(this.enPassantTile == -1 ? "-"
-                : "" + ((char) ('a' + this.enPassantTile % 8)) + (8 - (this.enPassantTile / 8)));
+                : "" + ((char) ('A' + this.enPassantTile % 8)) + (8 - (this.enPassantTile / 8)));
 
         // half move
         fenString.append(" ");
-        fenString.append(this.halfMoveClock / 2);
+        fenString.append(this.halfMoveClock);
 
         // full move
         fenString.append(" ");
@@ -535,8 +558,64 @@ public class Board extends JPanel {
             }
         }
 
-        for (Piece piece : this.pieceList) {
+        for (Piece piece : new ArrayList<>(this.pieceList)) {
             piece.paint(g2d);
+        }        
+
+    }
+
+    public void makeMoveUsingCoordinate(String moveCoord) { 
+
+        String fromSquareString = moveCoord.substring(0,2);
+        String toSquareString = moveCoord.substring(2,4);
+        String promotionPieceString = moveCoord.length() == 5 ? moveCoord.substring(4,5) : null;
+        
+        int[] fromSquareCoords = DecodeCoord.board(fromSquareString);
+        int[] toSquareCoords = DecodeCoord.board(toSquareString);
+        
+        Piece piece = this.getPiece(fromSquareCoords[0], fromSquareCoords[1]);
+
+        Piece promoteToPiece = switch (convertPieceStringToType(promotionPieceString)) {
+                case Q ->
+                    new Queen(this, toSquareCoords[0], toSquareCoords[1], isWhiteToMove);
+                case B ->
+                    new Bishop(this, toSquareCoords[0], toSquareCoords[1], isWhiteToMove);
+                case N ->
+                    new Knight(this, toSquareCoords[0], toSquareCoords[1], isWhiteToMove);
+                case R ->
+                    new Rook(this, toSquareCoords[0], toSquareCoords[1], isWhiteToMove);
+                default ->
+                    null;
+        };
+
+
+        Move move = new Move(this, piece, toSquareCoords[0], toSquareCoords[1], promoteToPiece);
+
+        System.out.println("Syncing Engine Move "+moveCoord+" : " + move.piece.abbreviation +  " "+PieceCoordinateConversion.EncodeCoord.board(move.oldCol, move.oldRow) + " to " + PieceCoordinateConversion.EncodeCoord.board(move.newCol, move.newRow));
+
+        this.makeMove(move, false);
+    }
+
+    private int convertPieceStringToType(String pieceStr) {
+
+        if(pieceStr == null) {
+            return NULL_PIECE;
+        }
+
+        if(pieceStr.equals("K")){
+            return K;
+        } else if (pieceStr.equals("Q")) {
+            return Q;
+        } else if (pieceStr.equals("P")) {
+            return P;
+        } else if (pieceStr.equals("R")) {
+            return R;
+        } else if (pieceStr.equals("B")) {
+            return B;
+        } else if (pieceStr.equals("N")) {
+            return N;
+        } else {
+            return NULL_PIECE;
         }
 
     }

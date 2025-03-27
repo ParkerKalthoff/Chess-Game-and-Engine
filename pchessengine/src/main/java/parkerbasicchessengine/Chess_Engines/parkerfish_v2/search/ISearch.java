@@ -6,7 +6,7 @@ public interface ISearch {
 
     public Move makeMove();
 
-    public void makeMove(Move move);
+    public void makeMove(String move);
 
     public void printBoard();
 }
