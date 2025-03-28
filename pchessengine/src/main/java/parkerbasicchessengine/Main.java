@@ -5,6 +5,7 @@ import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -14,6 +15,7 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.parkerfish_v2;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Minimax;
+import parkerbasicchessengine.Utils.randomPositions.randomPosition;
 
 public class Main {
 
@@ -39,10 +41,10 @@ public class Main {
      * https://tearth.dev/bitboard-viewer/
      */
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
 
         // Need to build gui for testing engine matchups!!!, maybe some automation platform
-        
+
         JFrame frame = new JFrame();
         frame.getContentPane().setBackground(Color.black);
 
@@ -53,7 +55,7 @@ public class Main {
 
         Board board = new Board();
 
-        board.loadPositionFromFEN("rnbqkbnr/pppppp2/8/8/8/8/2PPPPPP/RNBQKBNR w KQkq - 0 1");
+        //board.loadPositionFromFEN("rnbqkbnr/pppppp2/8/8/8/8/2PPPPPP/RNBQKBNR w KQkq - 0 1");
 
         frame.add(board);
 
@@ -93,5 +95,7 @@ public class Main {
             
             board.repaint();
         }
+
+        System.out.println("Game over----");
     }
 }

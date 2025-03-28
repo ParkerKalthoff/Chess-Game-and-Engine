@@ -38,7 +38,7 @@ public class parkerfish_v2 implements IChessGameInput {
 
         this.board = BoardFactory.createBoard(fenString);
         searchAlgorithm.setBoard(board);
-        
+
     }
 
     public void printBoard() {
@@ -49,6 +49,11 @@ public class parkerfish_v2 implements IChessGameInput {
         System.out.println("Engine making move...");
         Move move = this.searchAlgorithm.makeMove();
         // Convert to coordinate
+
+        if(move == null) {
+            return null;
+        }
+
         return MoveConversion.parkerfish_v2(move);
     }
 

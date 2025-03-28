@@ -63,12 +63,20 @@ public class ChessEngineManager {
             
             String whiteMove = whitePlayer.engineMakeMove();
 
+            if(whiteMove == null) {
+                return;
+            }
+
             board.makeMoveUsingCoordinate(whiteMove);
 
         } else if (!board.isWhiteToMove && blackPlayer != null) {
             
             String blackMove = blackPlayer.engineMakeMove();
             
+            if(blackMove == null) {
+                return;
+            }
+
             board.makeMoveUsingCoordinate(blackMove);
         
         } else {
