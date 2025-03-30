@@ -1,13 +1,10 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2;
 
-import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
-
 import parkerbasicchessengine.IChessGameInput;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.BoardFactory;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.ISearch;
-import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Minimax;
 import parkerbasicchessengine.Utils.MoveConversion;
 
 public class parkerfish_v2 implements IChessGameInput {
@@ -18,6 +15,7 @@ public class parkerfish_v2 implements IChessGameInput {
 
     private ISearch searchAlgorithm;
     public Board board;
+    public String name;
 
     public parkerfish_v2(ISearch searchAlgorithm, String fenString) {
         // load position
@@ -64,5 +62,9 @@ public class parkerfish_v2 implements IChessGameInput {
     @Override
     public String getFenString() {
         return board.fenString();
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

@@ -18,7 +18,7 @@ public class MoveConversion {
         String toSquare = PieceCoordinateConversion.EncodeCoord.parkerfish_v2(move.getToSquare());
         
         String pieceStrs[] = new String[]{"K","Q","B","N","R","P"};
-        String promotion = move.isCapture() ? pieceStrs[move.getCapturePieceType()] : ""; 
+        String promotion = move.isPromotion() ? pieceStrs[move.getPromotionPiece()] : ""; 
 
         return fromSquare + toSquare + promotion;
 

@@ -407,7 +407,12 @@ public class Board {
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append("    a b c d e f g h\n");
+        sb.append("   ________________\n");
+
         for (int rank = 0; rank <= 7; rank++) {
+
+            sb.append(8-rank + " | ");
 
             for (int file = 0; file < 8; file++) {
 

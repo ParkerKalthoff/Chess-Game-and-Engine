@@ -8,11 +8,18 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.eval_v1.eval_
 public class Evaluator_v1 implements IEvaluate {
 
     private IEvaluationModule evalModules[] = {
+        // Default modules
         new MaterialEval(),
         new PieceSquareTables()
     };
 
-    public Evaluator_v1(Board board) {
+    public Evaluator_v1() {/* Uses Default Modules */}
+
+    public Evaluator_v1(IEvaluationModule evalModules[]) {
+        this.evalModules = evalModules;
+    }
+
+    public void setBoard(Board board) {
 
         for(IEvaluationModule evalModule : evalModules) {
             evalModule.setBoard(board);

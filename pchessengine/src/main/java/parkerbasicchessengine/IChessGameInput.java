@@ -11,4 +11,6 @@ public interface IChessGameInput {
     void printBoard();
 
     void loadPosition(String fenString);
+
+    String getName();
 }

@@ -2,17 +2,21 @@ package parkerbasicchessengine;
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseBoard;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.BitwiseMove;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v1.parkerfish_v1;
+import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chessEngineFactory;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.parkerfish_v2;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Minimax;
 import parkerbasicchessengine.Utils.randomPositions.randomPosition;
@@ -43,59 +47,15 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
 
-        // Need to build gui for testing engine matchups!!!, maybe some automation platform
+        IChessGameInput engine = chessEngineFactory.Parkerfish_v2();
 
-        JFrame frame = new JFrame();
-        frame.getContentPane().setBackground(Color.black);
+        MatchManager matchManager = new MatchManager(engine, engine);
 
-        frame.setLayout(new GridBagLayout());
-        frame.setMinimumSize(new Dimension(1000, 1000));
-
-        frame.setLocationRelativeTo(null);
-
-        Board board = new Board();
-
-        //board.loadPositionFromFEN("rnbqkbnr/pppppp2/8/8/8/8/2PPPPPP/RNBQKBNR w KQkq - 0 1");
-
-        frame.add(board);
-
-        frame.setVisible(true);
-
-        board.repaint();
-
-        IChessGameInput testEngine = new parkerfish_v2(new Minimax());
-        
-        board.engineManager.setBlackPlayer(testEngine);
-        board.engineManager.setWhitePlayer(testEngine);
-        
-        while (!board.isGameOver) {
-            if (board.engineManager.whitePlayer == null) {
-                board.awaitingPlayerMove = true;
-                while (board.awaitingPlayerMove) {
-                    Thread.sleep(100);
-                }
-            } else {
-                board.engineManager.engineMakeMove();
-            }
-        
-            System.out.println(" - White made move");
-
-            board.repaint();
-
-            if (board.engineManager.blackPlayer == null) {
-                board.awaitingPlayerMove = true;
-                while (board.awaitingPlayerMove) {
-                    Thread.sleep(100);
-                }
-            } else {
-                board.engineManager.engineMakeMove();
-            }
-
-            System.out.println(" - Black made move");
-            
-            board.repaint();
+        for(int i = 0; i < 500; i++) {
+            matchManager.setRandomPosition();
+            matchManager.startMatch();
         }
 
-        System.out.println("Game over----");
+        matchManager.printMatchResultTotals();
     }
 }

@@ -21,16 +21,13 @@ public class Minimax implements ISearch {
     public int nodesGenerated;
     public int positionsEvaluated;
 
-    public Minimax(Board board) {
-        this.board = board;
-        this.evalModule = new Evaluator_v1(board);
+    public Minimax(IEvaluate evaluater) {
+        this.evalModule = evaluater;
     }
-
-    public Minimax() {}
 
     public void setBoard(Board board) {
         this.board = board;
-        this.evalModule = new Evaluator_v1(board);
+        this.evalModule.setBoard(board);
     }
 
     public void printBoard() {

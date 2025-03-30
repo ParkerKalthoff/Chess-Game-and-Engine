@@ -49,7 +49,7 @@ public class Board extends JPanel {
     public boolean isWhiteToMove = true;
     public boolean isGameOver = false;
 
-    public boolean awaitingPlayerMove = true;
+    public boolean awaitingPlayerMove = false;
 
     public String gameState = "";
 
@@ -310,6 +310,9 @@ public class Board extends JPanel {
 
     public void loadPositionFromFEN(String fenString) {
 
+        this.isGameOver = false;
+        this.awaitingPlayerMove = false;
+
         this.pieceList.clear();
 
         String[] parts = fenString.split(" ");
@@ -395,6 +398,15 @@ public class Board extends JPanel {
         // full move
 
         this.fullMoveCounter = Integer.parseInt(parts[5]);
+
+        if(this.engineManager.whitePlayer != null) {
+            engineManager.whitePlayer.loadPosition(fenString);
+        }
+
+        if(this.engineManager.blackPlayer != null && this.engineManager.blackPlayer != this.engineManager.whitePlayer) {
+            engineManager.blackPlayer.loadPosition(fenString);
+        }
+
     }
 
     public String updateGameState(boolean isWhiteToMove) {
@@ -420,8 +432,8 @@ public class Board extends JPanel {
         if (this.halfMoveClock >= 100) {
             return "50 Move Rule";
         }
-        return "";
 
+        return "";
     }
 
     public String convertPostionToFEN() {
@@ -587,7 +599,6 @@ public class Board extends JPanel {
                 default ->
                     null;
         };
-
 
         Move move = new Move(this, piece, toSquareCoords[0], toSquareCoords[1], promoteToPiece);
 
