@@ -1,6 +1,7 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board;
 
 public class Move {
+    
     private int moveData;
 
     // Bit shifts for move

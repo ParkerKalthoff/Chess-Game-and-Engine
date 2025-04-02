@@ -18,14 +18,18 @@ public class Board {
     private int halfMoveClock;
     public boolean isGameOver;
     public boolean isWhitesTurn;
-    private byte castlingRights; // 0bKQkq
+    public byte castlingRights; // 0bKQkq
     public int enPassantIndex;
+    private long boardHash;
+
+    public HashMap<Long, Integer> previousPositions = new HashMap<>();
 
     public long bitboards[][];
     private Stack<BoardState> boardStateStack;
 
-    // TODO set back to private
-    public MoveGenerator moveGenerator;
+    private MoveGenerator moveGenerator;
+
+    private ZobristHasher zobristHasher = new ZobristHasher(this);
 
     public Board(int fullMoveCounter, int halfMoveClock, boolean isGameOver, boolean isWhitesTurn, byte castlingRights,
             int enPassantIndex, long[][] bitboards) {
@@ -38,6 +42,10 @@ public class Board {
         this.bitboards = bitboards;
         this.boardStateStack = new Stack<BoardState>();
 
+        this.boardHash = zobristHasher.getHash();
+
+        previousPositions.put(boardHash, 1);
+
         this.moveGenerator = new MoveGenerator(this);
     }
 
@@ -48,15 +56,18 @@ public class Board {
         public boolean isWhitesTurn;
         public byte castlingRights;
         public int enPassantIndex;
+        public long boardHash;
 
         BoardState(int fullMoveCounter, int halfMoveClock, boolean isGameOver,
-                boolean isWhitesTurn, byte castlingRights, int enPassantIndex) {
+                boolean isWhitesTurn, byte castlingRights, int enPassantIndex,
+                long boardHash) {
             this.fullMoveCounter = fullMoveCounter;
             this.halfMoveClock = halfMoveClock;
             this.isGameOver = isGameOver;
             this.isWhitesTurn = isWhitesTurn;
             this.castlingRights = castlingRights;
             this.enPassantIndex = enPassantIndex;
+            this.boardHash = boardHash;
         }
     }
 
@@ -90,12 +101,23 @@ public class Board {
         return moveGenerator.checkCount != 0;
     }
 
+    public boolean isThreeMoveRepitionStalemate() {
+        
+        for(Integer occurences : previousPositions.values()) {
+            if(occurences >= 3) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public long getAllPieces() {
         return getTeamsPieces(White) | getTeamsPieces(Black);
     }
 
     public long getTeamsPieces(int team) {
-        return this.bitboards[team][K] |
+        return  this.bitboards[team][K] |
                 this.bitboards[team][Q] |
                 this.bitboards[team][B] |
                 this.bitboards[team][N] |
@@ -204,8 +226,9 @@ public class Board {
             throw new RuntimeErrorException(null, "Attempting to make move when game is over");
         }
 
-        boardStateStack.add(new BoardState(fullMoveCounter, halfMoveClock, isGameOver, isWhitesTurn, castlingRights,
-                enPassantIndex));
+        boardStateStack.add(new BoardState(fullMoveCounter, halfMoveClock, isGameOver, isWhitesTurn, castlingRights, enPassantIndex, boardHash));
+
+        zobristHasher.preMoveHashAdjustment();
 
         if (move.getPieceType() == P || move.isCapture()) {
             halfMoveClock = 0;
@@ -297,7 +320,13 @@ public class Board {
             togglePiece(rookTo, move.getTeam(), R);
         }
 
-        if (halfMoveClock >= 100 || bitboards[White][K] == 0L || bitboards[Black][K] == 0L) {
+        
+        this.boardHash = zobristHasher.postMoveHashAdjustment(move);
+
+        this.previousPositions.compute(boardHash, (k, v) -> (v == null) ? 1 : v + 1);
+
+
+        if (halfMoveClock >= 100 || bitboards[White][K] == 0L || bitboards[Black][K] == 0L || previousPositions.get(boardHash) >= 3) {
             isGameOver = true;
         }
         
@@ -308,6 +337,8 @@ public class Board {
         if (boardStateStack.isEmpty()) {
             throw new RuntimeErrorException(null, "No moves to unmake");
         }
+
+        this.previousPositions.compute(this.boardHash, (k, v) -> v - 1);
     
         BoardState previousState = boardStateStack.pop();
         this.fullMoveCounter = previousState.fullMoveCounter;
@@ -316,6 +347,7 @@ public class Board {
         this.isWhitesTurn = previousState.isWhitesTurn;
         this.castlingRights = previousState.castlingRights;
         this.enPassantIndex = previousState.enPassantIndex;
+        this.boardHash = previousState.boardHash;
     
         if (move.isCastling()) {
             int rookFrom, rookTo;
@@ -363,7 +395,8 @@ public class Board {
                     state.isGameOver,
                     state.isWhitesTurn,
                     state.castlingRights,
-                    state.enPassantIndex));
+                    state.enPassantIndex,
+                    state.boardHash));
         }
 
         Board board = new Board(
@@ -400,7 +433,6 @@ public class Board {
             default:
                 throw new RuntimeErrorException(null, "Invalid Input");
         }
-
     }
 
     public String toString() {
@@ -509,14 +541,4 @@ public class Board {
     
         return fen.toString();
     }
-    
-    private String indexToAlgebraic(int index) {
-        if (index < 0 || index > 63) {
-            return "-";
-        }
-        int file = index % 8;
-        int rank = index / 8;
-        return "" + (char) ('a' + file) + (rank + 1);
-    }
-
 }

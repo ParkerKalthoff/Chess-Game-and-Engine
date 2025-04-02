@@ -1,6 +1,8 @@
 package parkerbasicchessengine.Chess_Engines.parkerfish_v2.search;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.evaluate.IEvaluate;
@@ -9,7 +11,7 @@ import parkerbasicchessengine.Chess_Engines.parkerfish_v2.search.Utils.MoveOrder
 
 import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*;
 
-public class Minimax implements ISearch {
+public class QuiescenceMM implements ISearch {
 
     // Implementation for Minimax with A-B pruning
 
@@ -17,11 +19,12 @@ public class Minimax implements ISearch {
     private IEvaluate evalModule;
 
     private final int DEPTH = 4; // Piles
+    private final int QUIESCENCE_DEPTH_LIMIT = 2; // Piles (This is ontop of the regular depth so I keep it low)
 
     public int nodesGenerated;
     public int positionsEvaluated;
 
-    public Minimax(IEvaluate evaluater) {
+    public QuiescenceMM(IEvaluate evaluater) {
         this.evalModule = evaluater;
     }
 
@@ -105,9 +108,7 @@ public class Minimax implements ISearch {
 
         if (depth == 0 || board.isGameOver) {
 
-            positionsEvaluated += 1;
-
-            int eval = evalModule.evaluate();
+            int eval = quiescenceSearch(alpha, beta, 1);
 
             return eval;
 
@@ -117,7 +118,7 @@ public class Minimax implements ISearch {
 
         moves = MoveOrdering.orderMoves(moves);
 
-        nodesGenerated += moves.size();
+        
 
         if (moves.isEmpty()) {
 
@@ -127,15 +128,12 @@ public class Minimax implements ISearch {
 
             if (kingBitboard == 0L) {
                 // king captured (should pause before, but safeguard)
-                positionsEvaluated += 1;
 
                 return evalModule.evaluate() + recencyBias;
             }
 
             if (board.isKingInCheck()) {
 
-                // checkmate
-                positionsEvaluated += 1;
 
                 if (board.isWhitesTurn) {
                     return Integer.MIN_VALUE - recencyBias; // Black is checkmating
@@ -197,5 +195,71 @@ public class Minimax implements ISearch {
         }
     }
 
+    private int quiescenceSearch(int alpha, int beta, int depth) {
+        int standingPat = evalModule.evaluate();
     
+        if (standingPat >= beta) {
+            return beta;
+        }
+    
+        alpha = Math.max(alpha, standingPat);
+    
+        ArrayList<Move> moves = board.getValidMoves();
+    
+        // Remove quiet moves
+        ArrayList<Move> nonQuietMoves = new ArrayList<>(moves.stream()
+                               .filter(Move::isCapture)
+                               .toList());
+    
+        nonQuietMoves = MoveOrdering.orderMoves(nonQuietMoves);
+    
+        if (moves.isEmpty()) {
+            long kingBitboard = board.bitboards[board.getActiveTeam()][K];
+    
+            if (kingBitboard == 0L) { // king captured
+                return evalModule.evaluate();
+            }
+    
+            if (board.isKingInCheck()) {
+                return board.isWhitesTurn ? Integer.MIN_VALUE : Integer.MAX_VALUE; // Checkmate
+            }
+    
+            return 0; // Stalemate
+        }
+    
+        if (board.isGameOver || nonQuietMoves.isEmpty() || depth >= QUIESCENCE_DEPTH_LIMIT) {
+            return standingPat;
+        }
+    
+        if (board.isWhitesTurn) { // Maximizing Player
+            int maxEval = Integer.MIN_VALUE;
+    
+            for (Move move : nonQuietMoves) {
+                board.makeMove(move);
+                int evaluation = quiescenceSearch(alpha, beta, depth + 1);
+                board.unmakeMove(move);
+    
+                maxEval = Math.max(maxEval, evaluation);
+                alpha = Math.max(alpha, evaluation);
+    
+                if (beta <= alpha) break;
+            }
+            return maxEval;
+    
+        } else { // Minimizing Player
+            int minEval = Integer.MAX_VALUE;
+    
+            for (Move move : nonQuietMoves) {
+                board.makeMove(move);
+                int evaluation = quiescenceSearch(alpha, beta, depth + 1);
+                board.unmakeMove(move);
+    
+                minEval = Math.min(minEval, evaluation);
+                beta = Math.min(beta, evaluation);
+    
+                if (beta <= alpha) break;
+            }
+            return minEval;
+        }
+    }    
 }

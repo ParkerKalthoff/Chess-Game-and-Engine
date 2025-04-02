@@ -4,6 +4,8 @@ import static parkerbasicchessengine.Chess_Engines.parkerfish_v2.utills.consts.*
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.management.RuntimeErrorException;
+
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Board;
 import parkerbasicchessengine.Chess_Engines.parkerfish_v2.chess_board.Move;
 
@@ -52,7 +54,7 @@ public class MoveGenerator {
 
     }
 
-    public ArrayList<Move> generateMoves() {
+    public ArrayList<Move> generateMoves() throws ArrayIndexOutOfBoundsException {
 
         
         this.moveList = new ArrayList<>();
@@ -61,6 +63,10 @@ public class MoveGenerator {
 
         int team = this.board.getActiveTeam();
         int enemyTeam = this.board.getInactiveTeam();
+
+        if(board.bitboards[team][K] == 0L) {
+            return moveList;
+        }
 
         updateOpponentCoverage(enemyTeam);
 
@@ -316,7 +322,9 @@ public class MoveGenerator {
         long friendlyKing = this.board.bitboards[friendlyTeam][K];
         int friendlyKingIndex = Long.numberOfTrailingZeros(friendlyKing);
 
-        assert friendlyKingIndex < 64 : "Friendly King does not exist on king bitboard";
+        if(friendlyKingIndex >= 64) {
+            throw new RuntimeErrorException(null, "Friendly King does not exist on king bitboard");
+        };
         // TODO : keep for duration of testing
 
         long[] enemyTeamPieces = this.board.bitboards[enemyTeam];

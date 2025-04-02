@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,18 +16,24 @@ import parkerbasicchessengine.Utils.randomPositions.randomPosition;
 
 public class MatchManager {
 
-    private Board board;
+    public Board board;
     private JFrame frame;
 
     private HashMap<String, Integer> gameResults = new HashMap<>();
 
-    public MatchManager(IChessGameInput whitePlayer, IChessGameInput blackPlayer) {
+    public MatchManager(IChessGameInput playerOne, IChessGameInput playerTwo) {
         
         board = new Board();
+
+        IChessGameInput whitePlayer, blackPlayer;
+
+        whitePlayer = playerOne;
+        blackPlayer = playerTwo;
 
         if (whitePlayer != null) {
             board.engineManager.setWhitePlayer(whitePlayer);
         }
+
         if (blackPlayer != null) {
             board.engineManager.setBlackPlayer(blackPlayer);
         }
@@ -49,7 +56,7 @@ public class MatchManager {
         String versusText = whitePlayerName + " vs " + blackPlayerName;
 
         JLabel nameLabel = new JLabel(versusText, JLabel.CENTER);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 35));
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 30));
         nameLabel.setForeground(Color.WHITE);
         frame.add(nameLabel, BorderLayout.SOUTH);
 
@@ -79,35 +86,52 @@ public class MatchManager {
     public void startMatch() throws InterruptedException {
         
         while (!board.isGameOver) {
-            if (board.engineManager.whitePlayer == null) {
-                board.awaitingPlayerMove = true;
-                while (board.awaitingPlayerMove) {
-                    Thread.sleep(100);
+
+            if(board.isWhiteToMove) {
+                if (board.engineManager.whitePlayer == null) {
+                    board.awaitingPlayerMove = true;
+                    while (board.awaitingPlayerMove) {
+                        Thread.sleep(100);
+                    }
+                } else {
+                    board.engineManager.engineMakeMove();
                 }
-            } else {
-                board.engineManager.engineMakeMove();
+            }
+
+            if(board.isGameOver) {
+                break;
             }
 
             System.out.println(" - White made move");
             board.repaint();
 
-            if (board.engineManager.blackPlayer == null) {
-                board.awaitingPlayerMove = true;
-                while (board.awaitingPlayerMove) {
-                    Thread.sleep(100);
+            if(!board.isWhiteToMove) {
+                if (!board.isWhiteToMove && board.engineManager.blackPlayer == null) {
+                    board.awaitingPlayerMove = true;
+                    while (board.awaitingPlayerMove) {
+                        Thread.sleep(100);
+                    }
+                } else {
+                    board.engineManager.engineMakeMove();
                 }
-            } else {
-                board.engineManager.engineMakeMove();
             }
 
             System.out.println(" - Black made move\n");
             board.repaint();
+
+            
+            if(board.isGameOver) {
+                break;
+            }
+
         }
+
+        board.repaint();
 
         System.out.println("Game over : " + board.gameState);
 
         gameResults.putIfAbsent(board.gameState, 0);
-        gameResults.computeIfPresent(board.gameState, (key, value) -> value + 1);        
+        gameResults.computeIfPresent(board.gameState, (k, v) -> v + 1);        
 
         System.out.println(board.convertPostionToFEN());
     }

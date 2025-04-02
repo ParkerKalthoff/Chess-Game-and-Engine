@@ -13,6 +13,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 import javax.swing.JPanel;
@@ -50,6 +52,9 @@ public class Board extends JPanel {
     public boolean isGameOver = false;
 
     public boolean awaitingPlayerMove = false;
+
+    public HashMap<String, Integer> previousPositions = new HashMap<>();
+    private Stack<String> previousPositionsStack = new Stack<>();
 
     public String gameState = "";
 
@@ -317,6 +322,13 @@ public class Board extends JPanel {
 
         String[] parts = fenString.split(" ");
 
+        previousPositions = new HashMap<>();
+        previousPositionsStack = new Stack<>();
+
+        String positionString = parts[0] + parts[1] + parts[2] + parts[3];
+        previousPositionsStack.push(positionString);
+        previousPositions.compute(positionString, (k, v) -> 1);
+
         // load piece positions
         String position = parts[0];
         int row = 0;
@@ -410,11 +422,21 @@ public class Board extends JPanel {
     }
 
     public String updateGameState(boolean isWhiteToMove) {
+
+        String parts[] = this.convertPostionToFEN().split(" ");
+        String positionString = parts[0] + parts[1] + parts[2] + parts[3];
+        previousPositionsStack.push(positionString);
+        previousPositions.compute(positionString, (k, v) -> (v == null) ? 1 : v + 1);
+
+        if(previousPositions.get(positionString) >= 3) {
+            return "Three Move Repitition";
+        }
+
         Piece king = findKing(isWhiteToMove);
 
         if (king == null) {
             // only done by engine, engine checks king captures
-            return "";
+            return isWhiteToMove ? "Black Wins" : "White wins";
         }
 
         if (insufficientMaterial(true) && insufficientMaterial(false)) {
@@ -600,7 +622,14 @@ public class Board extends JPanel {
                     null;
         };
 
-        Move move = new Move(this, piece, toSquareCoords[0], toSquareCoords[1], promoteToPiece);
+        Move move;
+
+        try {
+            move = new Move(this, piece, toSquareCoords[0], toSquareCoords[1], promoteToPiece);
+        } catch(NullPointerException e) {
+            System.out.println("Attempted to convert : "+moveCoord);
+            throw e;
+        }
 
         System.out.println("Syncing Engine Move "+moveCoord+" : " + move.piece.abbreviation +  " "+PieceCoordinateConversion.EncodeCoord.board(move.oldCol, move.oldRow) + " to " + PieceCoordinateConversion.EncodeCoord.board(move.newCol, move.newRow));
 

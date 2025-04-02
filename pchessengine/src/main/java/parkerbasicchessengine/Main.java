@@ -47,14 +47,25 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
 
-        IChessGameInput engine = chessEngineFactory.Parkerfish_v2();
+        // TODO
 
-        MatchManager matchManager = new MatchManager(engine, engine);
+        /*
+         * 1) Weird castling bug duplicating rooks???
+         * 2) Interfacing between engines
+         * 3) Random null moves
+         * 4) Engine rook randomly gone?
+         * 
+         */
 
-        for(int i = 0; i < 500; i++) {
-            matchManager.setRandomPosition();
-            matchManager.startMatch();
-        }
+        IChessGameInput minimaxEngine = chessEngineFactory.Parkerfish_Minimax_v2();
+
+        IChessGameInput QuiescenceEngine = chessEngineFactory.Parkerfish_Quiescence_v2();
+
+        MatchManager matchManager = new MatchManager(null, minimaxEngine);
+
+        matchManager.startMatch();
+
+        System.out.println(minimaxEngine);
 
         matchManager.printMatchResultTotals();
     }

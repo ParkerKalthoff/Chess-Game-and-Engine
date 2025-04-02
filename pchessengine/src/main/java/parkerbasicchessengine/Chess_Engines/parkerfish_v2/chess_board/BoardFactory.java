@@ -13,7 +13,6 @@ public class BoardFactory {
         int enPassantIndex;
         long bitboards[][] = new long[2][6];
 
-
         String parts[] = fenString.split(" ");
         char piecePlacementChars[] = parts[0].replaceAll("/", "").toCharArray();
 

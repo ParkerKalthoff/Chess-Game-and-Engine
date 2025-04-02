@@ -113,8 +113,8 @@ public class MagicBitboards {
         return possibleMoves;
     }
 
-    public static long generateRookMovementBitboard(int rookIndex, long blockerBitboard) {
-
+    public static long generateRookMovementBitboard(int rookIndex, long blockerBitboard) throws ArrayIndexOutOfBoundsException {
+        
         long blockers = blockerBitboard & rookMask[rookIndex];
         int magicIndex = (int) ((blockers * RookMagics[rookIndex]) >>> (RookShifts[rookIndex]));
         long possibleMoves = rookMagicIndexToMoves[rookIndex][magicIndex];

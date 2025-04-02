@@ -74,6 +74,7 @@ public class consts {
     public static final int G1 = 62;
     public static final int H1 = 63;
     
+    public static final int NULL_SQUARE = -1;
     // Directions
 
     public static final int NORTH = -8;
@@ -150,8 +151,6 @@ public class consts {
     // Squares between king and rook (must be empty but not necessarily safe)
     public static final long WHITE_KINGSIDE_CASTLE_PATH = (1L << F1) | (1L << G1);
     public static final long WHITE_QUEENSIDE_CASTLE_PATH = (1L << B1) | (1L << C1) | (1L << D1);
-
-
 
     // Black castling
     public static final int BLACK_KING_START = E8;
